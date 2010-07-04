@@ -1,0 +1,70 @@
+# ScalaRay
+
+This is ScalaRay, a [ray tracer](http://en.wikipedia.org/wiki/Ray_tracing_%28graphics%29) written in [Scala](http://www.scala-lang.org/) 2.8. It is based on [pbrt](http://pbrt.org/), the ray tracer described in the book:
+
+Physically Based Rendering - From Theory to Implementation
+by Matt Pharr and Greg Humphreys
+Publisher: Morgan Kaufmann
+ISBN: 0-12-553180-X
+
+Note: The second edition of this book is coming out in July 2010; I have the first edition.
+
+## Background
+
+I wrote ScalaRay because I wanted to learn the Scala programming language by doing a larger project. Note that ScalaRay is not intended to be production-quality software; it is an educational hobby project, it is not complete and not optimized for speed.
+
+I've been interested in 3D computer graphics for a long time. I wrote my first ray tracing program in C on the [Commodore Amiga](http://en.wikipedia.org/wiki/Amiga), inspired by a German book (Amiga 3D-Grafik und Animation, by Axel Plenge, ISBN 3-89090-526-9). That was in 1988. I remember writing a ray tracer in Turbo Pascal a few years later on my first MS-DOS PC.
+
+## Prerequisites
+
+To compile and run ScalaRay, you need:
+
+- [JDK for Java 6](http://java.sun.com/javase/)
+- [Scala 2.8](http://www.scala-lang.org/) (use the latest release candidate)
+- [Apache Maven](http://maven.apache.org/)
+
+After installing the JDK and Maven and adding their `bin` directories to your `PATH`, you can compile it with: `mvn package`
+
+If you have compiled ScalaRay successfully, run it with: `scala -cp target\classes org.jesperdj.scalaray.Main`
+
+## TODOs
+
+ScalaRay is not as complete as the original pbrt. Here is a list of things that need to be fixed, enhanced or implemented, in no particular order.
+
+package spectrum:
+- make class Spectrum multi-channel (not just rgb), note second edition of book will contain more about this
+
+package shape:
+- implement shapes: TriangleMesh, Triangle, LoopSubdivisionSurface, HeightField
+- implement Sphere.sampleSurface
+
+package scene:
+- finish BoundingVolumeHierarchyAccelerator (it's messy and incomplete)
+- implement other accelerators (see book chapter 4)
+
+package sampler:
+- implement other samplers (see book chapter 7)
+
+package raster:
+- EXR output
+- tone mapping (see book chapter 8)
+
+package material:
+- implement reflection models, materials, texture (see book chapters 9, 10, 11)
+
+package lightsource:
+- implement other light sources: texture projection light (13.2.2) goniometric diagram light (13.2.3), infinite area light (13.5)
+
+package integrator:
+- change DirectLightingSurfaceIntegrator to use materials and BSDFs
+- Volume rendering (see book chapter 17)
+
+package camera:
+- implement other cameras (see book chapter 6)
+
+general:
+- create unit tests (with ScalaTest)
+- profile, optimize speed (at the moment I haven't found a profiler which works well with Scala)
+- better concurrency
+- statistics
+- DSL for scene definition (use Scala's parser stuff)
