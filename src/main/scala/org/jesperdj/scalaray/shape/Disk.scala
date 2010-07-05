@@ -26,6 +26,9 @@ final class Disk (val objectToWorld: Transform, height: Double, radius: Double, 
 	// Maximum φ angle (pbrt 3.4.1)
 	private val maxPhi = clamp(pm, 0.0, 2.0 * π)
 
+	// Surface normal in world coordinates
+	private val normal = (objectToWorld * Normal.ZAxis).normalize
+
 	// Bounding box in object coordinates (pbrt 3.4.2)
 	val objectBound = new BoundingBox(Point(-radius, -radius, height - 1e-9), Point(radius, radius, height + 1e-9))
 
@@ -55,8 +58,8 @@ final class Disk (val objectToWorld: Transform, height: Double, radius: Double, 
 			// Intersection point
 			lazy val point = objectToWorld * p
 
-			// Surface normal (fixed to Z axis in object coordinates)
-			override lazy val normal = (objectToWorld * Normal.ZAxis).normalize
+			// Surface normal
+			override lazy val normal = Disk.this.normal
 
 			// Surface parameter coordinates (pbrt 3.4.3)
 			lazy val u = phi / maxPhi
@@ -82,9 +85,7 @@ final class Disk (val objectToWorld: Transform, height: Double, radius: Double, 
 	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
 	def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double) = {
 		val (x, y) = SampleTransforms.concentricSampleDisk(u1, u2)
-		val p = new Point(x * radius, y * radius, height)
-		val n = (objectToWorld * Normal.ZAxis).normalize
-		(objectToWorld * p, n, 1.0 / surfaceArea)
+		(objectToWorld * new Point(x * radius, y * radius, height), normal, 1.0 / surfaceArea)
 	}
 
 	override def toString =
