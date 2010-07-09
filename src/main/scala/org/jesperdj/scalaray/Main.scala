@@ -108,8 +108,6 @@ object Main {
 //		val l1 = new DirectionalLightSource(new Vector(-0.5, -1.25, 4.0), new Spectrum(0.4, 0.4, 0.4))
 		val l1 = new PointLightSource(new Point(0.5, 2.0, 0.0), new Spectrum(5.0, 5.0, 5.0))
 
-		// TODO: Area light source moet persé de shapeToWorld transform weten. Zie opmerkingen in AreaLightSource.scala
-
 		val s3 = new Disk(1.5)
 		val t3 = Transform.translate(-0.3, 5.0, 3.5) * Transform.rotateX(π / 2.0)
 		val l2 = new AreaLightSource(s3, t3, new Spectrum(0.1, 0.1, 0.1), 4, 4)

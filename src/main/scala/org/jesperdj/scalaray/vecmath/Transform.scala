@@ -37,6 +37,13 @@ sealed class Transform private (private val mat: Matrix, private val inv: Matrix
 	// Get the inverse of this transform
 	def inverse = new Transform(inv, mat)
 
+	// Check if this transform has a scale factor
+	def hasScale: Boolean = {
+		val det = mat(0, 0) * mat(1, 1) * mat(2, 2) + mat(0, 1) * mat(1, 2) * mat(2, 0) + mat(0, 2) * mat(1, 0) * mat(2, 1) -
+				  mat(0, 0) * mat(1, 2) * mat(2, 1) - mat(0, 1) * mat(1, 0) * mat(2, 2) - mat(0, 2) * mat(1, 1) * mat(2, 0)
+		det < 0.999 || det > 1.001
+	}
+
 	override def toString = "Transform(mat=%s, inv=%s)" format (mat, inv)
 }
 

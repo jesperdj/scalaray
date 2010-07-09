@@ -59,7 +59,8 @@ final class Sphere (radius: Double = 1.0, minZ: Double = Double.NegativeInfinity
 			lazy val normal: Normal = Normal(p).normalize
 
 			// Surface parameter coordinates (pbrt 3.3.4)
-			lazy val uv: (Double, Double) = (phi / maxPhi, (math.acos(p.z / radius) - minTheta) / diffTheta)
+			lazy val u: Double = phi / maxPhi
+			lazy val v: Double = (math.acos(p.z / radius) - minTheta) / diffTheta
 
 			// Shape which is intersected
 			val shape: Shape = Sphere.this

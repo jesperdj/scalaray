@@ -15,24 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray.shape
+package org.jesperdj.scalaray.scene
 
+import scala.collection.immutable.Traversable
+
+import org.jesperdj.scalaray.shape.BoundingBox
 import org.jesperdj.scalaray.vecmath._
 
-// Differential geometry, describes the geometry at a point on a surface
-abstract class DifferentialGeometry {
-	// Point on the surface
-	val point: Point
+// Grid accelerator
+final class GridAccelerator (primitives: Traversable[Primitive]) extends Primitive {
+	// Bounding box that contains the primitive
+	val boundingBox: BoundingBox = BoundingBox.Empty // TODO
 
-	// Surface normal at the point
-	val normal: Normal
+	// Bounding box when primitive is transformed
+	override def boundingBox(transform: Transform): BoundingBox =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
 
-	// Surface parameter coordinates
-	val u: Double
-	val v: Double
+	// Compute intersection between a ray and this primitive
+	def intersect(ray: Ray): Option[Intersection] =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
 
-	// Shape which defines the surface
-	val shape: Shape
-
-	override def toString = "DifferentialGeometry(point=%s, normal=%s, u=%g, v=%g, shape=%s)" format (point, normal, u, v, shape)
+	override def toString = "GridAccelerator"
 }

@@ -19,22 +19,34 @@ package org.jesperdj.scalaray.shape
 
 import org.jesperdj.scalaray.vecmath._
 
-// NOTE: In contrast to pbrt, shapes in ScalaRay do not have a shape-to-world transform. Transformations have been abstracted away to TransformedPrimitive.
-// The methods in shapes work with and return values in local shape coordinates, not world coordinates as in pbrt.
+// Vertex
+final class Vertex (val point: Point, val normal: Normal, val u: Double, val v: Double) {
+	override def toString = "Vertex(point=%s, normal=%s, u=%g, v=%g)" format (point, normal, u, v)
+}
 
-// Shape, describes geometry of a surface
-abstract class Shape extends HasBoundingBox {
+// Triangle
+final class Triangle (v1: Vertex, v2: Vertex, v3: Vertex) extends Shape {
+	// Edge vectors
+	private val e1: Vector = v2.point - v1.point
+	private val e2: Vector = v3.point - v1.point
+
+	// Bounding box that contains the object
+	val boundingBox: BoundingBox = BoundingBox(v1.point, v2.point, v3.point)
+
+	// Bounding box when object is transformed
+	override def boundingBox(transform: Transform): BoundingBox = BoundingBox(transform * v1.point, transform * v2.point, transform * v3.point)
+
 	// Compute intersection between a ray and this shape, returns differential geometry and distance of intersection along ray
-	def intersect(ray: Ray): Option[(DifferentialGeometry, Double)]
+	def intersect(ray: Ray): Option[(DifferentialGeometry, Double)] =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
 
 	// Surface area
-	def surfaceArea: Double
+	val surfaceArea: Double = 0.0 // TODO
 
 	// Sample a point on the surface using the random variables u1, u2
 	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
-	def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double)
+	def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double) =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
 
-	// Sample a point on the surface with respect to a point from which the shape is visible using the random variables u1, u2
-	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
-	def sampleSurface(point: Point, u1: Double, u2: Double): (Point, Normal, Double) = sampleSurface(u1, u2)
+	override def toString = "Triangle(%s, %s, %s)" format (v1, v2, v3)
 }

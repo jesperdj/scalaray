@@ -15,15 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray.shape
+package org.jesperdj.scalaray.scene
 
+import scala.collection.immutable.Traversable
+
+import org.jesperdj.scalaray.shape.BoundingBox
 import org.jesperdj.scalaray.vecmath._
 
-// Mixin for classes that have a bounding box
-trait HasBoundingBox {
-	// Bounding box that contains the object
-	val boundingBox: BoundingBox
+// kd-tree accelerator
+final class KdTreeAccelerator (primitives: Traversable[Primitive]) extends Primitive {
+	// Bounding box that contains the primitive
+	val boundingBox: BoundingBox = BoundingBox.Empty // TODO
 
-	// Bounding box when object is transformed (override this if the object can provide a tighter bound)
-	def boundingBox(transform: Transform): BoundingBox = transform * boundingBox
+	// Bounding box when primitive is transformed
+	override def boundingBox(transform: Transform): BoundingBox =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
+	
+	// Compute intersection between a ray and this primitive
+	def intersect(ray: Ray): Option[Intersection] =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
+
+	override def toString = "KdTreeAccelerator"
 }

@@ -53,8 +53,9 @@ final class Cylinder (radius: Double = 1.0, minZ: Double = -1.0, maxZ: Double = 
 			lazy val normal: Normal = Normal(p.x, p.y, 0.0).normalize
 
 			// Surface parameter coordinates (pbrt 3.3.4)
-			lazy val uv: (Double, Double) = (phi / maxPhi, (p.z - minZ) / (maxZ - minZ))
-	
+			lazy val u: Double = phi / maxPhi
+			lazy val v: Double = (p.z - minZ) / (maxZ - minZ)
+
 			// Shape which is intersected
 			val shape: Shape = Cylinder.this
 		})

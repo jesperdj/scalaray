@@ -23,30 +23,29 @@ import org.jesperdj.scalaray._
 import org.jesperdj.scalaray.shape._
 import org.jesperdj.scalaray.vecmath._
 
-// TODO Not yet complete etc.
-
 // Bounding volume hierarchy accelerator (pbrt 4.4)
-final class BoundingVolumeHierarchyAccelerator
-	(primitives: Traversable[Primitive],
-	 split: (Traversable[Primitive]) => (Traversable[Primitive], Traversable[Primitive]) = BoundingVolumeHierarchyAccelerator.splitSurfaceAreaHeuristic,
-	 maxPrimitivesPerNode: Int = 2) {
-
+final class BoundingVolumeHierarchyAccelerator (
+	primitives: Traversable[Primitive],
+	split: (Traversable[Primitive]) => (Traversable[Primitive], Traversable[Primitive]) = BoundingVolumeHierarchyAccelerator.splitSurfaceAreaHeuristic,
+	maxPrimitivesPerNode: Int = 2) extends Primitive {
 	require(maxPrimitivesPerNode >= 2, "maxPrimitivesPerNode must be >= 2")
 
 	private val root: Primitive = {
 		// Recursive function to build the tree
 		def build(ps: Traversable[Primitive]): Primitive = {
-			if (ps.size == 1) ps.head else if (ps.size <= maxPrimitivesPerNode) new CompositePrimitive(ps) else {
-				val (left, right) = split(ps)
-				new CompositePrimitive(build(left), build(right))
-			}
+			if (ps.size == 1) ps.head
+			else if (ps.size <= maxPrimitivesPerNode) new CompositePrimitive(ps)
+			else { val (left, right) = split(ps); new CompositePrimitive(build(left), build(right)) }
 		}
 
 		build(primitives)
 	}
 
-	// Bounding box in world coordinates
+	// Bounding box that contains the primitive
 	val boundingBox: BoundingBox = root.boundingBox
+
+	// Bounding box when primitive is transformed
+	override def boundingBox(transform: Transform): BoundingBox = root.boundingBox(transform)
 
 	// Compute intersection between a ray and this primitive
 	def intersect(ray: Ray): Option[Intersection] = root intersect ray
@@ -71,7 +70,9 @@ object BoundingVolumeHierarchyAccelerator {
 		ps partition pred
 	}
 
-	def splitEqualCounts(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) = (Traversable(ps.head), ps.tail) // TODO
+	def splitEqualCounts(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
 
-	def splitSurfaceAreaHeuristic(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) = (Traversable(ps.head), ps.tail) // TODO
+	def splitSurfaceAreaHeuristic(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
 }

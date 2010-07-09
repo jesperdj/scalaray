@@ -22,6 +22,8 @@ import org.jesperdj.scalaray.vecmath._
 
 // Perspective camera (pbrt 6.2.2) - This is less complicated than the pbrt version
 final class PerspectiveCamera (cameraToWorld: Transform, angleOfView: Double, rasterWidth: Int, rasterHeight: Int) extends Camera {
+	require(!cameraToWorld.hasScale, "PerspectiveCamera only works correctly when cameraToWorld transform has no scale factor")
+
 	private val tx = (rasterWidth - 1) / 2.0
 	private val ty = (rasterHeight - 1) / 2.0
 

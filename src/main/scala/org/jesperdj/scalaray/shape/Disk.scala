@@ -58,7 +58,8 @@ final class Disk (radius: Double = 1.0, innerRadius: Double = 0.0, maxPhi: Doubl
 			val normal: Normal = Normal.ZAxis
 
 			// Surface parameter coordinates (pbrt 3.4.3)
-			lazy val uv: (Double, Double) = (phi / maxPhi, 1.0 - ((math.sqrt(distanceSquared) - innerRadius) / (radius - innerRadius)))
+			lazy val u: Double = phi / maxPhi
+			lazy val v: Double = 1.0 - ((math.sqrt(distanceSquared) - innerRadius) / (radius - innerRadius))
 
 			// Shape which is intersected
 			val shape: Shape = Disk.this

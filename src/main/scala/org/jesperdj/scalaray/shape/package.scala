@@ -42,7 +42,8 @@ package object shape {
 			lazy val normal: Normal = (t * dg.normal).normalize
 
 			// Surface parameter coordinates
-			lazy val uv: (Double, Double) = dg.uv
+			val u: Double = dg.u
+			val v: Double = dg.v
 
 			// Shape which defines the surface
 			val shape = dg.shape

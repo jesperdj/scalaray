@@ -36,8 +36,17 @@ abstract class DeltaLightSource extends LightSource {
 	def sampleRadiance(point: Point): (Spectrum, Ray)
 }
 
+// NOTE: AreaLightSource needs the actual shape-to-world transform of its shape. In the case of instancing, the area light source for each instance
+// needs the shape-to-world transform for that specific instance. In pbrt, area light sources don't work with instancing because there the area light source
+// doesn't know the shape-to-world transform of the actual instance.
+
+// NOTE: Area light sources don't work correctly if the shape-to-world transform has a scale factor, because then the surface area of the shape in
+// world coordinates is different from the surface area in shape coordinates, so that totalPower will return a wrong value.
+
 // Area light source (pbrt 13.4)
 final class AreaLightSource (val shape: Shape, shapeToWorld: Transform, power: Spectrum, val numberOfSamplesX: Int, val numberOfSamplesY: Int) extends LightSource {
+	require(!shapeToWorld.hasScale, "AreaLightSource only works correctly when the shapeToWorld transform has no scale factor")
+
 	// Total emitted power of this light source onto the scene (pbrt 13.4)
 	def totalPower(scene: Scene): Spectrum = power * (shape.surfaceArea * π)
 
@@ -50,18 +59,9 @@ final class AreaLightSource (val shape: Shape, shapeToWorld: Transform, power: S
 		// Sample a point on the surface of the area light with respect to the given point
 		val (sp, sn, pdf) = shape.sampleSurface(point, u1, u2)
 
+		// Transform point and normal to world coordinates
 		val p = shapeToWorld * sp
 		val n = shapeToWorld * sn
-
-		// TODO: Dit gaat nu fout! Shape.sampleSurface returnt nu een point en normal in shape coordinates, niet in world coordinates,
-		// maar AreaLightSource rekent er wel op dat dit world coordinates zijn... Niet eenvoudig op te lossen want we weten hier de
-		// transform niet...
-		//
-		// Aha, nu begrijp ik ook waarom instancing niet werkt met area light sources in pbrt... omdat de area light source dan ook
-		// niet bij de world transform van de shape kan. Die transform kan in principe een heel samenstel van transforms zijn, als
-		// je een aantal geneste TransformedPrimitives hebt.
-		//
-		// Tijdelijke oplossing: shapeToWorld expliciet doorgeven aan light source. Dit moet op een betere manier...
 
 		// Point for shadow ray calculations just above light surface to avoid self-intersection
 		val lightPoint = p + n * 1e-6
