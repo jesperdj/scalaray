@@ -32,23 +32,17 @@ package object shape {
 
 	final class ImplicitTransformDifferentialGeometry (t: Transform) {
 		def *(dg: DifferentialGeometry) = new DifferentialGeometry {
+			// NOTE: This class depends on the fact that the fields of DifferentialGeometry have value semantics (the fields must be vals, not defs)
+			// If the fields in DifferentialGeometry would be defs, they should be defs here as well instead of (lazy) vals
+
 			// Point on the surface
-			lazy val point = t * dg.point
+			lazy val point: Point = t * dg.point
 
 			// Surface normal at the point
-			override lazy val normal = (t * dg.normal).normalize
+			lazy val normal: Normal = (t * dg.normal).normalize
 
 			// Surface parameter coordinates
-			lazy val u = dg.u
-			lazy val v = dg.v
-
-			// Partial derivatives of the surface position with respect to the (u, v) coordinates
-			lazy val dpdu = t * dg.dpdu
-			lazy val dpdv = t * dg.dpdv
-
-			// Partial derivatives of the surface normal with respect to the (u, v) coordinates
-			lazy val dndu = t * dg.dndu
-			lazy val dndv = t * dg.dndv
+			lazy val uv: (Double, Double) = dg.uv
 
 			// Shape which defines the surface
 			val shape = dg.shape

@@ -24,8 +24,8 @@ import org.jesperdj.scalaray.vecmath._
 // Intersection with a primitive (pbrt 4.1)
 final class Intersection (val differentialGeometry: DifferentialGeometry, val distance: Double, val primitive: GeometricPrimitive) {
 	// Emitted radiance if the intersection is on an area light (pbrt 13.4)
-	def emittedRadiance(point: Point, normal: Normal, direction: Vector): Spectrum = primitive.areaLight match {
-		case Some(areaLight) => areaLight.emittedRadiance(point, normal, direction)
+	def emittedRadiance(point: Point, normal: Normal, direction: Vector): Spectrum = primitive.areaLightSource match {
+		case Some(areaLightSource) => areaLightSource.emittedRadiance(point, normal, direction)
 		case None => Spectrum.Black
 	}
 

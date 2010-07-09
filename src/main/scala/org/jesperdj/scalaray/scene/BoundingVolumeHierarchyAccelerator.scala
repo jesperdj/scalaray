@@ -23,29 +23,30 @@ import org.jesperdj.scalaray._
 import org.jesperdj.scalaray.shape._
 import org.jesperdj.scalaray.vecmath._
 
+// TODO Not yet complete etc.
+
 // Bounding volume hierarchy accelerator (pbrt 4.4)
 final class BoundingVolumeHierarchyAccelerator
 	(primitives: Traversable[Primitive],
 	 split: (Traversable[Primitive]) => (Traversable[Primitive], Traversable[Primitive]) = BoundingVolumeHierarchyAccelerator.splitSurfaceAreaHeuristic,
-	 maxPrimitivesPerNode: Int = 2) extends Primitive {
+	 maxPrimitivesPerNode: Int = 2) {
 
 	require(maxPrimitivesPerNode >= 2, "maxPrimitivesPerNode must be >= 2")
 
-	private val root = {
+	private val root: Primitive = {
 		// Recursive function to build the tree
 		def build(ps: Traversable[Primitive]): Primitive = {
-			if (ps.size == 1) ps.head else if (ps.size <= maxPrimitivesPerNode) new AggregatePrimitive(ps) else {
+			if (ps.size == 1) ps.head else if (ps.size <= maxPrimitivesPerNode) new CompositePrimitive(ps) else {
 				val (left, right) = split(ps)
-				new AggregatePrimitive(build(left), build(right))
+				new CompositePrimitive(build(left), build(right))
 			}
 		}
 
-		// Fully refine all primitives and build the tree
-		build(primitives flatMap (_.fullyRefine))
+		build(primitives)
 	}
 
 	// Bounding box in world coordinates
-	val worldBound = root.worldBound
+	val boundingBox: BoundingBox = root.boundingBox
 
 	// Compute intersection between a ray and this primitive
 	def intersect(ray: Ray): Option[Intersection] = root intersect ray
@@ -56,13 +57,13 @@ final class BoundingVolumeHierarchyAccelerator
 object BoundingVolumeHierarchyAccelerator {
 	def splitMiddle(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) = {
 		// Compute bounding box of centroids and extents of that bounding box
-		val cb = ps.foldLeft(BoundingBox.Empty) { (bb, p) => bb union p.worldBound.centroid }
+		val cb = ps.foldLeft(BoundingBox.Empty) { (bb, p) => bb union p.boundingBox.centroid }
 		val (ex, ey, ez) = (cb.max.x - cb.min.x, cb.max.y - cb.min.y, cb.max.z - cb.min.z)
 
 		// Predicates for partitioning
-		def predX(p: Primitive) = p.worldBound.centroid.x < cb.centroid.x
-		def predY(p: Primitive) = p.worldBound.centroid.y < cb.centroid.y
-		def predZ(p: Primitive) = p.worldBound.centroid.z < cb.centroid.z
+		def predX(p: Primitive) = p.boundingBox.centroid.x < cb.centroid.x
+		def predY(p: Primitive) = p.boundingBox.centroid.y < cb.centroid.y
+		def predZ(p: Primitive) = p.boundingBox.centroid.z < cb.centroid.z
 
 		// Select predicate for the largest extent axis
 		val pred: (Primitive) => Boolean = if (ex > ey && ex > ez) predX else if (ey > ex && ey > ez) predY else predZ

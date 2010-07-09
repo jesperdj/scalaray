@@ -21,17 +21,20 @@ import scala.collection.immutable.Traversable
 
 import org.jesperdj.scalaray.lightsource.{ LightSource, AreaLightSource, DeltaLightSource }
 import org.jesperdj.scalaray.shape.BoundingBox
-import org.jesperdj.scalaray.vecmath.Ray
+import org.jesperdj.scalaray.vecmath._
 
 // Scene (pbrt 1.3.2)
-final class Scene (aggregate: Primitive, val lightSources: Traversable[LightSource]) {
+final class Scene (primitive: Primitive, val lightSources: Traversable[LightSource]) {
 	// Partition light sources into area light sources and delta light sources
 	val (areaLightSources: Traversable[AreaLightSource], deltaLightSources: Traversable[DeltaLightSource]) =
 		lightSources partition (_.isInstanceOf[AreaLightSource])
 
 	// Bounding box of the whole scene
-	def worldBound: BoundingBox = aggregate.worldBound
+	def boundingBox: BoundingBox = primitive.boundingBox
+
+	// Bounding sphere of the whole scene
+	def boundingSphere: (Point, Double) = boundingBox.boundingSphere
 
 	// Compute intersection between a ray and primitives in the scene
-	def intersect(ray: Ray): Option[Intersection] = aggregate.intersect(ray)
+	def intersect(ray: Ray): Option[Intersection] = primitive intersect ray
 }

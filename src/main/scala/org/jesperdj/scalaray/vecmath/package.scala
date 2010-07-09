@@ -33,4 +33,11 @@ package object vecmath {
 	final class ImplicitScaleNormal[N <% Double](f: N) {
 		def *(n: Normal) = n * f
 	}
+
+	// Implicit conversion for multiplying a point by a weight
+	implicit def implicitScalePoint[N <% Double](f: N) = new ImplicitScalePoint(f)
+
+	final class ImplicitScalePoint[N <% Double](f: N) {
+		def *(p: Point) = p * f
+	}
 }

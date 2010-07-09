@@ -19,20 +19,11 @@ package org.jesperdj.scalaray.shape
 
 import org.jesperdj.scalaray.vecmath._
 
-// Loop subdivision surface (pbrt 3.7.1)
-final class LoopSubdivisionSurface (val objectToWorld: Transform) extends Shape {
-	// Bounding box in object coordinates (pbrt TODO)
-	val objectBound: BoundingBox = BoundingBox.Empty // TODO
+// Mixin for classes that have a bounding box
+trait HasBoundingBox {
+	// Bounding box that contains the object
+	def boundingBox: BoundingBox
 
-	// Compute intersection between a ray and this shape (pbrt TODO)
-	def intersect(ray: Ray): Option[(DifferentialGeometry, Double)] = None // TODO
-
-	// Surface area (pbrt TODO)
-	val surfaceArea: Double = 0.0 // TODO
-
-	// Sample a point on the surface using the random variables u1, u2 (pbrt 15.6.3)
-	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
-	def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double) = (null, null, 0.0) // TODO
-
-	override def toString = "LoopSubdivisionSurface(objectToWorld=%s)" format (objectToWorld)
+	// Bounding box when object is transformed (override this if the object can provide a tighter bound)
+	def boundingBox(transform: Transform): BoundingBox = transform * boundingBox
 }

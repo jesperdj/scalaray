@@ -29,7 +29,7 @@ final class DirectionalLightSource (direction: Vector, intensity: Spectrum) exte
 
 	// Total emitted power of this light source onto the scene (pbrt 13.3)
 	def totalPower(scene: Scene): Spectrum = {
-		val (p, r) = scene.worldBound.boundingSphere
+		val (p, r) = scene.boundingSphere
 		intensity * (π * r * r)
 	}
 

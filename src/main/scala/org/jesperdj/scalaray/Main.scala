@@ -99,19 +99,22 @@ object Main {
 	}
 
 	def createScene(): Scene = {
-		val s1 = new Sphere(Transform.translate(0.0, 0.75, 4.0), 0.75)
-		val p1 = new GeometricPrimitive(s1, new Material)
+		val s1 = new Sphere(0.75)
+		val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, new Material), Transform.translate(0.0, 0.75, 4.0))
 
-		val s2 = new Disk(Transform.translate(0.0, 0.0, 4.0) * Transform.rotateX(-π / 2.0), 0.0, 3.0)
-		val p2 = new GeometricPrimitive(s2, new Material)
+		val s2 = new Disk(3.0)
+		val p2 = new TransformedPrimitive(new GeometricPrimitive(s2, new Material), Transform.translate(0.0, 0.0, 4.0) * Transform.rotateX(-π / 2.0))
 
-		val l1 = new DirectionalLightSource(new Vector(-0.5, -1.25, 4.0), new Spectrum(0.4, 0.4, 0.4))
-//		val l1 = new PointLightSource(new Point(0.5, 2.0, 0.0), new Spectrum(5.0, 5.0, 5.0))
+//		val l1 = new DirectionalLightSource(new Vector(-0.5, -1.25, 4.0), new Spectrum(0.4, 0.4, 0.4))
+		val l1 = new PointLightSource(new Point(0.5, 2.0, 0.0), new Spectrum(5.0, 5.0, 5.0))
 
-		val s3 = new Disk(Transform.translate(-0.3, 5.0, 3.5) * Transform.rotateX(π / 2.0), 0.0, 1.5)
-		val l2 = new AreaLightSource(s3, new Spectrum(0.1, 0.1, 0.1), 4, 4)
-		val p3 = new GeometricPrimitive(l2, new Material)
+		// TODO: Area light source moet persé de shapeToWorld transform weten. Zie opmerkingen in AreaLightSource.scala
 
-		new Scene(new AggregatePrimitive(p1, p2, p3), Traversable(l1, l2))
+		val s3 = new Disk(1.5)
+		val t3 = Transform.translate(-0.3, 5.0, 3.5) * Transform.rotateX(π / 2.0)
+		val l2 = new AreaLightSource(s3, t3, new Spectrum(0.1, 0.1, 0.1), 4, 4)
+		val p3 = new TransformedPrimitive(new GeometricPrimitive(l2, new Material), t3)
+
+		new Scene(new CompositePrimitive(p1, p2, p3), Traversable(l1, l2))
 	}
 }

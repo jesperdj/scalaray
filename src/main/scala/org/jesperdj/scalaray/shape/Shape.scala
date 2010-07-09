@@ -17,44 +17,24 @@
  */
 package org.jesperdj.scalaray.shape
 
-import scala.collection.immutable.Traversable
-
 import org.jesperdj.scalaray.vecmath._
 
-// Shape (pbrt 3.1)
-abstract class Shape {
-	// Transformation from object to world coordinates
-	val objectToWorld: Transform
-
-	// Transformation from world to object coordinates
-	lazy val worldToObject: Transform = objectToWorld.inverse
-
-	// Bounding box in object coordinates (pbrt 3.1.1)
-	val objectBound: BoundingBox
-
-	// Bounding box in world coordinates (override this if shape can supply a tighter world bound) (pbrt 3.1.1)
-	lazy val worldBound: BoundingBox = objectToWorld * objectBound
-
-	// True if this shape can be intersected, false if it needs to be refined (pbrt 3.1.2)
-	val canIntersect: Boolean = true
-
-	// Refine this shape into a collection of parts (pbrt 3.1.2)
-	def refine: Traversable[Shape] = throw new java.lang.UnsupportedOperationException("This shape cannot be refined")
-
-	// Compute intersection between a ray and this shape, returns differential geometry and distance of intersection along ray (pbrt 3.1.3)
+// Shape, describes geometry of a surface
+abstract class Shape extends HasBoundingBox {
+	// Compute intersection between a ray and this shape, returns differential geometry and distance of intersection along ray
 	def intersect(ray: Ray): Option[(DifferentialGeometry, Double)]
 
-	// Compute shading geometry (pbrt 3.1.5)
-	def shadingGeometry(objToWorld: Transform, dg: DifferentialGeometry): DifferentialGeometry = dg
-
-	// Surface area (pbrt 3.1.6)
+	// Surface area
 	def surfaceArea: Double
 
-	// Sample a point on the surface using the random variables u1, u2 (pbrt 15.6.3)
+	// TODO: surfaceArea klopt alleen als de shape niet wordt getransformed met een scaling transform!
+	// Daardoor werken area lights, die hiervan gebruik maken, niet op de juiste manier als je de shape met een scaling transform transformeert.
+
+	// Sample a point on the surface using the random variables u1, u2
 	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
 	def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double)
 
-	// Sample a point on the surface with respect to a point from which the shape is visible using the random variables u1, u2 (pbrt 15.6.3)
+	// Sample a point on the surface with respect to a point from which the shape is visible using the random variables u1, u2
 	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
 	def sampleSurface(point: Point, u1: Double, u2: Double): (Point, Normal, Double) = sampleSurface(u1, u2)
 }

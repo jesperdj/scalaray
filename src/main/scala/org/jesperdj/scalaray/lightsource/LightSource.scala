@@ -37,7 +37,7 @@ abstract class DeltaLightSource extends LightSource {
 }
 
 // Area light source (pbrt 13.4)
-final class AreaLightSource (val shape: Shape, power: Spectrum, val numberOfSamplesX: Int, val numberOfSamplesY: Int) extends LightSource {
+final class AreaLightSource (val shape: Shape, shapeToWorld: Transform, power: Spectrum, val numberOfSamplesX: Int, val numberOfSamplesY: Int) extends LightSource {
 	// Total emitted power of this light source onto the scene (pbrt 13.4)
 	def totalPower(scene: Scene): Spectrum = power * (shape.surfaceArea * π)
 
@@ -48,7 +48,20 @@ final class AreaLightSource (val shape: Shape, power: Spectrum, val numberOfSamp
 	// Returns the radiance, a ray from light source to the point and the value of the probability distribution function for this sample
 	def sampleRadiance(point: Point, u1: Double, u2: Double): (Spectrum, Ray, Double) = {
 		// Sample a point on the surface of the area light with respect to the given point
-		val (p, n, pdf) = shape.sampleSurface(point, u1, u2)
+		val (sp, sn, pdf) = shape.sampleSurface(point, u1, u2)
+
+		val p = shapeToWorld * sp
+		val n = shapeToWorld * sn
+
+		// TODO: Dit gaat nu fout! Shape.sampleSurface returnt nu een point en normal in shape coordinates, niet in world coordinates,
+		// maar AreaLightSource rekent er wel op dat dit world coordinates zijn... Niet eenvoudig op te lossen want we weten hier de
+		// transform niet...
+		//
+		// Aha, nu begrijp ik ook waarom instancing niet werkt met area light sources in pbrt... omdat de area light source dan ook
+		// niet bij de world transform van de shape kan. Die transform kan in principe een heel samenstel van transforms zijn, als
+		// je een aantal geneste TransformedPrimitives hebt.
+		//
+		// Tijdelijke oplossing: shapeToWorld expliciet doorgeven aan light source. Dit moet op een betere manier...
 
 		// Point for shadow ray calculations just above light surface to avoid self-intersection
 		val lightPoint = p + n * 1e-6

@@ -22,17 +22,14 @@ import org.jesperdj.scalaray.vecmath._
 
 // Quadric, superclass for quadric shapes
 abstract class Quadric extends Shape {
-	// Compute intersection between a ray and this shape
+	// Compute intersection between a ray and this shape, returns differential geometry and distance of intersection along ray
 	def intersect(ray: Ray): Option[(DifferentialGeometry, Double)] = {
-		// Transform ray to object coordinates
-		val r = worldToObject * ray
-
 		// Get differential geometry and distance if the intersection point is in the range of the ray
-		def getResult(t: Double): Option[(DifferentialGeometry, Double)] =
-			if (r.isInRange(t)) differentialGeometry(r.point(t)) map { case dg => (dg, t) } else None
+		def getResult(distance: Double): Option[(DifferentialGeometry, Double)] =
+			if (ray.isInRange(distance)) differentialGeometry(ray.point(distance)) map { case dg => (dg, distance) } else None
 
 		// Compute quadratic coefficients
-		val (a, b, c) = computeCoefficients(r)
+		val (a, b, c) = computeCoefficients(ray)
 
 		// Solve quadratic equation
 		val d = b * b - 4.0 * a * c
@@ -46,8 +43,8 @@ abstract class Quadric extends Shape {
 	}
 
 	// Compute quadratic coefficients
-	protected def computeCoefficients(r: Ray): (Double, Double, Double)
+	protected def computeCoefficients(ray: Ray): (Double, Double, Double)
 
 	// Get differential geometry for an intersection point
-	protected def differentialGeometry(p: Point): Option[DifferentialGeometry]
+	protected def differentialGeometry(point: Point): Option[DifferentialGeometry]
 }

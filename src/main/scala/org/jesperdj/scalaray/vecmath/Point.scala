@@ -37,6 +37,10 @@ final class Point (val x: Double, val y: Double, val z: Double) {
 	// Subtract two points (pbrt 2.3)
 	def -(p: Point) = new Vector(x - p.x, y - p.y, z - p.z)
 
+	// Multiply or divide a point by a weight (pbrt 2.3)
+	def *(f: Double) = new Point(x * f, y * f, z * f)
+	def /(f: Double) = new Point(x / f, y / f, z / f)
+
 	// Distance between two points (pbrt 2.3)
 	def distance(p: Point) = (this - p).length
 
