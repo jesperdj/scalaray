@@ -54,6 +54,7 @@ final class BoundingVolumeHierarchyAccelerator (
 }
 
 object BoundingVolumeHierarchyAccelerator {
+	// TODO: There are bugs in this, it might return empty collections, that should never happen
 	def splitMiddle(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) = {
 		// Compute bounding box of centroids and extents of that bounding box
 		val cb = ps.foldLeft(BoundingBox.Empty) { (bb, p) => bb union p.boundingBox.centroid }
