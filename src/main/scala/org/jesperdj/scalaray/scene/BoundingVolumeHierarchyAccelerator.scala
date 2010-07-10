@@ -27,7 +27,7 @@ import org.jesperdj.scalaray.vecmath._
 final class BoundingVolumeHierarchyAccelerator (
 	primitives: Traversable[Primitive],
 	split: (Traversable[Primitive]) => (Traversable[Primitive], Traversable[Primitive]) = BoundingVolumeHierarchyAccelerator.splitSurfaceAreaHeuristic,
-	maxPrimitivesPerNode: Int = 2) extends Primitive {
+	maxPrimitivesPerNode: Int = 2) extends Primitive with Accelerator {
 	require(maxPrimitivesPerNode >= 2, "maxPrimitivesPerNode must be >= 2")
 
 	private val root: Primitive = {
@@ -50,7 +50,7 @@ final class BoundingVolumeHierarchyAccelerator (
 	// Compute intersection between a ray and this primitive
 	def intersect(ray: Ray): Option[Intersection] = root intersect ray
 
-	override def toString = "BoundingVolumeHierarchyAccelerator"
+	override def toString = "BoundingVolumeHierarchyAccelerator(root=%s)" format (root)
 }
 
 object BoundingVolumeHierarchyAccelerator {
@@ -71,8 +71,8 @@ object BoundingVolumeHierarchyAccelerator {
 	}
 
 	def splitEqualCounts(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO
+		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement splitEqualCounts
 
 	def splitSurfaceAreaHeuristic(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO
+		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement splitSurfaceAreaHeuristic
 }

@@ -23,17 +23,17 @@ import org.jesperdj.scalaray.shape.BoundingBox
 import org.jesperdj.scalaray.vecmath._
 
 // Grid accelerator
-final class GridAccelerator (primitives: Traversable[Primitive]) extends Primitive {
+final class GridAccelerator (primitives: Traversable[Primitive]) extends Primitive with Accelerator {
 	// Bounding box that contains the primitive
-	val boundingBox: BoundingBox = BoundingBox.Empty // TODO
+	val boundingBox: BoundingBox = BoundingBox.Empty // TODO: Implement boundingBox
 
 	// Bounding box when primitive is transformed
 	override def boundingBox(transform: Transform): BoundingBox =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO
+		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement boundingBox
 
 	// Compute intersection between a ray and this primitive
 	def intersect(ray: Ray): Option[Intersection] =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO
+		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement intersect
 
 	override def toString = "GridAccelerator"
 }

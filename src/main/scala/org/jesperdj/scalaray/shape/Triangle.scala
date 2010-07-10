@@ -17,6 +17,7 @@
  */
 package org.jesperdj.scalaray.shape
 
+import org.jesperdj.scalaray.sampler.SampleTransforms
 import org.jesperdj.scalaray.vecmath._
 
 // Vertex
@@ -25,28 +26,69 @@ final class Vertex (val point: Point, val normal: Normal, val u: Double, val v: 
 }
 
 // Triangle
-final class Triangle (v1: Vertex, v2: Vertex, v3: Vertex) extends Shape {
+final class Triangle (v0: Vertex, v1: Vertex, v2: Vertex) extends Shape {
 	// Edge vectors
-	private val e1: Vector = v2.point - v1.point
-	private val e2: Vector = v3.point - v1.point
+	private val e1: Vector = v1.point - v0.point
+	private val e2: Vector = v2.point - v0.point
+
+	// Surface normal
+	private val normal: Normal = Normal(e1 ** e2).normalize
 
 	// Bounding box that contains the object
-	val boundingBox: BoundingBox = BoundingBox(v1.point, v2.point, v3.point)
+	val boundingBox: BoundingBox = BoundingBox(v0.point, v1.point, v2.point)
 
 	// Bounding box when object is transformed
-	override def boundingBox(transform: Transform): BoundingBox = BoundingBox(transform * v1.point, transform * v2.point, transform * v3.point)
+	override def boundingBox(transform: Transform): BoundingBox = BoundingBox(transform * v0.point, transform * v1.point, transform * v2.point)
 
 	// Compute intersection between a ray and this shape, returns differential geometry and distance of intersection along ray
-	def intersect(ray: Ray): Option[(DifferentialGeometry, Double)] =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO
+	def intersect(ray: Ray): Option[(DifferentialGeometry, Double)] = {
+		val s1 = ray.direction ** e2
+		val div = s1 * e1
+		if (div == 0.0) return None
+
+		// Compute first barycentric coordinate
+		val d = ray.origin - v0.point
+		val b1 = (d * s1) / div
+		if (b1 < 0.0 || b1 > 1.0) return None
+
+		// Compute second barycentric coordinate
+		val s2 = d ** e1
+		val b2 = (ray.direction * s2) / div
+		if (b2 < 0.0 || b1 + b2 > 1.0) return None
+
+		// Compute distance to intersection point
+		val distance = (e2 * s2) / div
+		if (!ray.isInRange(distance)) return None
+
+		// Initialize differential geometry
+		Some(new DifferentialGeometry {
+			// Intersection point
+			lazy val point: Point = ray.point(distance)
+
+			// Surface normal
+			val normal: Normal = Triangle.this.normal
+
+			// Surface parameter coordinates; interpolate from vertices
+			lazy val (u, v): (Double, Double) = {
+				val b0 = 1.0 - b1 - b2
+				(b0 * v0.u + b1 * v1.u + b2 * v2.u, b0 * v0.v + b1 * v1.v + b2 * v2.v)
+			}
+
+			// Shape which is intersected
+			val shape: Shape = Triangle.this
+		}, distance)
+	}
 
 	// Surface area
-	val surfaceArea: Double = 0.0 // TODO
+	val surfaceArea: Double = 0.5 * (e1 ** e2).length
 
 	// Sample a point on the surface using the random variables u1, u2
 	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
-	def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double) =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO
+	def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double) = {
+		val (b1, b2) = SampleTransforms.uniformSampleTriangle(u1, u2)
+		(v0.point + (e1 * b1 + e2 * b2), normal, 1.0 / surfaceArea)
+		// TODO: Is the normal being computed correctly here? What about interpolating vertex normals, or is that only for shading geometry?
+	}
 
-	override def toString = "Triangle(%s, %s, %s)" format (v1, v2, v3)
+	override def toString = "Triangle(%s, %s, %s)" format (v0, v1, v2)
 }

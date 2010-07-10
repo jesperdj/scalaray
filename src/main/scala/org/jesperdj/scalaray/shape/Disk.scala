@@ -29,7 +29,7 @@ final class Disk (radius: Double = 1.0, innerRadius: Double = 0.0, maxPhi: Doubl
 	require(maxPhi >= 0.0 && maxPhi <= 2.0 * π, "maxPhi must be >= 0 and <= 2π")
 
 	// Bounding box that contains the shape (pbrt 3.4.2)
-	val boundingBox: BoundingBox = BoundingBox(Point(-radius, -radius, -1e-9), Point(radius, radius, 1e-9))
+	val boundingBox: BoundingBox = BoundingBox(Point(-radius, -radius, 0.0), Point(radius, radius, 0.0))
 
 	// Compute intersection between a ray and this shape, returns differential geometry and distance of intersection along ray (pbrt 3.4.3)
 	def intersect(ray: Ray): Option[(DifferentialGeometry, Double)] = {
@@ -74,7 +74,7 @@ final class Disk (radius: Double = 1.0, innerRadius: Double = 0.0, maxPhi: Doubl
 	def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double) = {
 		val (x, y) = SampleTransforms.concentricSampleDisk(u1, u2)
 		(Point(x * radius, y * radius, 0.0), Normal.ZAxis, 1.0 / surfaceArea)
-		// TODO: wordt hier geen rekening gehouden met innerRadius en maxPhi? hoe zit dat in pbrt?
+		// TODO: We are not taking partial disks into account (innerRadius and maxPhi), isn't that necessary? How is this done in pbrt?
 	}
 
 	override def toString = "Disk(radius=%g, innerRadius=%g, maxPhi=%g)" format (radius, innerRadius, maxPhi)

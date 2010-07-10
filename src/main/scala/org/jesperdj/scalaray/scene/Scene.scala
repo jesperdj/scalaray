@@ -37,4 +37,6 @@ final class Scene (primitive: Primitive, val lightSources: Traversable[LightSour
 
 	// Compute intersection between a ray and primitives in the scene
 	def intersect(ray: Ray): Option[Intersection] = primitive intersect ray
+
+	override def toString = "Scene(primitive=%s, lightSources=%s)" format (primitive, lightSources)
 }

@@ -60,6 +60,7 @@ object Main {
 		println("- Sampler1: " + sampler1)
 		println("- Sampler2: " + sampler2)
 		println("- Filter: " + filter)
+//		println("- Scene: " + scene)
 
 		def render(sampler: Sampler): Unit = {
 			def computeRadiance(ray: Ray, sample: Sample): Spectrum =
@@ -99,8 +100,9 @@ object Main {
 	}
 
 	def createScene(): Scene = {
-		val s1 = new Sphere(0.75)
-		val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, new Material), Transform.translate(0.0, 0.75, 4.0))
+//		val s1 = new Sphere(0.75)
+//		val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, new Material), Transform.translate(0.0, 0.75, 4.0))
+		val p1 = new TransformedPrimitive(createCube(0.5, new Material), Transform.translate(0.0, 0.75, 4.0) * Transform.rotateY(-π / 6.0) * Transform.rotateX(-π / 6.0))
 
 		val s2 = new Disk(3.0)
 		val p2 = new TransformedPrimitive(new GeometricPrimitive(s2, new Material), Transform.translate(0.0, 0.0, 4.0) * Transform.rotateX(-π / 2.0))
@@ -114,5 +116,47 @@ object Main {
 		val p3 = new TransformedPrimitive(new GeometricPrimitive(l2, new Material), t3)
 
 		new Scene(new CompositePrimitive(p1, p2, p3), Traversable(l1, l2))
+	}
+
+	def createCube(size: Double, material: Material): Primitive = {
+		import scala.collection.immutable.IndexedSeq
+
+		// TODO: Properly generate normals and u, v surface coordinates for vertices
+
+		// Generate vertices
+		val v: IndexedSeq[Vertex] = for (i <- 0 to 7) yield
+			new Vertex(Point(if ((i & 1) != 0) size else -size, if ((i & 2) != 0) size else -size, if ((i & 4) != 0) size else -size), Normal.Zero, 0.0, 0.0)
+
+		// Front
+		val ft1 = new GeometricPrimitive(new Triangle(v(0), v(2), v(3)), material)
+		val ft2 = new GeometricPrimitive(new Triangle(v(3), v(1), v(0)), material)
+		val f = new CompositePrimitive(ft1, ft2)
+
+		// Back
+		val bkt1 = new GeometricPrimitive(new Triangle(v(5), v(7), v(6)), material)
+		val bkt2 = new GeometricPrimitive(new Triangle(v(6), v(4), v(5)), material)
+		val bk = new CompositePrimitive(bkt1, bkt2)
+
+		// Left
+		val lt1 = new GeometricPrimitive(new Triangle(v(4), v(6), v(2)), material)
+		val lt2 = new GeometricPrimitive(new Triangle(v(2), v(0), v(4)), material)
+		val l = new CompositePrimitive(lt1, lt2)
+
+		// Right
+		val rt1 = new GeometricPrimitive(new Triangle(v(1), v(3), v(7)), material)
+		val rt2 = new GeometricPrimitive(new Triangle(v(7), v(5), v(1)), material)
+		val r = new CompositePrimitive(rt1, rt2)
+
+		// Bottom
+		val btt1 = new GeometricPrimitive(new Triangle(v(4), v(0), v(1)), material)
+		val btt2 = new GeometricPrimitive(new Triangle(v(1), v(5), v(4)), material)
+		val bt = new CompositePrimitive(btt1, btt2)
+
+		// Top
+		val tt1 = new GeometricPrimitive(new Triangle(v(7), v(3), v(2)), material)
+		val tt2 = new GeometricPrimitive(new Triangle(v(2), v(6), v(7)), material)
+		val t = new CompositePrimitive(tt1, tt2)
+
+		new CompositePrimitive(f, bk, l, r, bt, t)
 	}
 }

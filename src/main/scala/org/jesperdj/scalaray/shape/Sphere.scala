@@ -80,7 +80,7 @@ final class Sphere (radius: Double = 1.0, minZ: Double = Double.NegativeInfinity
 	// Sample a point on the surface with respect to a point from which the shape is visible using the random variables u1, u2 (pbrt 15.6.3)
 	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
 	override def sampleSurface(point: Point, u1: Double, u2: Double): (Point, Normal, Double) =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO: zie pbrt pagina 705-708
+		throw new UnsupportedOperationException("Not yet implemented") // TODO: See pbrt book page 705-708
 
 	override def toString = "Sphere(radius=%g, minZ=%g, maxZ=%g, maxPhi=%g)" format (radius, minZ, maxZ, maxPhi)
 }

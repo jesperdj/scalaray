@@ -17,5 +17,5 @@
  */
 package org.jesperdj.scalaray.material
 
-// TODO
+// TODO: Implement Material
 class Material

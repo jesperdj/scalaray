@@ -28,7 +28,7 @@ final class TransformedPrimitive (primitive: Primitive, transform: Transform) ex
 	val boundingBox: BoundingBox = primitive.boundingBox(transform)
 
 	// Bounding box when primitive is transformed
-	override def boundingBox(tr: Transform): BoundingBox = primitive.boundingBox(transform * tr)
+	override def boundingBox(tr: Transform): BoundingBox = primitive.boundingBox(tr * transform)
 
 	// Compute intersection between a ray and this primitive
 	def intersect(ray: Ray): Option[Intersection] = primitive intersect (inverse * ray) map { case intersection => transform * intersection }
