@@ -30,9 +30,9 @@ final class PointLightSource (position: Point, intensity: Spectrum) extends Delt
 	// Total emitted power of this light source onto the scene (pbrt 13.2)
 	def totalPower(scene: Scene): Spectrum = intensity * (4.0 * π)
 
-	// Sample the radiance of this light source at the point (pbrt 13.2)
+	// Gets the incident radiance of this light source at the point (pbrt 13.2)
 	// Returns the radiance and a ray from the light source to the point
-	def sampleRadiance(point: Point): (Spectrum, Ray) = {
+	def incidentRadiance(point: Point): (Spectrum, Ray) = {
 		var rd = point - position
 		(intensity / (rd.x * rd.x + rd.y * rd.y + rd.z * rd.z), new Ray(position, rd, 0.0, 1.0))
 	}

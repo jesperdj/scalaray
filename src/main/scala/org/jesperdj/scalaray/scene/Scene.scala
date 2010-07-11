@@ -19,16 +19,12 @@ package org.jesperdj.scalaray.scene
 
 import scala.collection.immutable.Traversable
 
-import org.jesperdj.scalaray.lightsource.{ LightSource, AreaLightSource, DeltaLightSource }
+import org.jesperdj.scalaray.lightsource.LightSource
 import org.jesperdj.scalaray.shape.BoundingBox
 import org.jesperdj.scalaray.vecmath._
 
 // Scene (pbrt 1.3.2)
 final class Scene (primitive: Primitive, val lightSources: Traversable[LightSource]) {
-	// Partition light sources into area light sources and delta light sources
-	val (areaLightSources: Traversable[AreaLightSource], deltaLightSources: Traversable[DeltaLightSource]) =
-		lightSources partition (_.isInstanceOf[AreaLightSource])
-
 	// Bounding box of the whole scene
 	def boundingBox: BoundingBox = primitive.boundingBox
 

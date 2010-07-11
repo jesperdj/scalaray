@@ -28,11 +28,11 @@ object VacuumVolumeIntegrator extends VolumeIntegrator {
 	// Sample specifications for the sample patterns that this integrator needs
 	val sampleSpecs: Traversable[SampleSpec] = Traversable()
 
-	// Compute radiance along the ray
-	def computeRadiance(ray: Ray, sample: Sample): Spectrum = Spectrum.Black
+	// Radiance along the ray
+	def radiance(ray: Ray, sample: Sample): Spectrum = Spectrum.Black
 	
-	// Compute transmittance along the ray
-	def computeTransmittance(ray: Ray, sample: Sample): Spectrum = Spectrum.Unit
+	// Transmittance along the ray
+	def transmittance(ray: Ray, sample: Sample): Spectrum = Spectrum.Unit
 
 	override def toString = "VacuumVolumeIntegrator"
 }

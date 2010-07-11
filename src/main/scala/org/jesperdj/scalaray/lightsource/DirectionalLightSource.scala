@@ -33,9 +33,9 @@ final class DirectionalLightSource (direction: Vector, intensity: Spectrum) exte
 		intensity * (π * r * r)
 	}
 
-	// Sample the radiance of this light source at the point (pbrt 13.1)
+	// Gets the incident radiance of this light source at the point (pbrt 13.1)
 	// Returns the radiance and a ray from the light source to the point
-	def sampleRadiance(point: Point): (Spectrum, Ray) = (intensity, new Ray(point, direction, Double.NegativeInfinity, 0.0))
+	def incidentRadiance(point: Point): (Spectrum, Ray) = (intensity, new Ray(point, direction, Double.NegativeInfinity, 0.0))
 
 	override def toString = "DirectionalLightSource(direction=%s, intensity=%s)" format (direction, intensity)
 }

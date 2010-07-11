@@ -17,5 +17,14 @@
  */
 package org.jesperdj.scalaray.material
 
-// TODO: Implement Material
-class Material
+import org.jesperdj.scalaray.shape._
+import org.jesperdj.scalaray.reflection._
+
+// TODO: Not yet implemented
+
+// Material
+class Material {
+	// TODO: Selects a BSDF by looking at the differential geometry
+	def bsdf(dg: DifferentialGeometry): BSDF =
+		null // throw new UnsupportedOperationException("Not yet implemented") // TODO
+}

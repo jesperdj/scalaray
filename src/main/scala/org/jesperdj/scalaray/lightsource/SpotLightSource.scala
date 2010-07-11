@@ -36,9 +36,9 @@ final class SpotLightSource (position: Point, direction: Vector, falloffAngle: D
 	// Total emitted power of this light source onto the scene (pbrt 13.2.1)
 	def totalPower(scene: Scene): Spectrum = intensity * (2.0 * π * (1.0 - 0.5 * (cosFalloff + cosWidth)))
 
-	// Sample the radiance of this light source at the point (pbrt 13.2.1)
+	// Gets the incident radiance of this light source at the point (pbrt 13.2.1)
 	// Returns the radiance and a ray from the light source to the point
-	def sampleRadiance(point: Point): (Spectrum, Ray) = {
+	def incidentRadiance(point: Point): (Spectrum, Ray) = {
 		// Ray direction vector from light source to intersection point
 		var rd = point - position
 

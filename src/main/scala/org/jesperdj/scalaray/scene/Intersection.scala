@@ -17,15 +17,19 @@
  */
 package org.jesperdj.scalaray.scene
 
+import org.jesperdj.scalaray.reflection.BSDF
 import org.jesperdj.scalaray.shape._
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath._
 
 // Intersection with a primitive (pbrt 4.1)
 final class Intersection (val differentialGeometry: DifferentialGeometry, val distance: Double, val primitive: GeometricPrimitive) {
+	// TODO
+	def bsdf: BSDF = primitive.bsdf(differentialGeometry)
+
 	// Emitted radiance if the intersection is on an area light (pbrt 13.4)
-	def emittedRadiance(point: Point, normal: Normal, direction: Vector): Spectrum = primitive.areaLightSource match {
-		case Some(areaLightSource) => areaLightSource.emittedRadiance(point, normal, direction)
+	def emittedRadiance(direction: Vector): Spectrum = primitive.areaLightSource match {
+		case Some(areaLightSource) => areaLightSource.emittedRadiance(differentialGeometry.point, differentialGeometry.normal, direction)
 		case None => Spectrum.Black
 	}
 

@@ -48,7 +48,7 @@ object Main {
 		val raster = new Raster(rect.width, rect.height)
 
 		val camera: Camera = new PerspectiveCamera(Transform.translate(0.0, 0.75, 0.0), π / 4.0, rect.width, rect.height)
-		val surfaceIntegrator: SurfaceIntegrator = new DirectLightingSurfaceIntegrator(scene)
+		val surfaceIntegrator: SurfaceIntegrator = DirectLightingSurfaceIntegrator(scene)
 		val volumeIntegrator: VolumeIntegrator = VacuumVolumeIntegrator
 		val sampler1: Sampler = new StratifiedSampler(new Rectangle(0, 0, 399, 599), 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
 		val sampler2: Sampler = new StratifiedSampler(new Rectangle(400, 0, 799, 599), 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
@@ -63,12 +63,12 @@ object Main {
 //		println("- Scene: " + scene)
 
 		def render(sampler: Sampler): Unit = {
-			def computeRadiance(ray: Ray, sample: Sample): Spectrum =
-				surfaceIntegrator.computeRadiance(ray, sample) * volumeIntegrator.computeTransmittance(ray, sample) + volumeIntegrator.computeRadiance(ray, sample)
+			def radiance(ray: Ray, sample: Sample): Spectrum =
+				surfaceIntegrator.radiance(ray, sample) * volumeIntegrator.transmittance(ray, sample) + volumeIntegrator.radiance(ray, sample)
 
 			for (sample <- sampler.samples) {
 				// Generate camera ray and compute radiance along the ray at the image plane
-				val radiance = computeRadiance(camera.generateRay(sample), sample)
+				val rad = radiance(camera.generateRay(sample), sample)
 
 				// Determine the raster extent of the sample
 				val ix = sample.imageX - 0.5
@@ -79,7 +79,7 @@ object Main {
 				val maxY = math.min(math.floor(iy + filter.extentY).toInt, rect.bottom)
 
 				// Add radiance to relevant pixels in the raster, weighted by reconstruction filter
-				for (y <- minY to maxY; x <- minX to maxX) raster(x, y).add(radiance, filter(x - ix, y - iy))
+				for (y <- minY to maxY; x <- minX to maxX) raster(x, y).add(rad, filter(x - ix, y - iy))
 			}
 		}
 
@@ -100,8 +100,8 @@ object Main {
 	}
 
 	def createScene(): Scene = {
-//		val s1 = new Sphere(0.75)
-//		val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, new Material), Transform.translate(0.0, 0.75, 4.0))
+//		val s1 = new Sphere(0.75, -1.0, 1.0, π * 4.0 / 3.0)
+//		val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, new Material), Transform.translate(0.0, 0.75, 4.0) * Transform.rotateY(π / 4.0) * Transform.rotateZ(π / 2.0))
 		val p1 = new TransformedPrimitive(createCube(0.5, new Material), Transform.translate(0.0, 0.75, 4.0) * Transform.rotateY(-π / 6.0) * Transform.rotateX(-π / 6.0))
 
 		val s2 = new Disk(3.0)

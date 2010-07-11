@@ -15,28 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray.integrator
+package org.jesperdj.scalaray.reflection
 
-import scala.collection.immutable.Traversable
+import scala.collection.immutable.IndexedSeq
 
-import org.jesperdj.scalaray.sampler.{ Sample, SampleSpec }
-import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.vecmath.Ray
+import org.jesperdj.scalaray.spectrum._
+import org.jesperdj.scalaray.vecmath._
 
-// Integrator (pbrt 16)
-sealed abstract class Integrator {
-	// Sample specifications for the sample patterns that this integrator needs
-	val sampleSpecs: Traversable[SampleSpec]
+// TODO: Not yet implemented
 
-	// Radiance along the ray (pbrt 16)
-	def radiance(ray: Ray, sample: Sample): Spectrum
-}
+// Bidirectional Scattering Distribution Function
+final class BSDF (bxdfs: IndexedSeq[BxDF]) extends ((Vector, Vector) => Spectrum) {
+	// TODO: Description
+	def apply(wi: Vector, wo: Vector): Spectrum = Spectrum.Unit // TODO
 
-// Surface integrator (pbrt 16)
-abstract class SurfaceIntegrator extends Integrator
+	// TODO: Description. Returns wi and pdf
+	def sample(wo: Vector, u1: Double, u2: Double, u3: Double): (Vector, Double) =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
 
-// Volume integrator (pbrt 17.2)
-abstract class VolumeIntegrator extends Integrator {
-	// Transmittance along the ray (pbrt 17.2)
-	def transmittance(ray: Ray, sample: Sample): Spectrum
 }

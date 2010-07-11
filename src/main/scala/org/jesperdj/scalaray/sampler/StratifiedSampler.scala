@@ -17,7 +17,8 @@
  */
 package org.jesperdj.scalaray.sampler
 
-import scala.collection.immutable.{ IndexedSeq, Map, Traversable }
+import scala.collection.immutable.{ IndexedSeq, Traversable }
+import scala.collection.mutable.{ Map => MutableMap }
 
 import org.jesperdj.scalaray._
 import org.jesperdj.scalaray.raster.Rectangle
@@ -35,8 +36,8 @@ final class StratifiedSampler (rectangle: Rectangle, samplesPerPixelX: Int, samp
 
 		for (i <- 0 until samplesPerPixel) yield {
 			// Generate 1D and 2D sample patterns for the current sample
-			var samples1D: Map[Int, Traversable[Double]] = Map()
-			var samples2D: Map[Int, Traversable[(Double, Double)]] = Map()
+			val samples1D = MutableMap[Int, Traversable[Double]]()
+			val samples2D = MutableMap[Int, Traversable[(Double, Double)]]()
 
 			sampleSpecs foreach {
 				_ match {
@@ -49,7 +50,7 @@ final class StratifiedSampler (rectangle: Rectangle, samplesPerPixelX: Int, samp
 			val (lu, lv) = lensSamples(i)
 
 			// Create Sample object, shift image samples to pixel position
-			new Sample(ix + x, iy + y, lu, lv, timeSamples(i), samples1D, samples2D)
+			new Sample(ix + x, iy + y, lu, lv, timeSamples(i), samples1D.toMap, samples2D.toMap)
 		}
 	}
 

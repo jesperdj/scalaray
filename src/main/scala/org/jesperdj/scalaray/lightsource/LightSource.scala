@@ -31,9 +31,9 @@ sealed abstract class LightSource {
 
 // Delta light source (pbrt 13.2)
 abstract class DeltaLightSource extends LightSource {
-	// Sample the radiance of this light source at the point (pbrt 13.1)
+	// Gets the incident radiance of this light source at the point (pbrt 13.1)
 	// Returns the radiance and a ray from the light source to the point
-	def sampleRadiance(point: Point): (Spectrum, Ray)
+	def incidentRadiance(point: Point): (Spectrum, Ray)
 }
 
 // NOTE: AreaLightSource needs the actual shape-to-world transform of its shape. In the case of instancing, the area light source for each instance
@@ -50,12 +50,9 @@ final class AreaLightSource (val shape: Shape, shapeToWorld: Transform, power: S
 	// Total emitted power of this light source onto the scene (pbrt 13.4)
 	def totalPower(scene: Scene): Spectrum = power * (shape.surfaceArea * π)
 
-	// The area light's emitted radiance from a given point with the given normal on the surface of the light in the given direction (pbrt 13.4)
-	def emittedRadiance(point: Point, normal: Normal, direction: Vector): Spectrum = if (normal * direction > 0.0) power else Spectrum.Black
-
-	// Sample the radiance of this light source at the point using the random variables u1, u2 (pbrt 15.6.3)
+	// Sample the incident radiance of this light source at the point using the random variables u1, u2 (pbrt 15.6.3)
 	// Returns the radiance, a ray from light source to the point and the value of the probability distribution function for this sample
-	def sampleRadiance(point: Point, u1: Double, u2: Double): (Spectrum, Ray, Double) = {
+	def incidentRadiance(point: Point, u1: Double, u2: Double): (Spectrum, Ray, Double) = {
 		// Sample a point on the surface of the area light with respect to the given point
 		val (sp, sn, pdf) = shape.sampleSurface(point, u1, u2)
 
@@ -72,6 +69,9 @@ final class AreaLightSource (val shape: Shape, shapeToWorld: Transform, power: S
 		// Return the radiance only if the light shines from the right side of the surface of the light source
 		(if (n * rd > 0.0) power else Spectrum.Black, new Ray(lightPoint, rd, 0.0, 1.0), pdf)
 	}
+
+	// The area light's emitted radiance from a given point with the given normal on the surface of the light in the given direction (pbrt 13.4)
+	def emittedRadiance(point: Point, normal: Normal, direction: Vector): Spectrum = if (normal * direction > 0.0) power else Spectrum.Black
 
 	override def toString = "AreaLightSource(shape=%s, power=%s)" format (shape, power)
 }

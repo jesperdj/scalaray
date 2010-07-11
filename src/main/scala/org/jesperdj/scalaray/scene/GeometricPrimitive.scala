@@ -19,6 +19,7 @@ package org.jesperdj.scalaray.scene
 
 import org.jesperdj.scalaray.lightsource._
 import org.jesperdj.scalaray.material._
+import org.jesperdj.scalaray.reflection.BSDF
 import org.jesperdj.scalaray.shape._
 import org.jesperdj.scalaray.vecmath._
 
@@ -38,6 +39,9 @@ final class GeometricPrimitive private (shape: Shape, material: Material, val ar
 
 	// Compute intersection between a ray and this primitive
 	def intersect(ray: Ray): Option[Intersection] = shape intersect ray map { case (dg, distance) => new Intersection(dg, distance, this) }
+
+	// TODO
+	def bsdf(dg: DifferentialGeometry): BSDF = material.bsdf(dg)
 
 	override def toString = "GeometricPrimitive(shape=%s, material=%s, areaLightSource=%s)" format (shape, material, areaLightSource)
 }
