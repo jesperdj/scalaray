@@ -28,6 +28,6 @@ final class SampleSpec1D (val count: Int) extends SampleSpec {
 }
 
 // Sample specification for a 2D sample pattern
-final class SampleSpec2D (val countX: Int, val countY: Int) extends SampleSpec {
-	override def toString = "SampleSpec2D(id=%d, countX=%d, countY=%d)" format (id, countX, countY)
+final class SampleSpec2D (val count: Int) extends SampleSpec {
+	override def toString = "SampleSpec2D(id=%d, count=%d)" format (id, count)
 }

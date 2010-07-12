@@ -104,7 +104,7 @@ object DirectLightingSurfaceIntegrator {
 
 		def process(lightSource: LightSource): Unit = lightSource match {
 			case ls: DeltaLightSource => deltaLights += ls
-			case ls: AreaLightSource => val ss = new SampleSpec2D(ls.numberOfSamplesX, ls.numberOfSamplesY); sampleSpecs += ss; areaLights += ss.id -> ls
+			case ls: AreaLightSource => val ss = new SampleSpec2D(ls.numberOfSamplesX * ls.numberOfSamplesY); sampleSpecs += ss; areaLights += ss.id -> ls
 		}
 
 		scene.lightSources foreach (process(_))
