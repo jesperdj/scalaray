@@ -74,7 +74,7 @@ final class Disk (radius: Double = 1.0, innerRadius: Double = 0.0, maxPhi: Doubl
 	def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double) = {
 		val (x, y) = SampleTransforms.concentricSampleDisk(u1, u2)
 		(Point(x * radius, y * radius, 0.0), Normal.ZAxis, 1.0 / surfaceArea)
-		// TODO: We are not taking partial disks into account (innerRadius and maxPhi), isn't that necessary? How is this done in pbrt?
+		// TODO: We are not taking partial disks into account (innerRadius and maxPhi). See pbrt exercise 15.1 (page 716).
 	}
 
 	override def toString = "Disk(radius=%g, innerRadius=%g, maxPhi=%g)" format (radius, innerRadius, maxPhi)

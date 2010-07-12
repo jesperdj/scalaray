@@ -75,6 +75,7 @@ final class Sphere (radius: Double = 1.0, minZ: Double = Double.NegativeInfinity
 	def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double) = {
 		val p = SampleTransforms.uniformSampleSphere(u1, u2)
 		(p * radius, Normal(p), 1.0 / surfaceArea)
+		// TODO: We are not taking partial spheres into account (innerRadius and maxPhi). See pbrt exercise 15.1 (page 716).
 	}
 
 	// Sample a point on the surface with respect to a point from which the shape is visible using the random variables u1, u2 (pbrt 15.6.3)
