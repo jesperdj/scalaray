@@ -25,7 +25,7 @@ import org.jesperdj.scalaray.raster.Rectangle
 
 // Stratified sampler (pbrt 7.3)
 final class StratifiedSampler (rectangle: Rectangle, samplesPerPixelX: Int, samplesPerPixelY: Int, sampleSpecs: Traversable[SampleSpec])
-	extends PixelSampler(rectangle, samplesPerPixelX, samplesPerPixelY) {
+	extends PixelSampler(rectangle, samplesPerPixelX * samplesPerPixelY) {
 
 	// Generate samples for one pixel
 	protected def generateSamples(x: Int, y: Int): IndexedSeq[Sample] = {

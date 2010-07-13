@@ -26,14 +26,14 @@ package object scalaray {
 		if (value < low) low else if (value > high) high else value
 	}
 
-	// Linearly interpolate a value
-	def interpolate(t: Double, a: Double, b: Double): Double = a * (1.0 - t) + b * t
-
 	// Get the minimum and maximum of two values as a pair
 	def minmax[N : Ordering](a: N, b: N): (N, N) = {
 		import Ordered._
 		if (a <= b) (a, b) else (b, a)
 	}
+
+	// Linearly interpolate a value
+	def interpolate(t: Double, a: Double, b: Double): Double = a * (1.0 - t) + b * t
 
 	// Randomly permutate an array - Fisher-Yates shuffle (see: http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
 	// NOTE: Scala 2.8 does have a shuffle method in scala.util.Random, but it does not work on arrays (and doesn't do it in-place)
