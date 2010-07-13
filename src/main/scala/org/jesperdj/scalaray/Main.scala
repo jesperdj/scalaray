@@ -112,7 +112,7 @@ object Main {
 
 		val s3 = new Disk(1.5)
 		val t3 = Transform.translate(-0.3, 5.0, 3.5) * Transform.rotateX(π / 2.0)
-		val l2 = new AreaLightSource(s3, t3, new Spectrum(0.1, 0.1, 0.1), 4, 4)
+		val l2 = new AreaLightSource(s3, t3, new Spectrum(0.1, 0.1, 0.1), 10)
 		val p3 = new TransformedPrimitive(new GeometricPrimitive(l2, new Material), t3)
 
 		new Scene(new CompositePrimitive(p1, p2, p3), Traversable(l1, l2))

@@ -30,11 +30,19 @@ abstract class Shape extends HasBoundingBox {
 	// Surface area
 	def surfaceArea: Double
 
-	// Sample a point on the surface using the random variables u1, u2
+	// Sample a point on the surface using the random variables u1, u2 (pbrt 15.6.3)
 	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
 	def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double)
 
-	// Sample a point on the surface with respect to a point from which the shape is visible using the random variables u1, u2
+	// Get the probability that sampleSurface(u1: Double, u2: Double) selects the given point (pbrt 15.6.3)
+	// NOTE: This must be overriden if sampleSurface(u1: Double, u2: Double) does not sample the surface uniformly
+	def pdf(point: Point): Double = 1.0 / surfaceArea
+
+	// Sample a point on the surface with respect to a point from which the shape is visible using the random variables u1, u2 (pbrt 15.6.3)
 	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
-	def sampleSurface(point: Point, u1: Double, u2: Double): (Point, Normal, Double) = sampleSurface(u1, u2)
+	def sampleSurface(viewPoint: Point, u1: Double, u2: Double): (Point, Normal, Double) = sampleSurface(u1, u2)
+
+	// Get the probability that sampleSurface(viewPoint: Point, u1: Double, u2: Double) selects the given point (pbrt 15.6.3)
+	def pdf(point: Point, wi: Vector): Double =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement this; see pbrt 15.6.3 (page 702-703)
 }

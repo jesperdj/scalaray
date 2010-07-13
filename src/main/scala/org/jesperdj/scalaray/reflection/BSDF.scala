@@ -27,10 +27,12 @@ import org.jesperdj.scalaray.vecmath._
 // Bidirectional Scattering Distribution Function
 final class BSDF (bxdfs: IndexedSeq[BxDF]) extends ((Vector, Vector) => Spectrum) {
 	// TODO: Description
-	def apply(wi: Vector, wo: Vector): Spectrum = Spectrum.Unit // TODO
+	def apply(wo: Vector, wi: Vector): Spectrum = Spectrum.Unit // TODO
 
 	// TODO: Description. Returns wi and pdf
 	def sample(wo: Vector, u1: Double, u2: Double, u3: Double): (Vector, Double) =
 		throw new UnsupportedOperationException("Not yet implemented") // TODO
 
+	// TODO: Description
+	def pdf(wo: Vector, wi: Vector): Double = 1.0 // TODO
 }

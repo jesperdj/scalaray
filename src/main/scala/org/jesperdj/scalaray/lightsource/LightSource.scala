@@ -31,7 +31,7 @@ sealed abstract class LightSource {
 
 // Delta light source (pbrt 13.2)
 abstract class DeltaLightSource extends LightSource {
-	// Gets the incident radiance of this light source at the point (pbrt 13.1)
+	// Get the incident radiance of this light source at the point (pbrt 13.1)
 	// Returns the radiance and a ray from the light source to the point
 	def incidentRadiance(point: Point): (Spectrum, Ray)
 }
@@ -44,17 +44,19 @@ abstract class DeltaLightSource extends LightSource {
 // world coordinates is different from the surface area in shape coordinates, so that totalPower will return a wrong value.
 
 // Area light source (pbrt 13.4)
-final class AreaLightSource (val shape: Shape, shapeToWorld: Transform, power: Spectrum, val numberOfSamplesX: Int, val numberOfSamplesY: Int) extends LightSource {
+final class AreaLightSource (val shape: Shape, shapeToWorld: Transform, power: Spectrum, val numberOfSamples: Int) extends LightSource {
 	require(!shapeToWorld.hasScale, "AreaLightSource only works correctly when the shapeToWorld transform has no scale factor")
+
+	private val worldToShape = shapeToWorld.inverse
 
 	// Total emitted power of this light source onto the scene (pbrt 13.4)
 	def totalPower(scene: Scene): Spectrum = power * (shape.surfaceArea * π)
 
 	// Sample the incident radiance of this light source at the point using the random variables u1, u2 (pbrt 15.6.3)
 	// Returns the radiance, a ray from light source to the point and the value of the probability distribution function for this sample
-	def incidentRadiance(point: Point, u1: Double, u2: Double): (Spectrum, Ray, Double) = {
+	def sampleRadiance(point: Point, u1: Double, u2: Double): (Spectrum, Ray, Double) = {
 		// Sample a point on the surface of the area light with respect to the given point
-		val (sp, sn, pdf) = shape.sampleSurface(point, u1, u2)
+		val (sp, sn, pdf) = shape.sampleSurface(worldToShape * point, u1, u2)
 
 		// Transform point and normal to world coordinates
 		val p = shapeToWorld * sp
@@ -69,6 +71,9 @@ final class AreaLightSource (val shape: Shape, shapeToWorld: Transform, power: S
 		// Return the radiance only if the light shines from the right side of the surface of the light source
 		(if (n * rd > 0.0) power else Spectrum.Black, new Ray(lightPoint, rd, 0.0, 1.0), pdf)
 	}
+
+	// Get the probability that sampleRadiance selects a ray in the given incoming direction wi (pbrt 15.6.3)
+	def pdf(point: Point, wi: Vector) = shape.pdf(worldToShape * point, worldToShape * wi)
 
 	// The area light's emitted radiance from a given point with the given normal on the surface of the light in the given direction (pbrt 13.4)
 	def emittedRadiance(point: Point, normal: Normal, direction: Vector): Spectrum = if (normal * direction > 0.0) power else Spectrum.Black

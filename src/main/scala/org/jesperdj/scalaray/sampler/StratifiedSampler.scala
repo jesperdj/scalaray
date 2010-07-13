@@ -36,8 +36,8 @@ final class StratifiedSampler (rectangle: Rectangle, samplesPerPixelX: Int, samp
 
 		for (i <- 0 until samplesPerPixel) yield {
 			// Generate 1D and 2D sample patterns for the current sample
-			val samples1D = MutableMap[Int, Traversable[Double]]()
-			val samples2D = MutableMap[Int, Traversable[(Double, Double)]]()
+			val samples1D = MutableMap[Int, IndexedSeq[Double]]()
+			val samples2D = MutableMap[Int, IndexedSeq[(Double, Double)]]()
 
 			sampleSpecs foreach {
 				_ match {

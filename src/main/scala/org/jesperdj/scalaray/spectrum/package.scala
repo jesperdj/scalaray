@@ -19,9 +19,9 @@ package org.jesperdj.scalaray
 
 package object spectrum {
 	// Implicit conversion for scaling spectra by multiplying a numeric type with a spectrum
-	implicit def implicitScaleSpectrum[N <% Double](f: N) = new ImplicitScaleSpectrum(f)
+	implicit def implicitScaleSpectrum[@specialized(Double, Int) N <% Double](f: N) = new ImplicitScaleSpectrum(f)
 
-	final class ImplicitScaleSpectrum[N <% Double](f: N) {
+	final class ImplicitScaleSpectrum[@specialized(Double, Int) N <% Double](f: N) {
 		def *(s: Spectrum): Spectrum = s * f
 	}
 }
