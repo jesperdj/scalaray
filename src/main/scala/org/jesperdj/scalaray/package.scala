@@ -36,17 +36,19 @@ package object scalaray {
 	def interpolate(t: Double, a: Double, b: Double): Double = a * (1.0 - t) + b * t
 
 	// Randomly permutate an array - Fisher-Yates shuffle (see: http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
-	// NOTE: Scala 2.8 does have a shuffle method in scala.util.Random, but it does not work on arrays (and doesn't do it in-place)
 	// This method can also take a custom swap method, which is useful for example for Latin hypercube sampling
 	def shuffle[@specialized(Double) T](array: Array[T], swap: (T, T) => (T, T) = { (a: T, b: T) => (b, a) }): Array[T] = {
 		val random = new scala.util.Random
 
 		for (n <- array.length - 1 to 0 by -1) {
 			val k = random.nextInt(n + 1)
-			val (a, b) = swap(array(k), array(n))
-			array(k) = a; array(n) = b
+			val (a, b) = swap(array(k), array(n)); array(k) = a; array(n) = b
 		}
 
 		array
 	}
+
+	// NOTE: In pbrt-v1, a naïve (biased) shuffling algorithm is used; in pbrt-v2, Fisher-Yates shuffling is used
+	// See also http://www.codinghorror.com/blog/2007/12/the-danger-of-naivete.html
+	// NOTE: Scala 2.8 does have a shuffle method in scala.util.Random, but it does not work on arrays (and doesn't do it in-place)
 }
