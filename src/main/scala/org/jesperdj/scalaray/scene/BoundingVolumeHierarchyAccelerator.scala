@@ -57,7 +57,7 @@ object BoundingVolumeHierarchyAccelerator {
 	// TODO: There are bugs in this, it might return empty collections, that should never happen
 	def splitMiddle(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) = {
 		// Compute bounding box of centroids and extents of that bounding box
-		val cb = ps.foldLeft(BoundingBox.Empty) { (bb, p) => bb union p.boundingBox.centroid }
+		val cb = (BoundingBox.Empty /: ps) { (bb, p) => bb union p.boundingBox.centroid }
 		val (ex, ey, ez) = (cb.max.x - cb.min.x, cb.max.y - cb.min.y, cb.max.z - cb.min.z)
 
 		// Predicates for partitioning

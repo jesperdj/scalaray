@@ -30,10 +30,10 @@ final class CompositePrimitive (primitives: Traversable[Primitive]) extends Prim
 	def this(primitives: Primitive*) = this(Traversable(primitives: _*))
 
 	// Bounding box that contains the primitive
-	val boundingBox: BoundingBox = primitives.foldLeft(BoundingBox.Empty) { (bb, p) => bb union p.boundingBox }
+	val boundingBox: BoundingBox = (BoundingBox.Empty /: primitives) { (bb, p) => bb union p.boundingBox }
 
 	// Bounding box when primitive is transformed
-	override def boundingBox(transform: Transform): BoundingBox = primitives.foldLeft(BoundingBox.Empty) { (bb, p) => bb union p.boundingBox(transform) }
+	override def boundingBox(transform: Transform): BoundingBox = (BoundingBox.Empty /: primitives) { (bb, p) => bb union p.boundingBox(transform) }
 
 	// Compute intersection between a ray and this primitive
 	def intersect(ray: Ray): Option[Intersection] = {
@@ -46,7 +46,7 @@ final class CompositePrimitive (primitives: Traversable[Primitive]) extends Prim
 		var r = Ray(ray.origin, ray.direction, minT, maxT)
 
 		// Find the closest intersection between the ray and one of the primitives
-		primitives.foldLeft(None: Option[Intersection]) { (o: Option[Intersection], p: Primitive) =>
+		((None: Option[Intersection]) /: primitives) { (o: Option[Intersection], p: Primitive) =>
 			val pi = p intersect r
 			if (pi.isEmpty) o else { r = Ray(r.origin, r.direction, r.minDistance, pi.get.distance); pi }
 		}

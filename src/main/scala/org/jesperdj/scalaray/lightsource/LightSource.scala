@@ -73,7 +73,7 @@ final class AreaLightSource (val shape: Shape, shapeToWorld: Transform, power: S
 	}
 
 	// Get the probability that sampleRadiance selects a ray in the given incoming direction wi (pbrt 15.6.3)
-	def pdf(point: Point, wi: Vector) = shape.pdf(worldToShape * point, worldToShape * wi)
+	def pdf(point: Point, wi: Vector): Double = shape.pdf(worldToShape * point, worldToShape * wi)
 
 	// The area light's emitted radiance from a given point with the given normal on the surface of the light in the given direction (pbrt 13.4)
 	def emittedRadiance(point: Point, normal: Normal, direction: Vector): Spectrum = if (normal * direction > 0.0) power else Spectrum.Black

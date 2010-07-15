@@ -65,12 +65,12 @@ final class DirectLightingSurfaceIntegrator private (
 	// Sample direct light from all light sources on the intersection point (pbrt 16.1)
 	private def uniformSampleAllLights(point: Point, normal: Normal, wo: Vector, bsdf: BSDF, sample: Sample): Spectrum = {
 		// Accumulate contributions of delta light sources
-		val deltaLightRadiance = deltaLights.foldLeft(Spectrum.Black) { (accu, deltaLight) =>
+		val deltaLightRadiance = (Spectrum.Black /: deltaLights) { (accu, deltaLight) =>
 			accu + computeDirect(deltaLight, point, normal, wo, bsdf)
 		}
 
 		// Accumulate contributions of area light sources
-		val areaLightRadiance = areaLights.foldLeft(Spectrum.Black) { (accu, areaLight) =>
+		val areaLightRadiance = (Spectrum.Black /: areaLights) { (accu, areaLight) =>
 			// Get sample patterns for this area light
 			val lightSamples = sample.samples2D(areaLight.lightSampleID)
 			val bsdfSamples = sample.samples2D(areaLight.bsdfSampleID)
