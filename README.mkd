@@ -17,7 +17,7 @@ I've been interested in 3D computer graphics for a long time. I wrote my first r
 To compile and run ScalaRay, you need:
 
 - [JDK for Java 6](http://java.sun.com/javase/)
-- [Scala 2.8](http://www.scala-lang.org/) (use the latest release candidate)
+- [Scala 2.8](http://www.scala-lang.org/)
 - [Apache Maven](http://maven.apache.org/)
 
 After installing the JDK and Maven and adding their `bin` directories to your `PATH`, you can compile it with: `mvn package`
@@ -28,6 +28,7 @@ If you have compiled ScalaRay successfully, run it with: `scala -cp target\class
 
 ScalaRay is not as complete as the original pbrt. Here is a list of things that need to be fixed, enhanced or implemented, in no particular order.
 
+- make it possible to sample area light sources with stratified sampling; not only with Latin hypercube sampling
 - is it worth it to have a mutable variant of class Spectrum? (call it SpectrumBuffer, for example; add implicit conversion SpectrumBuffer -> Spectrum)
 - are double-precision numbers necessary? does using Float instead of Double give a significant performance advantage?
 - implement accelerators (bounding volume hierarchy, kd-tree, grid)
@@ -49,3 +50,4 @@ ScalaRay is not as complete as the original pbrt. Here is a list of things that 
 - DSL for scene definition (use Scala's parser stuff)
 - add features that are not in pbrt (iso-surfaces ("blobs"), for example)
 - pbrt has no shadow ray caching; investigate if this is worth implementing
+- subsurface scattering
