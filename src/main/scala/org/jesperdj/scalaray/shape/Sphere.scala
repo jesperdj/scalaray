@@ -58,9 +58,34 @@ final class Sphere (radius: Double = 1.0, minZ: Double = Double.NegativeInfinity
 			// Surface normal (better method than what's used in pbrt)
 			lazy val normal: Normal = Normal(p).normalize
 
+			private lazy val theta = math.acos(clamp(p.z / radius, -1.0, 1.0))
+
 			// Surface parameter coordinates (pbrt 3.3.4)
 			lazy val u: Double = phi / maxPhi
-			lazy val v: Double = (math.acos(p.z / radius) - minTheta) / diffTheta
+			lazy val v: Double = (theta - minTheta) / diffTheta
+
+			// Partial derivatives of the surface position and normal
+			lazy val (dpdu, dpdv, dndu, dndv): (Vector, Vector, Normal, Normal) = {
+				val radiusZ = math.sqrt(p.x * p.x + p.y * p.y)
+				val (cosPhi, sinPhi) = if (radiusZ > 0.0) (p.x / radiusZ, p.y / radiusZ) else (0.0, 1.0)
+
+				val dpdv = Vector(cosPhi * p.z, sinPhi * p.z, -radius * math.sin(theta)) * diffTheta
+				val dpdu = if (radiusZ > 0.0) Vector(-maxPhi * p.y, maxPhi * p.x, 0.0) else dpdv ** Vector(p)
+
+				val d2Pduu = Vector(p.x, p.y, 0.0) * (-maxPhi * maxPhi)
+				val d2Pduv = Vector(-sinPhi, cosPhi, 0.0) * (diffTheta * maxPhi * p.z)
+				val d2Pdvv = Vector(p) * (-diffTheta * diffTheta)
+
+				val E = dpdu * dpdu; val F = dpdu * dpdv; val G = dpdv * dpdv
+				val N = (dpdu ** dpdv).normalize
+				val e = N * d2Pduu; val f = N * d2Pduv; val g = N * d2Pdvv
+
+				val EGF2 = (E * G - F * F)
+				val dndu = Normal(dpdu * ((f * F - e * G) / EGF2) + dpdv * ((e * F - f * E) / EGF2))
+				val dndv = Normal(dpdu * ((g * F - f * G) / EGF2) + dpdv * ((f * F - g * E) / EGF2))
+
+				(dpdu, dpdv, dndu, dndv)
+			}
 
 			// Shape which is intersected
 			val shape: Shape = Sphere.this
@@ -83,8 +108,9 @@ final class Sphere (radius: Double = 1.0, minZ: Double = Double.NegativeInfinity
 	override def sampleSurface(viewPoint: Point, u1: Double, u2: Double): (Point, Normal, Double) =
 		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement this; see pbrt 15.6.3 (page 705-708)
 
-	// Get the probability that sampleSurface(viewPoint: Point, u1: Double, u2: Double) selects the given point (pbrt 15.6.3)
-	override def pdf(point: Point, wi: Vector): Double =
+	// Get the value of the probability density function at the intersection point between the given ray and this shape with respect to
+	// the distribution that sampleSurface(viewPoint: Point, u1: Double, u2: Double) uses to sample points (pbrt 15.6.3)
+	override def pdf(ray: Ray): Double =
 		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement this; see pbrt 15.6.3 (page 708)
 
 	override def toString = "Sphere(radius=%g, minZ=%g, maxZ=%g, maxPhi=%g)" format (radius, minZ, maxZ, maxPhi)

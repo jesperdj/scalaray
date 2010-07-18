@@ -26,5 +26,5 @@ import org.jesperdj.scalaray.reflection._
 class Material {
 	// TODO: Selects a BSDF by looking at the differential geometry
 	def bsdf(dg: DifferentialGeometry): BSDF =
-		new BSDF(scala.collection.immutable.IndexedSeq()) // TODO
+		new BSDF(dg, scala.collection.immutable.IndexedSeq()) // TODO
 }

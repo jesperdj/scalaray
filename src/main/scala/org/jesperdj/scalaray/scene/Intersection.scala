@@ -35,3 +35,7 @@ final class Intersection (val differentialGeometry: DifferentialGeometry, val di
 
 	override def toString = "Intersection(differentialGeometry=%s, distance=%g, primitive=%s)" format (differentialGeometry, distance, primitive)
 }
+
+object Intersection {
+	def unapply(intersection: Intersection) = Some((intersection.differentialGeometry, intersection.distance, intersection.primitive))
+}

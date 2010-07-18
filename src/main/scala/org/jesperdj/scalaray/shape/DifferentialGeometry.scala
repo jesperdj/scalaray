@@ -19,7 +19,7 @@ package org.jesperdj.scalaray.shape
 
 import org.jesperdj.scalaray.vecmath._
 
-// Differential geometry, describes the geometry at a point on a surface
+// Differential geometry, describes the geometry at a point on a surface (pbrt 2.9)
 abstract class DifferentialGeometry {
 	// Point on the surface
 	val point: Point
@@ -30,6 +30,14 @@ abstract class DifferentialGeometry {
 	// Surface parameter coordinates
 	val u: Double
 	val v: Double
+
+	// Partial derivatives of the surface position
+	val dpdu: Vector
+	val dpdv: Vector
+
+	// Partial derivatives of the surface normal
+	val dndu: Normal
+	val dndv: Normal
 
 	// Shape which defines the surface
 	val shape: Shape

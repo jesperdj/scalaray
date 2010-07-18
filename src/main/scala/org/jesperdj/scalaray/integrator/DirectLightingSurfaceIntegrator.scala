@@ -23,20 +23,19 @@ import scala.collection.mutable.ListBuffer
 import org.jesperdj.scalaray.lightsource._
 import org.jesperdj.scalaray.reflection.BSDF
 import org.jesperdj.scalaray.sampler.{ Sample, SampleSpec, SampleSpec1D, SampleSpec2D }
-import org.jesperdj.scalaray.scene.Scene
+import org.jesperdj.scalaray.scene.{ Intersection, Scene }
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath._
 
-// An area light source and the identifiers of the sample patterns that are associated with it
-private class AreaLightSampleIDs (val areaLightSource: AreaLightSource, val lightSampleID: Int, val bsdfSampleID: Int, val bsdfComponentSampleID: Int) {
-	override def toString = "AreaLightSampleIDs(areaLightSource=%s, lightSampleID=%d, bsdfSampleID=%d, bsdfComponentSampleID=%d)" format
-		(areaLightSource, lightSampleID, bsdfSampleID, bsdfComponentSampleID)
+// Identifiers of sample patterns for an area light source
+private final class SampleIDs (val lightSampleID: Int, val bsdfSampleID: Int, val bsdfComponentSampleID: Int) {
+	override def toString = "SampleIDs(lightSampleID=%d, bsdfSampleID=%d, bsdfComponentSampleID=%d)" format (lightSampleID, bsdfSampleID, bsdfComponentSampleID)
 }
 
 // Direct lighting surface integrator (pbrt 16.1)
 final class DirectLightingSurfaceIntegrator private (
 	scene: Scene, val sampleSpecs: Traversable[SampleSpec],
-	deltaLights: Traversable[DeltaLightSource], areaLights: Traversable[AreaLightSampleIDs]) extends SurfaceIntegrator {
+	deltaLights: Traversable[DeltaLightSource], areaLights: Traversable[(AreaLightSource, SampleIDs)]) extends SurfaceIntegrator {
 
 	// Radiance along the ray (pbrt 16)
 	def radiance(ray: Ray, sample: Sample): Spectrum = scene intersect ray match {
@@ -66,57 +65,108 @@ final class DirectLightingSurfaceIntegrator private (
 	private def uniformSampleAllLights(point: Point, normal: Normal, wo: Vector, bsdf: BSDF, sample: Sample): Spectrum = {
 		// Accumulate contributions of delta light sources
 		val deltaLightRadiance = (Spectrum.Black /: deltaLights) { (accu, deltaLight) =>
-			accu + computeDirect(deltaLight, point, normal, wo, bsdf)
+			accu + estimateDirect(deltaLight, point, normal, wo, bsdf)
 		}
 
 		// Accumulate contributions of area light sources
-		val areaLightRadiance = (Spectrum.Black /: areaLights) { (accu, areaLight) =>
-			// Get sample patterns for this area light
-			val lightSamples = sample.samples2D(areaLight.lightSampleID)
-			val bsdfSamples = sample.samples2D(areaLight.bsdfSampleID)
-			val bsdfComponentSamples = sample.samples1D(areaLight.bsdfComponentSampleID)
-
-			// Estimate radiance for all samples
-			var radiance = Spectrum.Black
-			for (i <- 0 until lightSamples.size)
-				radiance += estimateDirect(areaLight.areaLightSource, point, normal, wo, bsdf, lightSamples(i), bsdfSamples(i), bsdfComponentSamples(i))
-
-			accu +* (radiance, 1.0 / lightSamples.size)
+		val areaLightRadiance = (Spectrum.Black /: areaLights) { case (accu, (areaLight, sampleIDs)) =>
+			accu + estimateDirect(areaLight, point, normal, wo, bsdf,
+								  sample.samples2D(sampleIDs.lightSampleID),
+								  sample.samples2D(sampleIDs.bsdfSampleID),
+								  sample.samples1D(sampleIDs.bsdfComponentSampleID))
 		}
 
 		deltaLightRadiance + areaLightRadiance
 	}
 
+	// TODO: Take transmittance along rays between light source and intersection point into account
+
 	// Compute direct light from a delta light source on the intersection point
-	private def computeDirect(deltaLight: DeltaLightSource, point: Point, normal: Normal, wo: Vector, bsdf: BSDF): Spectrum = {
+	private def estimateDirect(deltaLight: DeltaLightSource, point: Point, normal: Normal, wo: Vector, bsdf: BSDF): Spectrum = {
 		val (radiance, ray) = deltaLight.incidentRadiance(point)
 		if (radiance.isBlack) return Spectrum.Black
 
 		val wi = -ray.direction.normalize
 
 		// Evaluate BSDF
-		val f = bsdf(wo, wi)
-		if (f.isBlack) return Spectrum.Black
+		val reflectance = bsdf(wo, wi)
+		if (reflectance.isBlack) return Spectrum.Black
 
 		// Trace shadow ray
 		if (scene.intersect(ray).isDefined) return Spectrum.Black
 
-		f * radiance * math.abs(wi * normal)
+		radiance * reflectance * math.abs(wi * normal)
 	}
 
-	// Estimate direct light from an area light source on the intersection point (pbrt 16.1)
+	// Sample direct light from an area light source on the intersection point
 	private def estimateDirect(areaLight: AreaLightSource, point: Point, normal: Normal, wo: Vector, bsdf: BSDF,
-							   lightSample: (Double, Double), bsdfSample: (Double, Double), bsdfComponentSample: Double): Spectrum = {
-		val (radiance, ray, pdf) = areaLight.sampleRadiance(point, lightSample._1, lightSample._2)
-		if (radiance.isBlack || pdf == 0.0) return Spectrum.Black
+							   lightSamples: IndexedSeq[(Double, Double)],
+							   bsdfSamples: IndexedSeq[(Double, Double)], bsdfComponentSamples: IndexedSeq[Double]): Spectrum = {
+		// Sample light source
+		var lightContrib = Spectrum.Black
+		for (i <- 0 until lightSamples.size) {
+			val ls = lightSamples(i)
 
-		// Trace shadow ray
-		if (scene.intersect(ray).isDefined) return Spectrum.Black
+			val (radiance, ray, lightPdf) = areaLight.sampleRadiance(point, ls._1, ls._2)
+			if (lightPdf > 0.0 && !radiance.isBlack) {
+				val wi = -ray.direction.normalize
 
-		val wi = -ray.direction.normalize
-		radiance * (math.abs(wi * normal) / pdf)
+				// Evaluate BSDF
+				val reflectance = bsdf(wo, wi)
+				if (!reflectance.isBlack) {
+					// Trace shadow ray
+					if (scene.intersect(ray).isEmpty) {
+						// Add weighed contribution for this sample to total
+						lightContrib +*= (radiance * reflectance, math.abs(wi * normal) * powerHeuristic(1, lightPdf, 1, bsdf.pdf(wo, wi)) / lightPdf)
+					}
+				}
+			}
+		}
 
-		// TODO: sample light source and bsdf using multiple importance sampling (pbrt 15.4.1)
+		// Sample BSDF
+		var bsdfContrib = Spectrum.Black
+		for (i <- 0 until bsdfSamples.size) {
+			val bss = bsdfSamples(i); val bcs = bsdfComponentSamples(i)
+
+			val (reflectance, wi, bsdfPdf) = bsdf.sample(wo, bss._1, bss._2, bcs)
+			if (bsdfPdf > 0.0 && !reflectance.isBlack) {
+				val ray = Ray(point, wi)
+
+				val lightPdf = areaLight.pdf(ray)
+				if (lightPdf > 0.0) {
+					// Evaluate radiance from area light source
+					val radiance = scene.intersect(ray) match {
+						case Some(Intersection(dg, _, prim)) if (prim.areaLightSource.isDefined && prim.areaLightSource.get == areaLight) =>
+							// Ray intersects with area light source and point isn't shadowed
+							areaLight.emittedRadiance(dg.point, dg.normal, -wi)
+
+						case None => // No intersection
+							// TODO: In pbrt wordt hier light->Le(ray) genomen, waarom? Waarschijnlijk voor infinite area light source.
+							Spectrum.Black
+
+						case _ => // Point is shadowed
+							Spectrum.Black
+					}
+
+					if (!radiance.isBlack) {
+						// Add weighed contribution for this sample to total
+						bsdfContrib +*= (radiance * reflectance, math.abs(wi * normal) * powerHeuristic(1, bsdfPdf, 1, lightPdf) / bsdfPdf)
+					}
+				}
+			}
+		}
+
+		lightContrib / lightSamples.size + bsdfContrib / bsdfSamples.size
+	}
+
+	// Balance heuristic weighing function for multiple importance sampling (pbrt 15.4.1)
+	private def balanceHeuristic(nf: Int, fPdf: Double, ng: Int, gPdf: Double): Double =
+		(nf * fPdf) / (nf * fPdf + ng * gPdf)
+
+	// Power heuristic weighing function for multiple importance sampling (pbrt 15.4.1)
+	private def powerHeuristic(nf: Int, fPdf: Double, ng: Int, gPdf: Double): Double = {
+		val f = nf * fPdf; val g = ng * gPdf
+		(f * f) / (f * f + g * g)
 	}
 
 	override def toString = "DirectLightingSurfaceIntegrator(sampleSpecs=%s, deltaLights=%s, areaLights=%s)" format (sampleSpecs, deltaLights, areaLights)
@@ -126,7 +176,7 @@ object DirectLightingSurfaceIntegrator {
 	def apply(scene: Scene): DirectLightingSurfaceIntegrator = {
 		val sampleSpecs = ListBuffer[SampleSpec]()
 		val deltaLights = ListBuffer[DeltaLightSource]()
-		val areaLights = ListBuffer[AreaLightSampleIDs]()
+		val areaLights = ListBuffer[(AreaLightSource, SampleIDs)]()
 
 		scene.lightSources foreach {
 			_ match {
@@ -137,7 +187,7 @@ object DirectLightingSurfaceIntegrator {
 					val lightSampleSpec = new SampleSpec2D(lightSource.numberOfSamples); sampleSpecs += lightSampleSpec
 					val bsdfSampleSpec = new SampleSpec2D(lightSource.numberOfSamples); sampleSpecs += bsdfSampleSpec
 					val bsdfComponentSampleSpec = new SampleSpec1D(lightSource.numberOfSamples); sampleSpecs += bsdfComponentSampleSpec
-					areaLights += new AreaLightSampleIDs(lightSource, lightSampleSpec.id, bsdfSampleSpec.id, bsdfComponentSampleSpec.id)
+					areaLights += ((lightSource, new SampleIDs(lightSampleSpec.id, bsdfSampleSpec.id, bsdfComponentSampleSpec.id)))
 			}
 		}
 

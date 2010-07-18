@@ -58,4 +58,7 @@ object Spectrum {
 
 		override def toString = "Spectrum.Unit"
 	}
+
+	// Create a new spectrum
+	def apply(red: Double, green: Double, blue: Double) = new Spectrum(red, green, blue)
 }

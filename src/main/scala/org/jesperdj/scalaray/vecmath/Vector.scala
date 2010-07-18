@@ -52,6 +52,7 @@ final class Vector (val x: Double, val y: Double, val z: Double) {
 
 	// Length (pbrt 2.2.4)
 	def length = math.sqrt(x * x + y * y + z * z)
+	def lengthSquared = x * x + y * y + z * z
 
 	// Normalize (pbrt 2.2.4)
 	def normalize = this / length
@@ -74,4 +75,18 @@ object Vector {
 
 	// Create a vector from a point
 	def apply(p: Point) = new Vector(p)
+
+	// Coordinate system from a vector (pbrt 2.2.5)
+	def coordinateSystem(v1: Vector): (Vector, Vector) = {
+		val v2 = if (math.abs(v1.x) > math.abs(v1.y)) {
+			val len = math.sqrt(v1.x * v1.x + v1.z * v1.z)
+			new Vector(-v1.z / len, 0.0, v1.x / len)
+		}
+		else {
+			val len = math.sqrt(v1.y * v1.y + v1.z * v1.z)
+			new Vector(0.0, v1.z / len, -v1.y / len)
+		}
+
+		(v2, v1 ** v2)
+	}
 }

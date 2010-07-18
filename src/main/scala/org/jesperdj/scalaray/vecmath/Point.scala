@@ -43,6 +43,7 @@ final class Point (val x: Double, val y: Double, val z: Double) {
 
 	// Distance between two points (pbrt 2.3)
 	def distance(p: Point) = (this - p).length
+	def distanceSquared(p: Point) = (this - p).lengthSquared
 
 	override def toString = "Point(%g, %g, %g)" format (x, y, z)
 }

@@ -61,6 +61,14 @@ final class Disk (radius: Double = 1.0, innerRadius: Double = 0.0, maxPhi: Doubl
 			lazy val u: Double = phi / maxPhi
 			lazy val v: Double = 1.0 - ((math.sqrt(distanceSquared) - innerRadius) / (radius - innerRadius))
 
+			// Partial derivatives of the surface position (NOTE: pbrt source code has scale factors that are not in the book)
+			lazy val dpdu: Vector = Vector(-maxPhi * p.y, maxPhi * p.x, 0.0) / (2.0 * π)
+			lazy val dpdv: Vector = Vector(-p.x / (1.0 - v), -p.y / (1.0 - v), 0.0) * ((radius - innerRadius) / radius)
+
+			// Partial derivatives of the surface normal
+			val dndu: Normal = Normal.Zero
+			val dndv: Normal = Normal.Zero
+
 			// Shape which is intersected
 			val shape: Shape = Disk.this
 		}, distance)

@@ -45,6 +45,14 @@ package object shape {
 			val u: Double = dg.u
 			val v: Double = dg.v
 
+			// Partial derivatives of the surface position
+			lazy val dpdu: Vector = t * dg.dpdu
+			lazy val dpdv: Vector = t * dg.dpdv
+
+			// Partial derivatives of the surface normal
+			lazy val dndu: Normal = t * dg.dndu
+			lazy val dndv: Normal = t * dg.dndv
+
 			// Shape which defines the surface
 			val shape = dg.shape
 		}

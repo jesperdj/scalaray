@@ -19,20 +19,35 @@ package org.jesperdj.scalaray.reflection
 
 import scala.collection.immutable.IndexedSeq
 
+import org.jesperdj.scalaray._
+import org.jesperdj.scalaray.shape.DifferentialGeometry
 import org.jesperdj.scalaray.spectrum._
 import org.jesperdj.scalaray.vecmath._
 
 // TODO: Not yet implemented
 
 // Bidirectional Scattering Distribution Function
-final class BSDF (bxdfs: IndexedSeq[BxDF]) extends ((Vector, Vector) => Spectrum) {
+final class BSDF (dg: DifferentialGeometry, bxdfs: IndexedSeq[BxDF]) extends ((Vector, Vector) => Spectrum) {
+	private val sn = dg.dpdu.normalize
+	private val tn = dg.normal ** sn
+	private val nn = dg.normal
+
+	private def worldToLocal(v: Vector) = Vector(v * sn, v * tn, v * nn)
+
+	private def localToWorld(v: Vector) = Vector(
+		sn.x * v.x + tn.x * v.y + nn.x * v.z,
+		sn.y * v.x + tn.y * v.y + nn.y * v.z,
+		sn.z * v.x + tn.z * v.y + nn.z * v.z)
+
 	// TODO: Description
-	def apply(wo: Vector, wi: Vector): Spectrum = Spectrum.Unit // TODO
+	def apply(wo: Vector, wi: Vector): Spectrum =
+		Spectrum.Unit // TODO
 
 	// TODO: Description. Returns reflectance, wi and pdf
 	def sample(wo: Vector, u1: Double, u2: Double, u3: Double): (Spectrum, Vector, Double) =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO
+		(Spectrum.Unit, Vector(-wo.x, -wo.y, wo.z), 1.0) // TODO
 
 	// TODO: Description
-	def pdf(wo: Vector, wi: Vector): Double = 1.0 // TODO
+	def pdf(wo: Vector, wi: Vector): Double =
+		if (wo.z * wi.z > 0.0) math.abs(wi.z) / π else 0.0 // TODO
 }

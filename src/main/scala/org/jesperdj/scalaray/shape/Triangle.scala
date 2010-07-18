@@ -74,6 +74,26 @@ final class Triangle (v0: Vertex, v1: Vertex, v2: Vertex) extends Shape {
 				(b0 * v0.u + b1 * v1.u + b2 * v2.u, b0 * v0.v + b1 * v1.v + b2 * v2.v)
 			}
 
+			// Partial derivatives of the surface position
+			lazy val (dpdu, dpdv): (Vector, Vector) = {
+				val du1 = v0.u - v2.u
+				val du2 = v1.u - v2.u
+				val dv1 = v0.v - v2.v
+				val dv2 = v1.v - v2.v
+
+				val dp1 = v0.point - v2.point
+				val dp2 = v1.point - v2.point
+
+				val det = du1 * dv2 - dv1 * du2
+
+				if (det != 0.0) ((dp1 * dv2 - dp2 * dv1) / det, (dp1 * -du2 + dp2 * du1) / det)
+				else Vector.coordinateSystem((e2 ** e1).normalize)
+			}
+
+			// Partial derivatives of the surface normal
+			val dndu: Normal = Normal.Zero
+			val dndv: Normal = Normal.Zero
+
 			// Shape which is intersected
 			val shape: Shape = Triangle.this
 		}, distance)
