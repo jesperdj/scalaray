@@ -15,25 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj
+package org.jesperdj.scalaray
 
-package object scalaray {
+package object util {
 	val π = math.Pi
 
 	// Clamp a value between a low and high bound
-	def clamp[@specialized(Double, Int) N : Ordering](value: N, low: N, high: N): N = {
+	@inline def clamp[@specialized(Int, Double) N : Ordering](value: N, low: N, high: N): N = {
 		import Ordered._
 		if (value < low) low else if (value > high) high else value
 	}
 
 	// Get the minimum and maximum of two values as a pair
-	def minmax[@specialized(Double, Int) N : Ordering](a: N, b: N): (N, N) = {
+	@inline def minmax[@specialized(Int, Double) N : Ordering](a: N, b: N): (N, N) = {
 		import Ordered._
 		if (a <= b) (a, b) else (b, a)
 	}
 
 	// Linearly interpolate a value
-	def interpolate(t: Double, a: Double, b: Double): Double = a * (1.0 - t) + b * t
+	@inline def interpolate(t: Double, a: Double, b: Double): Double = a * (1.0 - t) + b * t
 
 	// Randomly permutate an array - Fisher-Yates shuffle (see: http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
 	// This method can also take a custom swap method, which is useful for example for Latin hypercube sampling

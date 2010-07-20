@@ -18,10 +18,25 @@
 package org.jesperdj.scalaray.camera
 
 import org.jesperdj.scalaray.sampler.CameraSample
-import org.jesperdj.scalaray.vecmath.Ray
+import org.jesperdj.scalaray.vecmath.{ Ray, RayDifferential }
 
 // Camera (pbrt 6.1)
 abstract class Camera {
 	// Generate a camera ray for a sample (pbrt 6.1)
 	def generateRay(sample: CameraSample): Ray
+
+	// Generate a camera ray with differentials
+	def generateRayDifferential(sample: CameraSample, scale: Double = 1.0): RayDifferential = {
+		val ray = generateRay(sample)
+
+		val rx = generateRay(new CameraSample(sample.imageX + 1, sample.imageY, sample.lensU, sample.lensV, sample.time))
+		val ry = generateRay(new CameraSample(sample.imageX, sample.imageY + 1, sample.lensU, sample.lensV, sample.time))
+
+		val rxOrigin = ray.origin + (rx.origin - ray.origin) * scale
+		val ryOrigin = ray.origin + (ry.origin - ray.origin) * scale
+		val rxDirection = ray.direction + (rx.direction - ray.direction) * scale
+		val ryDirection = ray.direction + (ry.direction - ray.direction) * scale
+
+		Ray(ray, rxOrigin, ryOrigin, rxDirection, ryDirection)
+	}
 }

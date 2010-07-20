@@ -15,7 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray
+package org.jesperdj.scalaray.util
 
-// TODO: Implement Renderer
-class Renderer
+// Trait that can be mixed in to give instances a unique identifier
+trait UniqueId {
+	// Unique identifier
+	val id = UniqueId.nextId.getAndIncrement
+}
+
+object UniqueId {
+	// Generator for unique identifiers
+	private val nextId = new java.util.concurrent.atomic.AtomicInteger
+}

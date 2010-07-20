@@ -19,15 +19,15 @@ package org.jesperdj.scalaray.reflection
 
 import scala.collection.immutable.IndexedSeq
 
-import org.jesperdj.scalaray._
 import org.jesperdj.scalaray.shape.DifferentialGeometry
 import org.jesperdj.scalaray.spectrum._
+import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 // TODO: Not yet implemented
 
 // Bidirectional Scattering Distribution Function
-final class BSDF (dg: DifferentialGeometry, bxdfs: IndexedSeq[BxDF]) extends ((Vector, Vector) => Spectrum) {
+final class BSDF (dg: DifferentialGeometry, bxdfs: IndexedSeq[BxDF]) {
 	private val sn = dg.dpdu.normalize
 	private val tn = dg.normal ** sn
 	private val nn = dg.normal

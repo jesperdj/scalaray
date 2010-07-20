@@ -17,7 +17,7 @@
  */
 package org.jesperdj.scalaray.sampler
 
-import org.jesperdj.scalaray._
+import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 // Transforming samples between distributions (pbrt 14.4, 14.5)

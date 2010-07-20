@@ -19,7 +19,6 @@ package org.jesperdj.scalaray.scene
 
 import scala.collection.immutable.Traversable
 
-import org.jesperdj.scalaray._
 import org.jesperdj.scalaray.shape._
 import org.jesperdj.scalaray.vecmath._
 

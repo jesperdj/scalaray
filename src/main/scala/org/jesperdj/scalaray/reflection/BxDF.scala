@@ -23,9 +23,12 @@ import org.jesperdj.scalaray.vecmath._
 // TODO: Not yet implemented
 
 // Superclass for BRDF and BTDF
-sealed abstract class BxDF extends ((Vector, Vector) => Spectrum) {
-	// TODO: Description. Returns wi and pdf
-	def sample(wo: Vector, u1: Double, u2: Double): (Vector, Double)
+sealed abstract class BxDF {
+	// TODO: Description
+	def apply(wo: Vector, wi: Vector): Spectrum
+
+	// TODO: Description. Returns reflectance, wi and pdf
+	def sample(wo: Vector, u1: Double, u2: Double): (Spectrum, Vector, Double)
 }
 
 // Bidirectional Reflectance Distribution Function

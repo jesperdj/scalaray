@@ -17,10 +17,10 @@
  */
 package org.jesperdj.scalaray.lightsource
 
-import org.jesperdj.scalaray._
 import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.shape._
 import org.jesperdj.scalaray.spectrum._
+import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 // Light source (pbrt 13.1)

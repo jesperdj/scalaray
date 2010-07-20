@@ -17,7 +17,7 @@
  */
 package org.jesperdj.scalaray.sampler
 
-import org.jesperdj.scalaray._
+import org.jesperdj.scalaray.util.UniqueId
 
 // Sample specification, used to configure a sampler to produce 1D and 2D sample patterns for each sample
 sealed abstract class SampleSpec extends UniqueId

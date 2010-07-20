@@ -17,8 +17,8 @@
  */
 package org.jesperdj.scalaray.shape
 
-import org.jesperdj.scalaray._
 import org.jesperdj.scalaray.sampler.SampleTransforms
+import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 // Sphere (pbrt 3.2)

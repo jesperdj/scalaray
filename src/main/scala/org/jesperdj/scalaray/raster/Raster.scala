@@ -19,31 +19,47 @@ package org.jesperdj.scalaray.raster
 
 import java.awt.image.BufferedImage
 
-import org.jesperdj.scalaray._
+import org.jesperdj.scalaray.filter.Filter
+import org.jesperdj.scalaray.sampler.CameraSample
+import org.jesperdj.scalaray.spectrum.Spectrum
+import org.jesperdj.scalaray.util._
 
 // Raster (mutable)
-final class Raster (width: Int, height: Int) {
+final class Raster (rectangle: Rectangle, filter: Filter) {
 	// The pixels in the raster
 	private val pixels = {
-		val array = new BlockedArray[Pixel](width, height)
-		for (y <- 0 until height; x <- 0 until width) array(x, y) = new Pixel
+		val array = new BlockedArray[Pixel](rectangle.width, rectangle.height)
+		for (y <- rectangle.top to rectangle.bottom; x <- rectangle.left to rectangle.right) array(x - rectangle.left, y - rectangle.top) = new Pixel
 		array
 	}
 
-	// Access the pixel at position (x, y)
-	def apply(x: Int, y: Int) = pixels(x, y)
+	def addSample(sample: CameraSample, spectrum: Spectrum): Unit = {
+		// Determine the raster extent of the sample
+		val ix = sample.imageX - 0.5
+		val iy = sample.imageY - 0.5
+
+		val minX = math.max(math.ceil(ix - filter.extentX).toInt, rectangle.left)
+		val maxX = math.min(math.floor(ix + filter.extentX).toInt, rectangle.right)
+		val minY = math.max(math.ceil(iy - filter.extentY).toInt, rectangle.top)
+		val maxY = math.min(math.floor(iy + filter.extentY).toInt, rectangle.bottom)
+
+		// Add radiance to relevant pixels in the raster, weighted by reconstruction filter
+		for (y <- minY to maxY; x <- minX to maxX) pixels(x, y).add(spectrum, filter(x - ix, y - iy))
+	
+	}
 
 	// Convert raster to an image (NOTE: for now a simplistic implementation without tone mapping)
 	def toImage = {
-		val image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+		val image = new BufferedImage(rectangle.width, rectangle.height, BufferedImage.TYPE_INT_RGB)
 
-		for (y <- 0 until height; x <- 0 until width) {
-			val (red, green, blue) = this(x, y).spectrum.toRGB
-			image.setRGB(x, y, (clamp(red, 0.0, 1.0) * 255.0).toInt << 16 | (clamp(green, 0.0, 1.0) * 255.0).toInt << 8 | (clamp(blue, 0.0, 1.0) * 255.0).toInt)
+		for (y <- rectangle.top to rectangle.bottom; x <- rectangle.left to rectangle.right) {
+			val px = x - rectangle.left; val py = y - rectangle.top
+			val (red, green, blue) = pixels(px, py).spectrum.toRGB
+			image.setRGB(px, py, (clamp(red, 0.0, 1.0) * 255.0).toInt << 16 | (clamp(green, 0.0, 1.0) * 255.0).toInt << 8 | (clamp(blue, 0.0, 1.0) * 255.0).toInt)
 		}
 
 		image
 	}
 
-	override def toString = "Raster(width=%d, height=%d, pixels=%s)" format (width, height, pixels)
+	override def toString = "Raster(rectangle=%s, filter=%s, pixels=%s)" format (rectangle, filter, pixels)
 }

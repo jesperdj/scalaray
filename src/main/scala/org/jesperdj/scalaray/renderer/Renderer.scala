@@ -15,15 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray
+package org.jesperdj.scalaray.renderer
 
-// Trait that can be mixed in to give instances a unique identifier
-trait UniqueId {
-	// Unique identifier
-	val id = UniqueId.nextId.getAndIncrement
-}
+import org.jesperdj.scalaray.raster.Raster
+import org.jesperdj.scalaray.sampler.Sample
+import org.jesperdj.scalaray.spectrum.Spectrum
+import org.jesperdj.scalaray.vecmath.Ray
 
-object UniqueId {
-	// Generator for unique identifiers
-	private val nextId = new java.util.concurrent.atomic.AtomicInteger
+// Renderer
+abstract class Renderer {
+	// TODO
+	def render(raster: Raster): Unit
+
+	// TODO
+	def radiance(ray: Ray, sample: Sample): Spectrum
+
+	// TODO
+	def transmittance(ray: Ray, sample: Sample): Spectrum
 }
