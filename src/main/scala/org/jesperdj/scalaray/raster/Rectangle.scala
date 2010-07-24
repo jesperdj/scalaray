@@ -24,3 +24,7 @@ final class Rectangle (val left: Int, val top: Int, val right: Int, val bottom: 
 
 	override def toString = "Rectangle(left=%d, top=%d, right=%d, bottom=%d)" format (left, top, right, bottom)
 }
+
+object Rectangle {
+	def apply(left: Int, top: Int, right: Int, bottom: Int) = new Rectangle(left, top, right, bottom)
+}

@@ -52,6 +52,7 @@ final class Normal (val x: Double, val y: Double, val z: Double) {
 
 	// Length
 	def length = math.sqrt(x * x + y * y + z * z)
+	def lengthSquared = x * x + y * y + z * z
 
 	// Normalize
 	def normalize = this / length

@@ -54,6 +54,25 @@ final class StratifiedSampler (rectangle: Rectangle, samplesPerPixelX: Int, samp
 		}
 	}
 
+	// Split the sampler into a number of sub-samplers (for multiprocessing)
+	def split(count: Int): Traversable[Sampler] = {
+		import scala.collection.mutable.ListBuffer
+
+		val ratio: Float = rectangle.width.toFloat / rectangle.height.toFloat
+		val pixels: Int = (rectangle.height.toFloat / math.sqrt(count / ratio).toFloat).ceil.toInt
+
+		val samplers: ListBuffer[Sampler] = ListBuffer()
+
+		for (py <- 0 until rectangle.height by pixels; px <- 0 until rectangle.width by pixels) {
+			val rect = Rectangle(px, py, math.min(px + pixels - 1, rectangle.right), math.min(py + pixels - 1, rectangle.bottom))
+			if (rect.width > 0 && rect.height > 0) samplers += new StratifiedSampler(rect, samplesPerPixelX, samplesPerPixelY, sampleSpecs)
+		}
+
+		require(samplers.size > 0, "Could not split sampler")
+
+		samplers.toList
+	}
+
 	override def toString = "StratifiedSampler(rectangle=%s, samplesPerPixelX=%d, samplesPerPixelY=%d, sampleSpecs=%s)" format
 		(rectangle, samplesPerPixelX, samplesPerPixelY, sampleSpecs)
 }

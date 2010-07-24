@@ -23,21 +23,56 @@ import org.jesperdj.scalaray.raster.Raster
 import org.jesperdj.scalaray.sampler.{ Sample, Sampler }
 import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.spectrum.Spectrum
+import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath.Ray
 
-final class SamplerRenderer (scene: Scene, sampler: Sampler, camera: Camera, surfaceIntegrator: SurfaceIntegrator, volumeIntegrator: VolumeIntegrator) extends Renderer {
-	// TODO
-	def render(raster: Raster): Unit = {
-		for (sample <- sampler.samples) {
-			val ray = camera.generateRay(sample)
-			raster.addSample(sample, surfaceIntegrator.radiance(ray, sample) * volumeIntegrator.transmittance(ray, sample) + volumeIntegrator.radiance(ray, sample))
+// Sampler renderer
+final class SamplerRenderer (scene: Scene, sampler: Sampler, surfaceIntegrator: SurfaceIntegrator, volumeIntegrator: VolumeIntegrator) extends Renderer {
+
+	private var runningTasks = new java.util.concurrent.atomic.AtomicInteger
+
+	private final class SamplerRendererTask (camera: Camera, raster: Raster, sampler: Sampler) extends Runnable {
+		def run() {
+			for (sample <- sampler.samples) {
+				val (rad, _) = radiance(camera.generateRay(sample), sample)
+				raster.addSample(sample, rad)
+			}
+			runningTasks.decrementAndGet
 		}
 	}
 
-	// TODO
-	def radiance(ray: Ray, sample: Sample): Spectrum =
-		surfaceIntegrator.radiance(ray, sample) * volumeIntegrator.transmittance(ray, sample) + volumeIntegrator.radiance(ray, sample)
+	// Render a frame using the given camera and store the result in the given raster
+	def render(camera: Camera, raster: Raster): Unit = {
+		import java.util.concurrent._
 
-	// TODO
+		// Determine number of tasks to create
+		val processors = Runtime.getRuntime().availableProcessors()
+		val numTasks = roundUpPow2(math.max(32 * processors, raster.rectangle.width * raster.rectangle.height / 256))
+
+		// Create executor service and tasks
+		val executorService = Executors.newFixedThreadPool(processors)
+		val samplers = sampler.split(numTasks)
+		samplers.foreach { s => runningTasks.incrementAndGet; executorService.submit(new SamplerRendererTask(camera, raster, s)) }
+
+		val numSamplers = samplers.size
+
+		// Wait until all tasks have finished
+		executorService.shutdown()
+		while (!executorService.isTerminated()) {
+			executorService.awaitTermination(10, TimeUnit.SECONDS)
+			println("%d/%d tasks done (%d%%)" format
+					(numSamplers - runningTasks.intValue, numSamplers, 100 - (100f * runningTasks.floatValue / numSamplers).toInt))
+		}
+	}
+
+	// Compute the radiance along the given ray; returns radiance and transmittance
+	def radiance(ray: Ray, sample: Sample): (Spectrum, Spectrum) = {
+		val (rad, trn) = volumeIntegrator.radiance(ray, sample)
+		(trn * surfaceIntegrator.radiance(ray, sample) + rad, trn)
+	}
+
+	// Compute the transmittance along the given ray
 	def transmittance(ray: Ray, sample: Sample): Spectrum = volumeIntegrator.transmittance(ray, sample)
+
+	override def toString = "SamplerRenderer"
 }

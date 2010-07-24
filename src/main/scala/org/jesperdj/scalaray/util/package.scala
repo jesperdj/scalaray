@@ -33,7 +33,17 @@ package object util {
 	}
 
 	// Linearly interpolate a value
+	@inline def interpolate(t: Float, a: Float, b: Float): Float = a * (1.0f - t) + b * t
 	@inline def interpolate(t: Double, a: Double, b: Double): Double = a * (1.0 - t) + b * t
+
+	// Round up to the next larger or equal power of 2
+	def roundUpPow2(value: Int): Int = {
+		if (value < 2) 2 else {
+			var result = 0x40000000
+			while (value <= result) { result >>= 1 }
+			result << 1
+		}
+	}
 
 	// Randomly permutate an array - Fisher-Yates shuffle (see: http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
 	// This method can also take a custom swap method, which is useful for example for Latin hypercube sampling

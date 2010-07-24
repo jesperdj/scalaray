@@ -17,6 +17,7 @@
  */
 package org.jesperdj.scalaray.renderer
 
+import org.jesperdj.scalaray.camera.Camera
 import org.jesperdj.scalaray.raster.Raster
 import org.jesperdj.scalaray.sampler.Sample
 import org.jesperdj.scalaray.spectrum.Spectrum
@@ -24,12 +25,12 @@ import org.jesperdj.scalaray.vecmath.Ray
 
 // Renderer
 abstract class Renderer {
-	// TODO
-	def render(raster: Raster): Unit
+	// Render a frame using the given camera and store the result in the given raster
+	def render(camera: Camera, raster: Raster): Unit
 
-	// TODO
-	def radiance(ray: Ray, sample: Sample): Spectrum
+	// Compute the radiance along the given ray; returns radiance and transmittance
+	def radiance(ray: Ray, sample: Sample): (Spectrum, Spectrum)
 
-	// TODO
+	// Compute the transmittance along the given ray
 	def transmittance(ray: Ray, sample: Sample): Spectrum
 }

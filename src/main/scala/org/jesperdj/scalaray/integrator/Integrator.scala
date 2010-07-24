@@ -27,16 +27,19 @@ import org.jesperdj.scalaray.vecmath.Ray
 sealed abstract class Integrator {
 	// Sample specifications for the sample patterns that this integrator needs
 	val sampleSpecs: Traversable[SampleSpec]
+}
 
+// Surface integrator (pbrt 16)
+abstract class SurfaceIntegrator extends Integrator {
 	// Radiance along the ray (pbrt 16)
 	def radiance(ray: Ray, sample: Sample): Spectrum
 }
 
-// Surface integrator (pbrt 16)
-abstract class SurfaceIntegrator extends Integrator
-
 // Volume integrator (pbrt 17.2)
 abstract class VolumeIntegrator extends Integrator {
+	// Radiance along the ray; returns radiance and transmittance
+	def radiance(ray: Ray, sample: Sample): (Spectrum, Spectrum)
+
 	// Transmittance along the ray (pbrt 17.2)
 	def transmittance(ray: Ray, sample: Sample): Spectrum
 }

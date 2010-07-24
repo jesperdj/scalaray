@@ -25,7 +25,7 @@ import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.util._
 
 // Raster (mutable)
-final class Raster (rectangle: Rectangle, filter: Filter) {
+final class Raster (val rectangle: Rectangle, filter: Filter) {
 	// The pixels in the raster
 	private val pixels = {
 		val array = new BlockedArray[Pixel](rectangle.width, rectangle.height)

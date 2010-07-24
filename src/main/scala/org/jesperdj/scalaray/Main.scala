@@ -29,6 +29,7 @@ import org.jesperdj.scalaray.integrator._
 import org.jesperdj.scalaray.lightsource._
 import org.jesperdj.scalaray.material._
 import org.jesperdj.scalaray.raster._
+import org.jesperdj.scalaray.renderer._
 import org.jesperdj.scalaray.sampler._
 import org.jesperdj.scalaray.scene._
 import org.jesperdj.scalaray.shape._
@@ -53,32 +54,21 @@ object Main {
 		val camera: Camera = new PerspectiveCamera(Transform.translate(0.0, 0.75, 0.0), π / 4.0, rect.width, rect.height)
 		val surfaceIntegrator: SurfaceIntegrator = DirectLightingSurfaceIntegrator(scene)
 		val volumeIntegrator: VolumeIntegrator = VacuumVolumeIntegrator
-		val sampler1: Sampler = new StratifiedSampler(new Rectangle(0, 0, 399, 599), 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
-		val sampler2: Sampler = new StratifiedSampler(new Rectangle(400, 0, 799, 599), 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
+		val sampler: Sampler = new StratifiedSampler(new Rectangle(0, 0, 799, 599), 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
+		val renderer: Renderer = new SamplerRenderer(scene, sampler, surfaceIntegrator, volumeIntegrator)
 
 		println("- Camera: " + camera)
 		println("- Surface integrator: " + surfaceIntegrator)
 		println("- Volume integrator: " + volumeIntegrator)
-		println("- Sampler1: " + sampler1)
-		println("- Sampler2: " + sampler2)
+		println("- Sampler: " + sampler)
 		println("- Filter: " + filter)
+		println("- Renderer: " + renderer)
 //		println("- Scene: " + scene)
-
-		def render(sampler: Sampler): Unit = {
-			def radiance(ray: Ray, sample: Sample): Spectrum =
-				surfaceIntegrator.radiance(ray, sample) * volumeIntegrator.transmittance(ray, sample) + volumeIntegrator.radiance(ray, sample)
-
-			for (sample <- sampler.samples) raster.addSample(sample, radiance(camera.generateRay(sample), sample))
-		}
 
 		println()
 		println("Rendering...")
 		val timer = new Timer("Total rendering time")
-		timer.time {
-			val f1 = future { render(sampler1) }
-			val f2 = future { render(sampler2) }
-			f1(); f2()
-		}
+		timer.time { renderer.render(camera, raster) }
 		println(timer.toString)
 
 		ImageIO.write(raster.toImage, "png", new File("output.png"))
