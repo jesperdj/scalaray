@@ -17,22 +17,28 @@
  */
 package org.jesperdj.scalaray.reflection
 
+import org.jesperdj.scalaray.sampler.SampleTransforms
 import org.jesperdj.scalaray.spectrum._
+import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
-// TODO: Not yet implemented
+// Bidirectional Reflectance or Transmittance Distribution Function (pbrt 8.1)
+abstract class BxDF {
+	// BxDF type
+	val bxdfType: BxDFType
 
-// Superclass for BRDF and BTDF
-sealed abstract class BxDF {
-	// TODO: Description
+	// Check if the type of this BxDF matches the given flags
+	def matchesType(flags: BxDFType): Boolean = bxdfType.matches(flags)
+
+	// Evaluate the BxDF for the given pair of directions
 	def apply(wo: Vector, wi: Vector): Spectrum
 
-	// TODO: Description. Returns reflectance, wi and pdf
-	def sample(wo: Vector, u1: Float, u2: Float): (Spectrum, Vector, Float)
+	// Sample the BxDF for the given outgoing direction; returns reflectance or transmittance, incoming direction and value of the pdf (pbrt 14.5)
+	def sample(wo: Vector, u1: Float, u2: Float): (Spectrum, Vector, Float) = {
+		val wi = { val w = Vector(SampleTransforms.cosineSampleHemisphere(u1, u2)); if (wo.z >= 0.0f) w else Vector(w.x, w.y, -w.z) }
+		(apply(wo, wi), wi, pdf(wo, wi))
+	}
+
+	// Get the value of the probability distribition function that matches the sampling method of sample(Vector, Float, Float) (pbrt 14.5)
+	def pdf(wo: Vector, wi: Vector): Float = if (wo.z * wi.z > 0.0f) wi.z.abs / π else 0.0f
 }
-
-// Bidirectional Reflectance Distribution Function
-abstract class BRDF extends BxDF
-
-// Bidirectional Transmittance Distribution Function
-abstract class BTDF extends BxDF

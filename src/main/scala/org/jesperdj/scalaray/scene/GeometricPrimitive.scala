@@ -23,7 +23,7 @@ import org.jesperdj.scalaray.reflection.BSDF
 import org.jesperdj.scalaray.shape._
 import org.jesperdj.scalaray.vecmath._
 
-// Geometric primitive: a primitive with a shape, material and optionally an area light source
+// Geometric primitive: a primitive with a shape, material and optionally an area light source (pbrt 4.1.1)
 final class GeometricPrimitive private (shape: Shape, material: Material, val areaLightSource: Option[AreaLightSource]) extends Primitive {
 	// Create a geometric primitive with a shape and material, no area light source
 	def this(shape: Shape, material: Material) = this(shape, material, None)
@@ -40,8 +40,8 @@ final class GeometricPrimitive private (shape: Shape, material: Material, val ar
 	// Compute intersection between a ray and this primitive
 	def intersect(ray: Ray): Option[Intersection] = shape intersect ray map { case (dg, distance) => new Intersection(dg, distance, this) }
 
-	// TODO
-	def bsdf(dg: DifferentialGeometry): BSDF = material.bsdf(dg)
+	// Get the BSDF for a given differential geometry and object-to-world transform
+	def bsdf(dg: DifferentialGeometry, objectToWorld: Transform): BSDF = material.bsdf(dg, shape.shadingGeometry(objectToWorld, dg))
 
 	override def toString = "GeometricPrimitive(shape=%s, material=%s, areaLightSource=%s)" format (shape, material, areaLightSource)
 }

@@ -15,16 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray.scene
+package org.jesperdj.scalaray.material
 
-import org.jesperdj.scalaray.shape.HasBoundingBox
-import org.jesperdj.scalaray.vecmath.Ray
+import org.jesperdj.scalaray.shape.DifferentialGeometry
+import org.jesperdj.scalaray.reflection.BSDF
 
-// NOTE: ScalaRay doesn't implement the shape and primitive refinement functionality of pbrt (pbrt 3.1.2, 4.1).
-// It is not necessary and only complicates the architecture.
-
-// Primitive (pbrt 4.1)
-abstract class Primitive extends HasBoundingBox {
-	// Compute intersection between a ray and this primitive (pbrt 4.1)
-	def intersect(ray: Ray): Option[Intersection]
+// Matte material (pbrt 9.2.1)
+final class MatteMaterial extends Material {
+	// Select a BSDF for the given differential geometries
+	def bsdf(dgGeom: DifferentialGeometry, dgShading: DifferentialGeometry): BSDF =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
 }

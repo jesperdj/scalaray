@@ -30,7 +30,6 @@ ScalaRay is not as complete as the original pbrt. Here is a list of things that 
 
 - make it possible to sample area light sources with stratified sampling; not only with Latin hypercube sampling
 - is it worth it to have a mutable variant of class Spectrum? (call it SpectrumBuffer, for example; add implicit conversion SpectrumBuffer -> Spectrum)
-- are double-precision numbers necessary? does using Float instead of Double give a significant performance advantage?
 - implement accelerators (bounding volume hierarchy, kd-tree, grid)
 - implement triangle mesh, loop subdivision surface, height field
 - implement Sphere.sampleSurface

@@ -25,7 +25,7 @@ import org.jesperdj.scalaray.vecmath._
 // Intersection with a primitive (pbrt 4.1)
 final class Intersection (val differentialGeometry: DifferentialGeometry, val distance: Float, val primitive: GeometricPrimitive) {
 	// TODO
-	def bsdf: BSDF = primitive.bsdf(differentialGeometry)
+	def bsdf: BSDF = primitive.bsdf(differentialGeometry, Transform.Identity) // TODO: How to deal with objectToWorld transform?
 
 	// Emitted radiance if the intersection is on an area light (pbrt 13.4)
 	def emittedRadiance(direction: Vector): Spectrum = primitive.areaLightSource match {

@@ -17,14 +17,11 @@
  */
 package org.jesperdj.scalaray.material
 
-import org.jesperdj.scalaray.shape._
-import org.jesperdj.scalaray.reflection._
+import org.jesperdj.scalaray.shape.DifferentialGeometry
+import org.jesperdj.scalaray.reflection.BSDF
 
-// TODO: Not yet implemented
-
-// Material
-class Material {
-	// TODO: Selects a BSDF by looking at the differential geometry
-	def bsdf(dg: DifferentialGeometry): BSDF =
-		new BSDF(dg, scala.collection.immutable.IndexedSeq()) // TODO
+// Material (pbrt 9.2)
+abstract class Material {
+	// Select a BSDF for the given differential geometries
+	def bsdf(dgGeom: DifferentialGeometry, dgShading: DifferentialGeometry): BSDF
 }

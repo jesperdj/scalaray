@@ -129,7 +129,7 @@ final class DirectLightingSurfaceIntegrator private (
 		for (i <- 0 until bsdfSamples.size) {
 			val bss = bsdfSamples(i); val bcs = bsdfComponentSamples(i)
 
-			val (reflectance, wi, bsdfPdf) = bsdf.sample(wo, bss._1, bss._2, bcs)
+			val (reflectance, wi, bsdfPdf, _) = bsdf.sample(wo, bss._1, bss._2, bcs)
 			if (bsdfPdf > 0.0f && !reflectance.isBlack) {
 				val ray = Ray(point, wi)
 

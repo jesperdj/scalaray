@@ -21,7 +21,7 @@ import java.io.File
 import javax.imageio.ImageIO
 
 import scala.actors.Futures._
-import scala.collection.immutable.Traversable
+import scala.collection.immutable.{ IndexedSeq, Traversable }
 
 import org.jesperdj.scalaray.camera._
 import org.jesperdj.scalaray.filter._
@@ -29,6 +29,7 @@ import org.jesperdj.scalaray.integrator._
 import org.jesperdj.scalaray.lightsource._
 import org.jesperdj.scalaray.material._
 import org.jesperdj.scalaray.raster._
+import org.jesperdj.scalaray.reflection._
 import org.jesperdj.scalaray.renderer._
 import org.jesperdj.scalaray.sampler._
 import org.jesperdj.scalaray.scene._
@@ -51,19 +52,19 @@ object Main {
 		val filter: Filter = new MitchellFilter
 		val raster = new Raster(rect, filter)
 
-		val camera: Camera = new PerspectiveCamera(Transform.translate(0.0f, 0.75f, 0.0f), π / 4.0f, rect.width, rect.height)
 		val surfaceIntegrator: SurfaceIntegrator = DirectLightingSurfaceIntegrator(scene)
 		val volumeIntegrator: VolumeIntegrator = VacuumVolumeIntegrator
-		val sampler: Sampler = new StratifiedSampler(new Rectangle(0, 0, 799, 599), 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
+		val sampler: Sampler = new StratifiedSampler(rect, 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
 		val renderer: Renderer = new SamplerRenderer(scene, sampler, surfaceIntegrator, volumeIntegrator)
 
-		println("- Camera: " + camera)
+		val camera: Camera = new PerspectiveCamera(Transform.translate(0.0f, 0.75f, 0.0f), π / 4.0f, rect.width, rect.height)
+
 		println("- Surface integrator: " + surfaceIntegrator)
 		println("- Volume integrator: " + volumeIntegrator)
 		println("- Sampler: " + sampler)
 		println("- Filter: " + filter)
 		println("- Renderer: " + renderer)
-//		println("- Scene: " + scene)
+		println("- Camera: " + camera)
 
 		println()
 		println("Rendering...")
@@ -78,20 +79,26 @@ object Main {
 	}
 
 	def createScene(): Scene = {
-//		val s1 = new Sphere(0.75, -1.0f, 1.0f, π * 4.0f / 3.0f)
-//		val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, new Material), Transform.translate(0.0f, 0.75, 4.0f) * Transform.rotateY(π / 4.0f) * Transform.rotateZ(π / 2.0f))
-		val p1 = new TransformedPrimitive(createCube(0.5f, new Material), Transform.translate(0.0f, 0.75f, 4.0f) * Transform.rotateY(-π / 6.0f) * Transform.rotateX(-π / 6.0f))
+		val simpleBxDFs: IndexedSeq[BxDF] = IndexedSeq(new Lambertian(Spectrum.Unit))
+
+		val simpleMaterial = new Material {
+			def bsdf(dgGeom: DifferentialGeometry, dgShading: DifferentialGeometry): BSDF = new BSDF(simpleBxDFs, dgShading, dgGeom.normal)
+		}
+
+//		val s1 = new Sphere(0.75f, -1.0f, 1.0f, π * 4.0f / 3.0f)
+//		val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, simpleMaterial), Transform.translate(0.0f, 0.75, 4.0f) * Transform.rotateY(π / 4.0f) * Transform.rotateZ(π / 2.0f))
+		val p1 = new TransformedPrimitive(createCube(0.5f, simpleMaterial), Transform.translate(0.0f, 0.75f, 4.0f) * Transform.rotateY(-π / 6.0f) * Transform.rotateX(-π / 6.0f))
 
 		val s2 = new Disk(3.0f)
-		val p2 = new TransformedPrimitive(new GeometricPrimitive(s2, new Material), Transform.translate(0.0f, 0.0f, 4.0f) * Transform.rotateX(-π / 2.0f))
+		val p2 = new TransformedPrimitive(new GeometricPrimitive(s2, simpleMaterial), Transform.translate(0.0f, 0.0f, 4.0f) * Transform.rotateX(-π / 2.0f))
 
-//		val l1 = new DirectionalLightSource(new Vector(-0.5, -1.25, 4.0f), new Spectrum(0.4, 0.4, 0.4))
-		val l1 = new PointLightSource(new Point(0.5f, 2.0f, 0.0f), new Spectrum(5.0f, 5.0f, 5.0f))
+//		val l1 = new DirectionalLightSource(new Vector(-0.5f, -1.25f, 4.0f), new Spectrum(0.4f, 0.4f, 0.4f))
+		val l1 = new PointLightSource(new Point(0.5f, 2.0f, 0.0f), new Spectrum(30.0f, 30.0f, 30.0f))
 
 		val s3 = new Disk(1.5f)
 		val t3 = Transform.translate(-0.3f, 5.0f, 3.5f) * Transform.rotateX(π / 2.0f)
-		val l2 = new AreaLightSource(s3, t3, new Spectrum(0.1f, 0.1f, 0.1f), 10)
-		val p3 = new TransformedPrimitive(new GeometricPrimitive(l2, new Material), t3)
+		val l2 = new AreaLightSource(s3, t3, new Spectrum(0.7f, 0.7f, 0.7f), 10)
+		val p3 = new TransformedPrimitive(new GeometricPrimitive(l2, simpleMaterial), t3)
 
 		new Scene(new CompositePrimitive(p1, p2, p3), Traversable(l1, l2))
 	}

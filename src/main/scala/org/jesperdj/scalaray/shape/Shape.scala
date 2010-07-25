@@ -20,14 +20,19 @@ package org.jesperdj.scalaray.shape
 import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
-
 // NOTE: In contrast to pbrt, shapes in ScalaRay do not have a shape-to-world transform. Transformations have been abstracted away to TransformedPrimitive.
 // The methods in shapes work with and return values in local shape coordinates, not world coordinates as in pbrt.
 
-// Shape, describes geometry of a surface
+// NOTE: ScalaRay doesn't implement the shape and primitive refinement functionality of pbrt (pbrt 3.1.2, 4.1).
+// It is not necessary and only complicates the architecture.
+
+// Shape, describes geometry of a surface (pbrt 3.1)
 abstract class Shape extends HasBoundingBox {
-	// Compute intersection between a ray and this shape, returns differential geometry and distance of intersection along ray
+	// Compute intersection between a ray and this shape, returns differential geometry and distance of intersection along ray (pbrt 3.1.3)
 	def intersect(ray: Ray): Option[(DifferentialGeometry, Float)]
+
+	// Get shading geometry (pbrt 3.1.5)
+	def shadingGeometry(objectToWorld: Transform, dg: DifferentialGeometry): DifferentialGeometry = dg
 
 	// Surface area
 	def surfaceArea: Float
