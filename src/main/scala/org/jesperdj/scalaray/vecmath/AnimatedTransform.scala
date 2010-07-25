@@ -19,5 +19,5 @@ package org.jesperdj.scalaray.vecmath
 
 // Animated transform (pbrt 2.9.3)
 final class AnimatedTransform {
-	// TODO
+	// TODO: Implement AnimatedTransform
 }

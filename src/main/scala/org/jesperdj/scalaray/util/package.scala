@@ -47,8 +47,4 @@ package object util {
 
 		array
 	}
-
-	// NOTE: In pbrt-v1, a naïve (biased) shuffling algorithm is used; in pbrt-v2, Fisher-Yates shuffling is used
-	// See also http://www.codinghorror.com/blog/2007/12/the-danger-of-naivete.html
-	// NOTE: Scala 2.8 does have a shuffle method in scala.util.Random, but it does not work on arrays (and doesn't do it in-place)
 }

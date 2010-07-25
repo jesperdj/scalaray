@@ -54,9 +54,9 @@ private sealed class Matrix (elems: IndexedSeq[Float]) {
 	def *(r: Ray): Ray = new Ray(this * r.origin, this * r.direction, r.minDistance, r.maxDistance)
 
 	// Transform a ray differential (pbrt 2.8.4)
-	def *(r: RayDifferential): RayDifferential =
-		new RayDifferential(this * r.origin, this * r.direction, this * r.rxOrigin, this * r.rxDirection, this * r.ryOrigin, this * r.ryDirection,
-							r.minDistance, r.maxDistance)
+	def *(rd: RayDifferential): RayDifferential =
+		new RayDifferential(this * rd.origin, this * rd.direction, this * rd.rxOrigin, this * rd.rxDirection, this * rd.ryOrigin, this * rd.ryDirection,
+							rd.minDistance, rd.maxDistance)
 
 	// Multiply with another matrix (pbrt A.6.2)
 	def *(m: Matrix) = new Matrix(

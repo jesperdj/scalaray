@@ -32,7 +32,7 @@ sealed class Transform private[vecmath] (private[vecmath] val mat: Matrix, priva
 	def *(r: Ray) = mat * r
 
 	// Transform a ray differential (pbrt 2.8.4)
-	def *(r: RayDifferential) = mat * r
+	def *(rd: RayDifferential) = mat * rd
 
 	// Combine transforms (pbrt 2.8.6)
 	def *(t: Transform) = new Transform(mat * t.mat, t.inv * inv)

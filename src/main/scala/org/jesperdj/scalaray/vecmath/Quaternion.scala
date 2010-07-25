@@ -43,13 +43,13 @@ final class Quaternion (val v: Vector, val w: Float) {
 	def normalize = this / length
 
 	// Rotation angle of this quaternion
-	def angle: Float = 2.0f * math.acos(w).toFloat
+	def angle = 2.0f * math.acos(w).toFloat
 
 	// Rotation axis of this quaternion
-	def axis: Vector = v.normalize
+	def axis = v.normalize
 
 	// Convert to a transform
-	def toTransform: Transform = {
+	def toTransform = {
 		val xx = v.x * v.x; val yy = v.y * v.y; val zz = v.z * v.z
 		val xy = v.x * v.y; val xz = v.x * v.z; val yz = v.y * v.z
 		val wx = v.x * w; val wy = v.y * w; val wz = v.z * w

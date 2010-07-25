@@ -22,6 +22,9 @@ final class Point (val x: Float, val y: Float, val z: Float) {
 	// Create a point from a vector
 	def this(v: Vector) = this(v.x, v.y, v.z)
 
+	// Create a point from a normal
+	def this(n: Normal) = this(n.x, n.y, n.z)
+
 	// Add a vector to a point
 	def +(v: Vector) = new Point(x + v.x, y + v.y, z + v.z)
 
@@ -59,4 +62,7 @@ object Point {
 
 	// Create a point from a vector
 	def apply(v: Vector) = new Point(v)
+
+	// Create a point from a normal
+	def apply(n: Normal) = new Point(n)
 }

@@ -38,6 +38,6 @@ abstract class Camera {
 		val ryOrigin = ray.origin + (ry.origin - ray.origin) * scale
 		val ryDirection = ray.direction + (ry.direction - ray.direction) * scale
 
-		Ray(ray, rxOrigin, rxDirection, ryOrigin, ryDirection)
+		RayDifferential(ray, rxOrigin, rxDirection, ryOrigin, ryDirection)
 	}
 }

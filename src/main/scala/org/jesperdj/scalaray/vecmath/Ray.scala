@@ -28,22 +28,33 @@ sealed class Ray (val origin: Point, val direction: Vector, val minDistance: Flo
 	override def toString = "Ray(origin=%s, direction=%s, minDistance=%g, maxDistance=%g)" format (origin, direction, minDistance, maxDistance)
 }
 
+object Ray {
+	// Create a ray
+	def apply(origin: Point, direction: Vector, minDistance: Float = 0.0f, maxDistance: Float = Float.PositiveInfinity) =
+		new Ray(origin, direction, minDistance, maxDistance)
+}
+
 // Ray differential (pbrt 2.5.1)
 final class RayDifferential (
 	origin: Point, direction: Vector, val rxOrigin: Point, val rxDirection: Vector, val ryOrigin: Point, val ryDirection: Vector,
 	minDistance: Float = 0.0f, maxDistance: Float = Float.PositiveInfinity) extends Ray(origin, direction, minDistance, maxDistance) {
+
+	// Create a ray differential from a ray
+	def this(ray: Ray, rxOrigin: Point, rxDirection: Vector, ryOrigin: Point, ryDirection: Vector) =
+		this(ray.origin, ray.direction, rxOrigin, rxDirection, ryOrigin, ryDirection, ray.minDistance, ray.maxDistance)
 
 	override def toString =
 		"RayDifferential(origin=%s, direction=%s, rxOrigin=%s, rxDirection=%s, ryOrigin=%s, ryDirection=%s, minDistance=%g, maxDistance=%g)" format
 		(origin, direction, rxOrigin, rxDirection, ryOrigin, ryDirection, minDistance, maxDistance)
 }
 
-object Ray {
-	// Create a ray
-	def apply(origin: Point, direction: Vector, minDistance: Float = 0.0f, maxDistance: Float = Float.PositiveInfinity) =
-		new Ray(origin, direction, minDistance, maxDistance)
-
+object RayDifferential {
 	// Create a ray differential
+	def apply(origin: Point, direction: Vector, rxOrigin: Point, rxDirection: Vector, ryOrigin: Point, ryDirection: Vector,
+			  minDistance: Float = 0.0f, maxDistance: Float = Float.PositiveInfinity) =
+				  new RayDifferential(origin, direction, rxOrigin, rxDirection, ryOrigin, ryDirection, minDistance, maxDistance)
+
+	// Create a ray differential from a ray
 	def apply(ray: Ray, rxOrigin: Point, rxDirection: Vector, ryOrigin: Point, ryDirection: Vector) =
-		new RayDifferential(ray.origin, ray.direction, rxOrigin, rxDirection, ryOrigin, ryDirection, ray.minDistance, ray.maxDistance)
+		new RayDifferential(ray, rxOrigin, rxDirection, ryOrigin, ryDirection)
 }

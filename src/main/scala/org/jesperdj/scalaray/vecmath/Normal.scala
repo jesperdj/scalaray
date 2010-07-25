@@ -51,8 +51,8 @@ final class Normal (val x: Float, val y: Float, val z: Float) {
 	def **(v: Vector) = new Vector(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x)
 
 	// Length
-	def length = math.sqrt(x * x + y * y + z * z).toFloat
-	def lengthSquared = x * x + y * y + z * z
+	def length = math.sqrt(this * this).toFloat
+	def lengthSquared = this * this
 
 	// Normalize
 	def normalize = this / length
