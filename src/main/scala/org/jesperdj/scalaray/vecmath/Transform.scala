@@ -18,7 +18,7 @@
 package org.jesperdj.scalaray.vecmath
 
 // Transform (pbrt 2.7)
-sealed class Transform private (private val mat: Matrix, private val inv: Matrix) {
+sealed class Transform private[vecmath] (private[vecmath] val mat: Matrix, private[vecmath] val inv: Matrix) {
 	// Transform a point (pbrt 2.8.1)
 	def *(p: Point) = mat * p
 
