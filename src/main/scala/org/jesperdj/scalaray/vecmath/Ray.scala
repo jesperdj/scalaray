@@ -30,12 +30,12 @@ sealed class Ray (val origin: Point, val direction: Vector, val minDistance: Dou
 
 // Ray differential (pbrt 2.5.1)
 final class RayDifferential (
-	origin: Point, direction: Vector, val rxOrigin: Point, val ryOrigin: Point, val rxDirection: Vector, val ryDirection: Vector,
+	origin: Point, direction: Vector, val rxOrigin: Point, val rxDirection: Vector, val ryOrigin: Point, val ryDirection: Vector,
 	minDistance: Double = 0.0, maxDistance: Double = Double.PositiveInfinity) extends Ray(origin, direction, minDistance, maxDistance) {
 
 	override def toString =
-		"RayDifferential(origin=%s, direction=%s, rxOrigin=%s, ryOrigin=%s, rxDirection=%s, ryDirection=%s, minDistance=%g, maxDistance=%g)" format
-		(origin, direction, rxOrigin, ryOrigin, rxDirection, ryDirection, minDistance, maxDistance)
+		"RayDifferential(origin=%s, direction=%s, rxOrigin=%s, rxDirection=%s, ryOrigin=%s, ryDirection=%s, minDistance=%g, maxDistance=%g)" format
+		(origin, direction, rxOrigin, rxDirection, ryOrigin, ryDirection, minDistance, maxDistance)
 }
 
 object Ray {
@@ -44,6 +44,6 @@ object Ray {
 		new Ray(origin, direction, minDistance, maxDistance)
 
 	// Create a ray differential (pbrt 2.5.1)
-	def apply(ray: Ray, rxOrigin: Point, ryOrigin: Point, rxDirection: Vector, ryDirection: Vector) =
-		new RayDifferential(ray.origin, ray.direction, rxOrigin, ryOrigin, rxDirection, ryDirection, ray.minDistance, ray.maxDistance)
+	def apply(ray: Ray, rxOrigin: Point, rxDirection: Vector, ryOrigin: Point, ryDirection: Vector) =
+		new RayDifferential(ray.origin, ray.direction, rxOrigin, rxDirection, ryOrigin, ryDirection, ray.minDistance, ray.maxDistance)
 }

@@ -47,7 +47,7 @@ final class SamplerRenderer (scene: Scene, sampler: Sampler, surfaceIntegrator: 
 
 		// Determine number of tasks to create
 		val processors = Runtime.getRuntime().availableProcessors()
-		val numTasks = roundUpPow2(math.max(32 * processors, raster.rectangle.width * raster.rectangle.height / 256))
+		val numTasks = math.max(32 * processors, raster.rectangle.width * raster.rectangle.height / 256)
 
 		// Create executor service and tasks
 		val executorService = Executors.newFixedThreadPool(processors)

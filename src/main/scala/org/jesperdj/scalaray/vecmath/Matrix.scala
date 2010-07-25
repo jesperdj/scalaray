@@ -17,7 +17,7 @@
  */
 package org.jesperdj.scalaray.vecmath
 
-import scala.collection.immutable._
+import scala.collection.immutable.IndexedSeq
 
 // Matrix, used for transformations
 private sealed class Matrix (elems: IndexedSeq[Double]) {

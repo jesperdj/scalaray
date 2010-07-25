@@ -33,10 +33,11 @@ abstract class Camera {
 		val ry = generateRay(new CameraSample(sample.imageX, sample.imageY + 1, sample.lensU, sample.lensV, sample.time))
 
 		val rxOrigin = ray.origin + (rx.origin - ray.origin) * scale
-		val ryOrigin = ray.origin + (ry.origin - ray.origin) * scale
 		val rxDirection = ray.direction + (rx.direction - ray.direction) * scale
+
+		val ryOrigin = ray.origin + (ry.origin - ray.origin) * scale
 		val ryDirection = ray.direction + (ry.direction - ray.direction) * scale
 
-		Ray(ray, rxOrigin, ryOrigin, rxDirection, ryDirection)
+		Ray(ray, rxOrigin, rxDirection, ryOrigin, ryDirection)
 	}
 }
