@@ -22,7 +22,7 @@ sealed class Ray (val origin: Point, val direction: Vector, val minDistance: Dou
 	// Check if distance t is in the valid range of this ray
 	def isInRange(t: Double) = t >= minDistance && t <= maxDistance
 
-	// Get a point along the ray (pbrt 2.5)
+	// Get a point along the ray
 	def point(t: Double) = origin + direction * t
 
 	override def toString = "Ray(origin=%s, direction=%s, minDistance=%g, maxDistance=%g)" format (origin, direction, minDistance, maxDistance)
@@ -39,11 +39,11 @@ final class RayDifferential (
 }
 
 object Ray {
-	// Create a ray (pbrt 2.5)
+	// Create a ray
 	def apply(origin: Point, direction: Vector, minDistance: Double = 0.0, maxDistance: Double = Double.PositiveInfinity) =
 		new Ray(origin, direction, minDistance, maxDistance)
 
-	// Create a ray differential (pbrt 2.5.1)
+	// Create a ray differential
 	def apply(ray: Ray, rxOrigin: Point, rxDirection: Vector, ryOrigin: Point, ryDirection: Vector) =
 		new RayDifferential(ray.origin, ray.direction, rxOrigin, rxDirection, ryOrigin, ryDirection, ray.minDistance, ray.maxDistance)
 }

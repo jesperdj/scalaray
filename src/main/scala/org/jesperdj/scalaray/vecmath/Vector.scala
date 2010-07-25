@@ -25,36 +25,36 @@ final class Vector (val x: Double, val y: Double, val z: Double) {
 	// Create a vector from a point
 	def this(p: Point) = this(p.x, p.y, p.z)
 
-	// Add two vectors (pbrt 2.2.1)
+	// Add two vectors
 	def +(v: Vector) = new Vector(x + v.x, y + v.y, z + v.z)
 
-	// Subtract two vectors (pbrt 2.2.1)
+	// Subtract two vectors
 	def -(v: Vector) = new Vector(x - v.x, y - v.y, z - v.z)
 
-	// Scale a vector (pbrt 2.2.2)
+	// Scale a vector
 	def *(f: Double) = new Vector(x * f, y * f, z * f)
 	def /(f: Double) = new Vector(x / f, y / f, z / f)
 
-	// Unary minus (pbrt 2.2.2)
+	// Unary minus
 	def unary_- = new Vector(-x, -y, -z)
 
-	// Dot product (pbrt 2.2.3)
+	// Dot product
 	def *(v: Vector) = x * v.x + y * v.y + z * v.z
 
 	// Dot product with a normal
 	def *(n: Normal) = x * n.x + y * n.y + z * n.z
 
-	// Cross product (pbrt 2.2.3)
+	// Cross product
 	def **(v: Vector) = new Vector(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x)
 
 	// Cross product with a normal
 	def **(n: Normal) = new Vector(y * n.z - z * n.y, z * n.x - x * n.z, x * n.y - y * n.x)
 
-	// Length (pbrt 2.2.4)
+	// Length
 	def length = math.sqrt(x * x + y * y + z * z)
 	def lengthSquared = x * x + y * y + z * z
 
-	// Normalize (pbrt 2.2.4)
+	// Normalize
 	def normalize = this / length
 
 	override def toString = "Vector(%g, %g, %g)" format (x, y, z)
@@ -67,7 +67,7 @@ object Vector {
 	val ZAxis = new Vector(0.0, 0.0, 1.0)
 	val Zero = new Vector(0.0, 0.0, 0.0)
 
-	// Create a vector (pbrt 2.2)
+	// Create a vector
 	def apply(x: Double, y: Double, z: Double) = new Vector(x, y, z)
 
 	// Create a vector from a normal
@@ -76,7 +76,7 @@ object Vector {
 	// Create a vector from a point
 	def apply(p: Point) = new Vector(p)
 
-	// Coordinate system from a vector (pbrt 2.2.5)
+	// Coordinate system from a vector
 	def coordinateSystem(v1: Vector): (Vector, Vector) = {
 		val v2 = if (math.abs(v1.x) > math.abs(v1.y)) {
 			val len = math.sqrt(v1.x * v1.x + v1.z * v1.z)

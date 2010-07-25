@@ -22,26 +22,26 @@ final class Point (val x: Double, val y: Double, val z: Double) {
 	// Create a point from a vector
 	def this(v: Vector) = this(v.x, v.y, v.z)
 
-	// Add a vector to a point (pbrt 2.3)
+	// Add a vector to a point
 	def +(v: Vector) = new Point(x + v.x, y + v.y, z + v.z)
 
 	// Add a normal to a point
 	def +(n: Normal) = new Point(x + n.x, y + n.y, z + n.z)
 
-	// Subtract a vector from a point (pbrt 2.3)
+	// Subtract a vector from a point
 	def -(v: Vector) = new Point(x - v.x, y - v.y, z - v.z)
 
 	// Subtract a normal from a point
 	def -(n: Normal) = new Point(x - n.x, y - n.y, z - n.z)
 
-	// Subtract two points (pbrt 2.3)
+	// Subtract two points
 	def -(p: Point) = new Vector(x - p.x, y - p.y, z - p.z)
 
-	// Multiply or divide a point by a weight (pbrt 2.3)
+	// Multiply or divide a point by a weight
 	def *(f: Double) = new Point(x * f, y * f, z * f)
 	def /(f: Double) = new Point(x / f, y / f, z / f)
 
-	// Distance between two points (pbrt 2.3)
+	// Distance between two points
 	def distance(p: Point) = (this - p).length
 	def distanceSquared(p: Point) = (this - p).lengthSquared
 
@@ -54,7 +54,7 @@ object Point {
 	val PositiveInfinity = new Point(Double.PositiveInfinity, Double.PositiveInfinity, Double.PositiveInfinity)
 	val NegativeInfinity = new Point(Double.NegativeInfinity, Double.NegativeInfinity, Double.NegativeInfinity)
 
-	// Create a point (pbrt 2.3)
+	// Create a point
 	def apply(x: Double, y: Double, z: Double) = new Point(x, y, z)
 
 	// Create a point from a vector

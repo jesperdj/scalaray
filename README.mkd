@@ -2,7 +2,7 @@
 
 This is ScalaRay, a [ray tracer](http://en.wikipedia.org/wiki/Ray_tracing_%28graphics%29) written in [Scala](http://www.scala-lang.org/) 2.8. It is based on [pbrt](http://pbrt.org/), the ray tracer described in the book *Physically Based Rendering - From Theory to Implementation* by Matt Pharr and Greg Humphreys, publisher: Morgan Kaufmann, ISBN: 0-12-553180-X
 
-Note: The second edition of this book is coming out in July 2010; I have the first edition, although some parts are inspired by pbrt version 2.
+Note: The second edition of this book came out in July 2010. I initially based ScalaRay on the first edition, but I now also have the second edition and parts of ScalaRay are based on pbrt version 2.
 
 pbrt is also available on github; see [mmp/pbrt-v1](http://github.com/mmp/pbrt-v1) for pbrt version 1 (first edition of the book) and [mmp/pbrt-v2](http://github.com/mmp/pbrt-v2) for pbrt version 2 (second edition of the book).
 
@@ -39,7 +39,7 @@ ScalaRay is not as complete as the original pbrt. Here is a list of things that 
 - implement other samplers (see book chapter 7)
 - implement other light sources: texture projection light (13.2.2) goniometric diagram light (13.2.3), infinite area light (13.5)
 - implement output to EXR format (high dynamic range)
-- tone mapping (see book chapter 8)
+- tone mapping (see book chapter 8, only in first edition)
 - implement other surface integrators
 - implement volume integrators
 - implement other cameras (see book chapter 6)
@@ -51,3 +51,4 @@ ScalaRay is not as complete as the original pbrt. Here is a list of things that 
 - add features that are not in pbrt (iso-surfaces ("blobs"), for example)
 - pbrt has no shadow ray caching; investigate if this is worth implementing
 - subsurface scattering
+- profiling and performance improvement; is the performance of ScalaRay significantly different from pbrt?

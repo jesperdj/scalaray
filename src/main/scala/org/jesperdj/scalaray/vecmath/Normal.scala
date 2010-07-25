@@ -22,7 +22,7 @@ package org.jesperdj.scalaray.vecmath
 
 // Normal (pbrt 2.4)
 final class Normal (val x: Double, val y: Double, val z: Double) {
-	// Create a normal from a vector (pbrt 2.4)
+	// Create a normal from a vector
 	def this(v: Vector) = this(v.x, v.y, v.z)
 
 	// Create a normal from a point
@@ -67,10 +67,10 @@ object Normal {
 	val ZAxis = new Normal(0.0, 0.0, 1.0)
 	val Zero = new Normal(0.0, 0.0, 0.0)
 
-	// Create a normal (pbrt 2.4)
+	// Create a normal
 	def apply(x: Double, y: Double, z: Double) = new Normal(x, y, z)
 
-	// Create a normal from a vector (pbrt 2.4)
+	// Create a normal from a vector
 	def apply(v: Vector) = new Normal(v)
 
 	// Create a normal from a point

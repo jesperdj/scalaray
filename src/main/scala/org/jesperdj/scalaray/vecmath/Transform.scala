@@ -31,10 +31,13 @@ sealed class Transform private[vecmath] (private[vecmath] val mat: Matrix, priva
 	// Transform a ray (pbrt 2.8.4)
 	def *(r: Ray) = mat * r
 
+	// Transform a ray differential (pbrt 2.8.4)
+	def *(r: RayDifferential) = mat * r
+
 	// Combine transforms (pbrt 2.8.6)
 	def *(t: Transform) = new Transform(mat * t.mat, t.inv * inv)
 
-	// Get the inverse of this transform
+	// Get the inverse of this transform (pbrt 2.7.2)
 	def inverse = new Transform(inv, mat)
 
 	// Check if this transform has a scale factor
@@ -130,7 +133,7 @@ object Transform {
 		new Transform(m, m.transpose)
 	}
 
-	// Create a "look at" transform (pbrt 2.7.7; NOTE: original pbrt-v1 code contains a bug)
+	// Create a "look at" transform (pbrt 2.7.7)
 	def lookAt(pos: Point, look: Point, up: Vector) = {
 		val dir = (look - pos).normalize
 		val left = (up.normalize ** dir).normalize

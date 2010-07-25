@@ -19,7 +19,7 @@ package org.jesperdj.scalaray.vecmath
 
 import scala.collection.immutable.IndexedSeq
 
-// Matrix, used for transformations
+// Matrix, used for transformations (pbrt A.6.2)
 private sealed class Matrix (elems: IndexedSeq[Double]) {
 	require(elems.length == 16, "A Matrix requires exactly 16 elements")
 
@@ -53,14 +53,19 @@ private sealed class Matrix (elems: IndexedSeq[Double]) {
 	// Transform a ray (pbrt 2.8.4)
 	def *(r: Ray): Ray = new Ray(this * r.origin, this * r.direction, r.minDistance, r.maxDistance)
 
-	// Multiply with another matrix
+	// Transform a ray differential (pbrt 2.8.4)
+	def *(r: RayDifferential): RayDifferential =
+		new RayDifferential(this * r.origin, this * r.direction, this * r.rxOrigin, this * r.rxDirection, this * r.ryOrigin, this * r.ryDirection,
+							r.minDistance, r.maxDistance)
+
+	// Multiply with another matrix (pbrt A.6.2)
 	def *(m: Matrix) = new Matrix(
 		for (row <- 0 to 3; col <- 0 to 3) yield this(row, 0) * m(0, col) + this(row, 1) * m(1, col) + this(row, 2) * m(2, col) + this(row, 3) * m(3, col))
 
-	// Transpose
+	// Transpose (pbrt A.6.2)
 	def transpose = new Matrix(for (row <- 0 to 3; col <- 0 to 3) yield this(col, row))
 
-	// Inverse
+	// Inverse (pbrt A.6.2)
 	def inverse = {
 		def cofactor(i: Int, j: Int) = {
 			def sub(row: Int, col: Int) = this(if (row < i) row else row + 1, if (col < j) col else col + 1)
