@@ -15,20 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray.filter
+package org.jesperdj.scalaray.vecmath
 
-import org.jesperdj.scalaray.util._
-
-// Windowed sinc filter (pbrt 7.6.1)
-final class LanczosSincFilter (extentX: Float = 4.0f, extentY: Float = 4.0f, tau: Float = 3.0f) extends Filter(extentX, extentY) {
-	private def lanczosSinc(v: Float) = {
-		val x = v.abs
-		if (x < 1e-6f) 1.0f else if (x > 1.0f) 0.0f else {
-			val w = π * x; val wt = w * tau; (math.sin(wt).toFloat / wt) * (math.sin(w).toFloat / w)
-		}
-	}
-
-	def apply(x: Float, y: Float) = lanczosSinc(x / extentX) * lanczosSinc(y / extentY)
-
-	override def toString = "LanczosSincFilter(extentX=%g, extentY=%g, tau=%g)" format (extentX, extentY, tau)
+// Animated transform (pbrt 2.9.3)
+final class AnimatedTransform {
+	// TODO
 }

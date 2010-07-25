@@ -51,7 +51,7 @@ object Main {
 		val filter: Filter = new MitchellFilter
 		val raster = new Raster(rect, filter)
 
-		val camera: Camera = new PerspectiveCamera(Transform.translate(0.0, 0.75, 0.0), π / 4.0, rect.width, rect.height)
+		val camera: Camera = new PerspectiveCamera(Transform.translate(0.0f, 0.75f, 0.0f), π / 4.0f, rect.width, rect.height)
 		val surfaceIntegrator: SurfaceIntegrator = DirectLightingSurfaceIntegrator(scene)
 		val volumeIntegrator: VolumeIntegrator = VacuumVolumeIntegrator
 		val sampler: Sampler = new StratifiedSampler(new Rectangle(0, 0, 799, 599), 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
@@ -78,32 +78,32 @@ object Main {
 	}
 
 	def createScene(): Scene = {
-//		val s1 = new Sphere(0.75, -1.0, 1.0, π * 4.0 / 3.0)
-//		val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, new Material), Transform.translate(0.0, 0.75, 4.0) * Transform.rotateY(π / 4.0) * Transform.rotateZ(π / 2.0))
-		val p1 = new TransformedPrimitive(createCube(0.5, new Material), Transform.translate(0.0, 0.75, 4.0) * Transform.rotateY(-π / 6.0) * Transform.rotateX(-π / 6.0))
+//		val s1 = new Sphere(0.75, -1.0f, 1.0f, π * 4.0f / 3.0f)
+//		val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, new Material), Transform.translate(0.0f, 0.75, 4.0f) * Transform.rotateY(π / 4.0f) * Transform.rotateZ(π / 2.0f))
+		val p1 = new TransformedPrimitive(createCube(0.5f, new Material), Transform.translate(0.0f, 0.75f, 4.0f) * Transform.rotateY(-π / 6.0f) * Transform.rotateX(-π / 6.0f))
 
-		val s2 = new Disk(3.0)
-		val p2 = new TransformedPrimitive(new GeometricPrimitive(s2, new Material), Transform.translate(0.0, 0.0, 4.0) * Transform.rotateX(-π / 2.0))
+		val s2 = new Disk(3.0f)
+		val p2 = new TransformedPrimitive(new GeometricPrimitive(s2, new Material), Transform.translate(0.0f, 0.0f, 4.0f) * Transform.rotateX(-π / 2.0f))
 
-//		val l1 = new DirectionalLightSource(new Vector(-0.5, -1.25, 4.0), new Spectrum(0.4, 0.4, 0.4))
-		val l1 = new PointLightSource(new Point(0.5, 2.0, 0.0), new Spectrum(5.0, 5.0, 5.0))
+//		val l1 = new DirectionalLightSource(new Vector(-0.5, -1.25, 4.0f), new Spectrum(0.4, 0.4, 0.4))
+		val l1 = new PointLightSource(new Point(0.5f, 2.0f, 0.0f), new Spectrum(5.0f, 5.0f, 5.0f))
 
-		val s3 = new Disk(1.5)
-		val t3 = Transform.translate(-0.3, 5.0, 3.5) * Transform.rotateX(π / 2.0)
-		val l2 = new AreaLightSource(s3, t3, new Spectrum(0.1, 0.1, 0.1), 10)
+		val s3 = new Disk(1.5f)
+		val t3 = Transform.translate(-0.3f, 5.0f, 3.5f) * Transform.rotateX(π / 2.0f)
+		val l2 = new AreaLightSource(s3, t3, new Spectrum(0.1f, 0.1f, 0.1f), 10)
 		val p3 = new TransformedPrimitive(new GeometricPrimitive(l2, new Material), t3)
 
 		new Scene(new CompositePrimitive(p1, p2, p3), Traversable(l1, l2))
 	}
 
-	def createCube(size: Double, material: Material): Primitive = {
+	def createCube(size: Float, material: Material): Primitive = {
 		import scala.collection.immutable.IndexedSeq
 
 		// TODO: Properly generate normals and u, v surface coordinates for vertices
 
 		// Generate vertices
 		val v: IndexedSeq[Vertex] = for (i <- 0 to 7) yield
-			new Vertex(Point(if ((i & 1) != 0) size else -size, if ((i & 2) != 0) size else -size, if ((i & 4) != 0) size else -size), Normal.Zero, 0.0, 0.0)
+			new Vertex(Point(if ((i & 1) != 0) size else -size, if ((i & 2) != 0) size else -size, if ((i & 4) != 0) size else -size), Normal.Zero, 0.0f, 0.0f)
 
 		// Front
 		val ft1 = new GeometricPrimitive(new Triangle(v(0), v(2), v(3)), material)

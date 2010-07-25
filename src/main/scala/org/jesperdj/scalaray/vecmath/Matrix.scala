@@ -20,18 +20,18 @@ package org.jesperdj.scalaray.vecmath
 import scala.collection.immutable.IndexedSeq
 
 // Matrix, used for transformations (pbrt A.6.2)
-private sealed class Matrix (elems: IndexedSeq[Double]) {
+private sealed class Matrix (elems: IndexedSeq[Float]) {
 	require(elems.length == 16, "A Matrix requires exactly 16 elements")
 
 	// Create a matrix (using varargs)
-	def this(elems: Double*) = this(IndexedSeq(elems: _*))
+	def this(elems: Float*) = this(IndexedSeq(elems: _*))
 
 	// Access a matrix element
 	def apply(row: Int, col: Int) = elems(row * 4 + col)
 
 	// Transform a point (pbrt 2.8.1)
 	def *(p: Point) = {
-		val w = 1.0 / (elems(12) * p.x + elems(13) * p.y + elems(14) * p.z + elems(15))
+		val w = 1.0f / (elems(12) * p.x + elems(13) * p.y + elems(14) * p.z + elems(15))
 		new Point(
 			(elems(0) * p.x + elems(1) * p.y + elems(2) * p.z + elems(3)) * w,
 			(elems(4) * p.x + elems(5) * p.y + elems(6) * p.z + elems(7)) * w,
@@ -70,7 +70,7 @@ private sealed class Matrix (elems: IndexedSeq[Double]) {
 		def cofactor(i: Int, j: Int) = {
 			def sub(row: Int, col: Int) = this(if (row < i) row else row + 1, if (col < j) col else col + 1)
 
-			(if ((i + j) % 2 == 0) 1.0 else -1.0) * (
+			(if ((i + j) % 2 == 0) 1.0f else -1.0f) * (
 				sub(0, 0) * sub(1, 1) * sub(2, 2) + sub(0, 1) * sub(1, 2) * sub(2, 0) + sub(0, 2) * sub(1, 0) * sub(2, 1) -
 				sub(0, 0) * sub(1, 2) * sub(2, 1) - sub(0, 1) * sub(1, 0) * sub(2, 2) - sub(0, 2) * sub(1, 1) * sub(2, 0))
 		}
@@ -78,7 +78,7 @@ private sealed class Matrix (elems: IndexedSeq[Double]) {
 		val adjugate = for (i <- 0 to 3; j <- 0 to 3) yield cofactor(j, i)
 
 		val determinant = elems(0) * adjugate(0) + elems(1) * adjugate(4) + elems(2) * adjugate(8) + elems(3) * adjugate(12)
-		require(math.abs(determinant) > 1e-9, "Singular matrix")
+		require(determinant.abs > 1e-9f, "Singular matrix")
 
 		new Matrix(adjugate map (_ / determinant))
 	}
@@ -88,7 +88,7 @@ private sealed class Matrix (elems: IndexedSeq[Double]) {
 
 private object Matrix {
 	// Matrix constants
-	val Identity: Matrix = new Matrix(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0) {
+	val Identity: Matrix = new Matrix(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f) {
 		override def *(p: Point) = p
 		override def *(v: Vector) = v
 		override def *(n: Normal) = n
@@ -101,8 +101,8 @@ private object Matrix {
 	}
 
 	// Create a matrix
-	def apply(elems: IndexedSeq[Double]) = new Matrix(elems)
+	def apply(elems: IndexedSeq[Float]) = new Matrix(elems)
 
 	// Create a matrix (using varargs)
-	def apply(elems: Double*) = new Matrix(elems: _*)
+	def apply(elems: Float*) = new Matrix(elems: _*)
 }

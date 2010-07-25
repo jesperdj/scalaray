@@ -23,18 +23,18 @@ import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 // Spot light source (pbrt 13.2.1)
-final class SpotLightSource (position: Point, direction: Vector, falloffAngle: Double, widthAngle: Double, intensity: Spectrum) extends DeltaLightSource {
+final class SpotLightSource (position: Point, direction: Vector, falloffAngle: Float, widthAngle: Float, intensity: Spectrum) extends DeltaLightSource {
 	require(widthAngle > falloffAngle, "Width angle must be greater than falloff angle for a spotlight")
 
 	// Create a new spot light source using a transform to specify the position and direction
-	def this(lightToWorld: Transform, falloffAngle: Double, widthAngle: Double, intensity: Spectrum) =
+	def this(lightToWorld: Transform, falloffAngle: Float, widthAngle: Float, intensity: Spectrum) =
 		this(lightToWorld * Point.Origin, (lightToWorld * Vector.ZAxis).normalize, falloffAngle, widthAngle, intensity)
 
-	private val cosFalloff = math.cos(falloffAngle)
-	private val cosWidth = math.cos(widthAngle)
+	private val cosFalloff = math.cos(falloffAngle).toFloat
+	private val cosWidth = math.cos(widthAngle).toFloat
 
 	// Total emitted power of this light source onto the scene (pbrt 13.2.1)
-	def totalPower(scene: Scene): Spectrum = intensity * (2.0 * π * (1.0 - 0.5 * (cosFalloff + cosWidth)))
+	def totalPower(scene: Scene): Spectrum = intensity * (2.0f * π * (1.0f - 0.5f * (cosFalloff + cosWidth)))
 
 	// Gets the incident radiance of this light source at the point (pbrt 13.2.1)
 	// Returns the radiance and a ray from the light source to the point
@@ -44,13 +44,13 @@ final class SpotLightSource (position: Point, direction: Vector, falloffAngle: D
 
 		// Compute falloff factor
 		val c = direction * rd.normalize
-		val f = if (c < cosWidth) 0.0 else if (c > cosFalloff) 1.0 else {
+		val f = if (c < cosWidth) 0.0f else if (c > cosFalloff) 1.0f else {
 			val d = (c - cosWidth) / (cosFalloff - cosWidth)
 			d * d * d * d
 		}
 
 		// Compute radiance, attenuates by falloff factor and distance
-		(if (f > 0.0) intensity * (f / (rd.x * rd.x + rd.y * rd.y + rd.z * rd.z)) else Spectrum.Black, new Ray(position, rd, 0.0, 1.0))
+		(if (f > 0.0f) intensity * (f / (rd.x * rd.x + rd.y * rd.y + rd.z * rd.z)) else Spectrum.Black, new Ray(position, rd, 0.0f, 1.0f))
 	}
 
 	override def toString = "SpotLightSource(position=%s, direction=%s, falloffAngle=%g, widthAndle=%g, intensity=%s)" format

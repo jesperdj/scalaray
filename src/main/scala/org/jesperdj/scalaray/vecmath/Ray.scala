@@ -18,12 +18,12 @@
 package org.jesperdj.scalaray.vecmath
 
 // Ray (pbrt 2.5)
-sealed class Ray (val origin: Point, val direction: Vector, val minDistance: Double = 0.0, val maxDistance: Double = Double.PositiveInfinity) {
+sealed class Ray (val origin: Point, val direction: Vector, val minDistance: Float = 0.0f, val maxDistance: Float = Float.PositiveInfinity) {
 	// Check if distance t is in the valid range of this ray
-	def isInRange(t: Double) = t >= minDistance && t <= maxDistance
+	def isInRange(t: Float) = t >= minDistance && t <= maxDistance
 
 	// Get a point along the ray
-	def point(t: Double) = origin + direction * t
+	def point(t: Float) = origin + direction * t
 
 	override def toString = "Ray(origin=%s, direction=%s, minDistance=%g, maxDistance=%g)" format (origin, direction, minDistance, maxDistance)
 }
@@ -31,7 +31,7 @@ sealed class Ray (val origin: Point, val direction: Vector, val minDistance: Dou
 // Ray differential (pbrt 2.5.1)
 final class RayDifferential (
 	origin: Point, direction: Vector, val rxOrigin: Point, val rxDirection: Vector, val ryOrigin: Point, val ryDirection: Vector,
-	minDistance: Double = 0.0, maxDistance: Double = Double.PositiveInfinity) extends Ray(origin, direction, minDistance, maxDistance) {
+	minDistance: Float = 0.0f, maxDistance: Float = Float.PositiveInfinity) extends Ray(origin, direction, minDistance, maxDistance) {
 
 	override def toString =
 		"RayDifferential(origin=%s, direction=%s, rxOrigin=%s, rxDirection=%s, ryOrigin=%s, ryDirection=%s, minDistance=%g, maxDistance=%g)" format
@@ -40,7 +40,7 @@ final class RayDifferential (
 
 object Ray {
 	// Create a ray
-	def apply(origin: Point, direction: Vector, minDistance: Double = 0.0, maxDistance: Double = Double.PositiveInfinity) =
+	def apply(origin: Point, direction: Vector, minDistance: Float = 0.0f, maxDistance: Float = Float.PositiveInfinity) =
 		new Ray(origin, direction, minDistance, maxDistance)
 
 	// Create a ray differential

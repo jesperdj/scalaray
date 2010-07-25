@@ -35,13 +35,13 @@ final class Raster (val rectangle: Rectangle, filter: Filter) {
 
 	def addSample(sample: CameraSample, spectrum: Spectrum): Unit = {
 		// Determine the raster extent of the sample
-		val ix = sample.imageX - 0.5
-		val iy = sample.imageY - 0.5
+		val ix = sample.imageX - 0.5f
+		val iy = sample.imageY - 0.5f
 
-		val minX = math.max(math.ceil(ix - filter.extentX).toInt, rectangle.left)
-		val maxX = math.min(math.floor(ix + filter.extentX).toInt, rectangle.right)
-		val minY = math.max(math.ceil(iy - filter.extentY).toInt, rectangle.top)
-		val maxY = math.min(math.floor(iy + filter.extentY).toInt, rectangle.bottom)
+		val minX = math.max((ix - filter.extentX).ceil.toInt, rectangle.left)
+		val maxX = math.min((ix + filter.extentX).floor.toInt, rectangle.right)
+		val minY = math.max((iy - filter.extentY).ceil.toInt, rectangle.top)
+		val maxY = math.min((iy + filter.extentY).floor.toInt, rectangle.bottom)
 
 		// Add radiance to relevant pixels in the raster, weighted by reconstruction filter
 		for (y <- minY to maxY; x <- minX to maxX) pixels(x, y).add(spectrum, filter(x - ix, y - iy))
@@ -55,7 +55,7 @@ final class Raster (val rectangle: Rectangle, filter: Filter) {
 		for (y <- rectangle.top to rectangle.bottom; x <- rectangle.left to rectangle.right) {
 			val px = x - rectangle.left; val py = y - rectangle.top
 			val (red, green, blue) = pixels(px, py).spectrum.toRGB
-			image.setRGB(px, py, (clamp(red, 0.0, 1.0) * 255.0).toInt << 16 | (clamp(green, 0.0, 1.0) * 255.0).toInt << 8 | (clamp(blue, 0.0, 1.0) * 255.0).toInt)
+			image.setRGB(px, py, (clamp(red, 0.0f, 1.0f) * 255.0f).toInt << 16 | (clamp(green, 0.0f, 1.0f) * 255.0f).toInt << 8 | (clamp(blue, 0.0f, 1.0f) * 255.0f).toInt)
 		}
 
 		image

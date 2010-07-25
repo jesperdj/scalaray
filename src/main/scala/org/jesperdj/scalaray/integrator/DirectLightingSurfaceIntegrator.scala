@@ -25,6 +25,7 @@ import org.jesperdj.scalaray.reflection.BSDF
 import org.jesperdj.scalaray.sampler.{ Sample, SampleSpec, SampleSpec1D, SampleSpec2D }
 import org.jesperdj.scalaray.scene.{ Intersection, Scene }
 import org.jesperdj.scalaray.spectrum.Spectrum
+import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 // Identifiers of sample patterns for an area light source
@@ -48,7 +49,7 @@ final class DirectLightingSurfaceIntegrator private (
 
 			// TODO: This does not work if the light source is on the wrong side of the surface. Solve the self-intersection problem differently.
 			// Point for shadow ray calculations just above surface to avoid self-intersection
-			val shadowPoint = dg.point + dg.normal * 1e-6
+			val shadowPoint = dg.point + dg.normal * 1e-6f
 
 			// Get radiance of direct light from light sources on the intersection point
 			val direct = uniformSampleAllLights(shadowPoint, dg.normal, wo, intersection.bsdf, sample)
@@ -95,20 +96,20 @@ final class DirectLightingSurfaceIntegrator private (
 		// Trace shadow ray
 		if (scene.intersect(ray).isDefined) return Spectrum.Black
 
-		radiance * reflectance * math.abs(wi * normal)
+		radiance * reflectance * (wi * normal).abs
 	}
 
 	// Sample direct light from an area light source on the intersection point
 	private def estimateDirect(areaLight: AreaLightSource, point: Point, normal: Normal, wo: Vector, bsdf: BSDF,
-							   lightSamples: IndexedSeq[(Double, Double)],
-							   bsdfSamples: IndexedSeq[(Double, Double)], bsdfComponentSamples: IndexedSeq[Double]): Spectrum = {
+							   lightSamples: IndexedSeq[(Float, Float)],
+							   bsdfSamples: IndexedSeq[(Float, Float)], bsdfComponentSamples: IndexedSeq[Float]): Spectrum = {
 		// Sample light source
 		var lightContrib = Spectrum.Black
 		for (i <- 0 until lightSamples.size) {
 			val ls = lightSamples(i)
 
 			val (radiance, ray, lightPdf) = areaLight.sampleRadiance(point, ls._1, ls._2)
-			if (lightPdf > 0.0 && !radiance.isBlack) {
+			if (lightPdf > 0.0f && !radiance.isBlack) {
 				val wi = -ray.direction.normalize
 
 				// Evaluate BSDF
@@ -117,7 +118,7 @@ final class DirectLightingSurfaceIntegrator private (
 					// Trace shadow ray
 					if (scene.intersect(ray).isEmpty) {
 						// Add weighed contribution for this sample to total
-						lightContrib +*= (radiance * reflectance, math.abs(wi * normal) * powerHeuristic(1, lightPdf, 1, bsdf.pdf(wo, wi)) / lightPdf)
+						lightContrib +*= (radiance * reflectance, (wi * normal).abs * powerHeuristic(1, lightPdf, 1, bsdf.pdf(wo, wi)) / lightPdf)
 					}
 				}
 			}
@@ -129,11 +130,11 @@ final class DirectLightingSurfaceIntegrator private (
 			val bss = bsdfSamples(i); val bcs = bsdfComponentSamples(i)
 
 			val (reflectance, wi, bsdfPdf) = bsdf.sample(wo, bss._1, bss._2, bcs)
-			if (bsdfPdf > 0.0 && !reflectance.isBlack) {
+			if (bsdfPdf > 0.0f && !reflectance.isBlack) {
 				val ray = Ray(point, wi)
 
 				val lightPdf = areaLight.pdf(ray)
-				if (lightPdf > 0.0) {
+				if (lightPdf > 0.0f) {
 					// Evaluate radiance from area light source
 					val radiance = scene.intersect(ray) match {
 						case Some(Intersection(dg, _, prim)) if (prim.areaLightSource.isDefined && prim.areaLightSource.get == areaLight) =>
@@ -150,7 +151,7 @@ final class DirectLightingSurfaceIntegrator private (
 
 					if (!radiance.isBlack) {
 						// Add weighed contribution for this sample to total
-						bsdfContrib +*= (radiance * reflectance, math.abs(wi * normal) * powerHeuristic(1, bsdfPdf, 1, lightPdf) / bsdfPdf)
+						bsdfContrib +*= (radiance * reflectance, (wi * normal).abs * powerHeuristic(1, bsdfPdf, 1, lightPdf) / bsdfPdf)
 					}
 				}
 			}
@@ -160,11 +161,11 @@ final class DirectLightingSurfaceIntegrator private (
 	}
 
 	// Balance heuristic weighing function for multiple importance sampling (pbrt 15.4.1)
-	private def balanceHeuristic(nf: Int, fPdf: Double, ng: Int, gPdf: Double): Double =
+	private def balanceHeuristic(nf: Int, fPdf: Float, ng: Int, gPdf: Float): Float =
 		(nf * fPdf) / (nf * fPdf + ng * gPdf)
 
 	// Power heuristic weighing function for multiple importance sampling (pbrt 15.4.1)
-	private def powerHeuristic(nf: Int, fPdf: Double, ng: Int, gPdf: Double): Double = {
+	private def powerHeuristic(nf: Int, fPdf: Float, ng: Int, gPdf: Float): Float = {
 		val f = nf * fPdf; val g = ng * gPdf
 		(f * f) / (f * f + g * g)
 	}

@@ -22,23 +22,23 @@ import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 // Sphere (pbrt 3.2)
-final class Sphere (radius: Double = 1.0, minZ: Double = Double.NegativeInfinity, maxZ: Double = Double.PositiveInfinity, maxPhi: Double = 2.0 * π) extends Quadric {
-	require(radius > 0.0, "radius must be > 0")
+final class Sphere (radius: Float = 1.0f, minZ: Float = Float.NegativeInfinity, maxZ: Float = Float.PositiveInfinity, maxPhi: Float = 2.0f * π) extends Quadric {
+	require(radius > 0.0f, "radius must be > 0")
 	require(minZ < maxZ, "minZ must be < maxZ")
-	require(maxPhi >= 0.0 && maxPhi <= 2.0 * π, "maxPhi must be >= 0 and <= 2π")
+	require(maxPhi >= 0.0f && maxPhi <= 2.0f * π, "maxPhi must be >= 0 and <= 2π")
 
 	// Minimum and maximum θ angle (pbrt 3.2.1)
-	private val minTheta = math.acos(clamp(minZ / radius, -1.0, 1.0))
-	private val maxTheta = math.acos(clamp(maxZ / radius, -1.0, 1.0))
+	private val minTheta = math.acos(clamp(minZ / radius, -1.0f, 1.0f)).toFloat
+	private val maxTheta = math.acos(clamp(maxZ / radius, -1.0f, 1.0f)).toFloat
 	private val diffTheta = maxTheta - minTheta
 
 	// Bounding box that contains the shape (pbrt 3.2.2)
 	val boundingBox: BoundingBox = BoundingBox(Point(-radius, -radius, minZ), Point(radius, radius, maxZ))
 
 	// Compute quadratic coefficients (pbrt 3.2.3)
-	protected def computeCoefficients(ray: Ray): (Double, Double, Double) =
+	protected def computeCoefficients(ray: Ray): (Float, Float, Float) =
 		(ray.direction.x * ray.direction.x + ray.direction.y * ray.direction.y + ray.direction.z * ray.direction.z,
-		 2.0 * (ray.direction.x * ray.origin.x + ray.direction.y * ray.origin.y + ray.direction.z * ray.origin.z),
+		 2.0f * (ray.direction.x * ray.origin.x + ray.direction.y * ray.origin.y + ray.direction.z * ray.origin.z),
 		 ray.origin.x * ray.origin.x + ray.origin.y * ray.origin.y + ray.origin.z * ray.origin.z - radius * radius)
 
 	// Get differential geometry for an intersection point (pbrt 3.2.4, 3.2.5, 3.2.6)
@@ -47,7 +47,7 @@ final class Sphere (radius: Double = 1.0, minZ: Double = Double.NegativeInfinity
 		if (p.z < minZ || p.z > maxZ) return None
 
 		// Check against max φ
-		val phi = { val f = math.atan2(p.y, p.x); if (f >= 0.0) f else f + 2.0 * π }
+		val phi = { val f = math.atan2(p.y, p.x).toFloat; if (f >= 0.0f) f else f + 2.0f * π }
 		if (phi > maxPhi) return None
 
 		// Initialize differential geometry
@@ -58,22 +58,22 @@ final class Sphere (radius: Double = 1.0, minZ: Double = Double.NegativeInfinity
 			// Surface normal (better method than what's used in pbrt)
 			lazy val normal: Normal = Normal(p).normalize
 
-			private lazy val theta = math.acos(clamp(p.z / radius, -1.0, 1.0))
+			private lazy val theta = math.acos(clamp(p.z / radius, -1.0f, 1.0f)).toFloat
 
 			// Surface parameter coordinates (pbrt 3.3.4)
-			lazy val u: Double = phi / maxPhi
-			lazy val v: Double = (theta - minTheta) / diffTheta
+			lazy val u: Float = phi / maxPhi
+			lazy val v: Float = (theta - minTheta) / diffTheta
 
 			// Partial derivatives of the surface position and normal
 			lazy val (dpdu, dpdv, dndu, dndv): (Vector, Vector, Normal, Normal) = {
-				val radiusZ = math.sqrt(p.x * p.x + p.y * p.y)
-				val (cosPhi, sinPhi) = if (radiusZ > 0.0) (p.x / radiusZ, p.y / radiusZ) else (0.0, 1.0)
+				val radiusZ = math.sqrt(p.x * p.x + p.y * p.y).toFloat
+				val (cosPhi, sinPhi) = if (radiusZ > 0.0f) (p.x / radiusZ, p.y / radiusZ) else (0.0f, 1.0f)
 
-				val dpdv = Vector(cosPhi * p.z, sinPhi * p.z, -radius * math.sin(theta)) * diffTheta
-				val dpdu = if (radiusZ > 0.0) Vector(-maxPhi * p.y, maxPhi * p.x, 0.0) else dpdv ** Vector(p)
+				val dpdv = Vector(cosPhi * p.z, sinPhi * p.z, -radius * math.sin(theta).toFloat) * diffTheta
+				val dpdu = if (radiusZ > 0.0f) Vector(-maxPhi * p.y, maxPhi * p.x, 0.0f) else dpdv ** Vector(p)
 
-				val d2Pduu = Vector(p.x, p.y, 0.0) * (-maxPhi * maxPhi)
-				val d2Pduv = Vector(-sinPhi, cosPhi, 0.0) * (diffTheta * maxPhi * p.z)
+				val d2Pduu = Vector(p.x, p.y, 0.0f) * (-maxPhi * maxPhi)
+				val d2Pduv = Vector(-sinPhi, cosPhi, 0.0f) * (diffTheta * maxPhi * p.z)
 				val d2Pdvv = Vector(p) * (-diffTheta * diffTheta)
 
 				val E = dpdu * dpdu; val F = dpdu * dpdv; val G = dpdv * dpdv
@@ -93,24 +93,24 @@ final class Sphere (radius: Double = 1.0, minZ: Double = Double.NegativeInfinity
 	}
 
 	// Surface area (pbrt 3.2.7)
-	val surfaceArea: Double = maxPhi * radius * (maxZ - minZ)
+	val surfaceArea: Float = maxPhi * radius * (maxZ - minZ)
 
 	// Sample a point on the surface using the random variables u1, u2 (pbrt 15.6.3)
 	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
-	def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double) = {
+	def sampleSurface(u1: Float, u2: Float): (Point, Normal, Float) = {
 		val p = SampleTransforms.uniformSampleSphere(u1, u2)
-		(p * radius, Normal(p), 1.0 / surfaceArea)
+		(p * radius, Normal(p), 1.0f / surfaceArea)
 		// TODO: We are not taking partial spheres into account (innerRadius and maxPhi). See pbrt exercise 15.1 (page 716).
 	}
 
 	// Sample a point on the surface with respect to a point from which the shape is visible using the random variables u1, u2 (pbrt 15.6.3)
 	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
-	override def sampleSurface(viewPoint: Point, u1: Double, u2: Double): (Point, Normal, Double) =
+	override def sampleSurface(viewPoint: Point, u1: Float, u2: Float): (Point, Normal, Float) =
 		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement this; see pbrt 15.6.3 (page 705-708)
 
 	// Get the value of the probability density function at the intersection point between the given ray and this shape with respect to
-	// the distribution that sampleSurface(viewPoint: Point, u1: Double, u2: Double) uses to sample points (pbrt 15.6.3)
-	override def pdf(ray: Ray): Double =
+	// the distribution that sampleSurface(viewPoint: Point, u1: Float, u2: Float) uses to sample points (pbrt 15.6.3)
+	override def pdf(ray: Ray): Float =
 		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement this; see pbrt 15.6.3 (page 708)
 
 	override def toString = "Sphere(radius=%g, minZ=%g, maxZ=%g, maxPhi=%g)" format (radius, minZ, maxZ, maxPhi)

@@ -18,36 +18,26 @@
 package org.jesperdj.scalaray
 
 package object util {
-	val π = math.Pi
+	val π = math.Pi.toFloat
 
 	// Clamp a value between a low and high bound
-	@inline def clamp[@specialized(Int, Double) N : Ordering](value: N, low: N, high: N): N = {
+	@inline def clamp[@specialized(Int, Float) N : Ordering](value: N, low: N, high: N): N = {
 		import Ordered._
 		if (value < low) low else if (value > high) high else value
 	}
 
 	// Get the minimum and maximum of two values as a pair
-	@inline def minmax[@specialized(Int, Double) N : Ordering](a: N, b: N): (N, N) = {
+	@inline def minmax[@specialized(Int, Float) N : Ordering](a: N, b: N): (N, N) = {
 		import Ordered._
 		if (a <= b) (a, b) else (b, a)
 	}
 
 	// Linearly interpolate a value
 	@inline def interpolate(t: Float, a: Float, b: Float): Float = a * (1.0f - t) + b * t
-	@inline def interpolate(t: Double, a: Double, b: Double): Double = a * (1.0 - t) + b * t
-
-	// Round up to the next larger or equal power of 2
-	def roundUpPow2(value: Int): Int = {
-		if (value < 2) 2 else {
-			var result = 0x40000000
-			while (value <= result) { result >>= 1 }
-			result << 1
-		}
-	}
 
 	// Randomly permutate an array - Fisher-Yates shuffle (see: http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
 	// This method can also take a custom swap method, which is useful for example for Latin hypercube sampling
-	def shuffle[@specialized(Double) T](array: Array[T], swap: (T, T) => (T, T) = { (a: T, b: T) => (b, a) }): Array[T] = {
+	def shuffle[@specialized(Float) T](array: Array[T], swap: (T, T) => (T, T) = { (a: T, b: T) => (b, a) }): Array[T] = {
 		val random = new scala.util.Random
 
 		for (n <- array.length - 1 to 0 by -1) {

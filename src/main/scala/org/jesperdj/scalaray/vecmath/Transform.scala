@@ -44,7 +44,7 @@ sealed class Transform private[vecmath] (private[vecmath] val mat: Matrix, priva
 	def hasScale: Boolean = {
 		val det = mat(0, 0) * mat(1, 1) * mat(2, 2) + mat(0, 1) * mat(1, 2) * mat(2, 0) + mat(0, 2) * mat(1, 0) * mat(2, 1) -
 				  mat(0, 0) * mat(1, 2) * mat(2, 1) - mat(0, 1) * mat(1, 0) * mat(2, 2) - mat(0, 2) * mat(1, 1) * mat(2, 0)
-		det < 0.999 || det > 1.001
+		det < 0.999f || det > 1.001f
 	}
 
 	override def toString = "Transform(mat=%s, inv=%s)" format (mat, inv)
@@ -64,57 +64,57 @@ object Transform {
 	}
 
 	// Create a translation (pbrt 2.7.3)
-	def translate(x: Double, y: Double, z: Double) = new Transform(
-		new Matrix(1.0, 0.0, 0.0, x, 0.0, 1.0, 0.0, y, 0.0, 0.0, 1.0, z, 0.0, 0.0, 0.0, 1.0),
-		new Matrix(1.0, 0.0, 0.0, -x, 0.0, 1.0, 0.0, -y, 0.0, 0.0, 1.0, -z, 0.0, 0.0, 0.0, 1.0))
+	def translate(x: Float, y: Float, z: Float) = new Transform(
+		new Matrix(1.0f, 0.0f, 0.0f, x, 0.0f, 1.0f, 0.0f, y, 0.0f, 0.0f, 1.0f, z, 0.0f, 0.0f, 0.0f, 1.0f),
+		new Matrix(1.0f, 0.0f, 0.0f, -x, 0.0f, 1.0f, 0.0f, -y, 0.0f, 0.0f, 1.0f, -z, 0.0f, 0.0f, 0.0f, 1.0f))
 
 	// Create a translation using a vector (pbrt 2.7.3)
 	def translate(v: Vector): Transform = translate(v.x, v.y, v.z)
 
 	// Create a uniform scaling transform (pbrt 2.7.4)
-	def scale(f: Double) = new Transform(
-		new Matrix(f, 0.0, 0.0, 0.0, 0.0, f, 0.0, 0.0, 0.0, 0.0, f, 0.0, 0.0, 0.0, 0.0, 1.0),
-		new Matrix(1.0 / f, 0.0, 0.0, 0.0, 0.0, 1.0 / f, 0.0, 0.0, 0.0, 0.0, 1.0 / f, 0.0, 0.0, 0.0, 0.0, 1.0))
+	def scale(f: Float) = new Transform(
+		new Matrix(f, 0.0f, 0.0f, 0.0f, 0.0f, f, 0.0f, 0.0f, 0.0f, 0.0f, f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f),
+		new Matrix(1.0f / f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f / f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f / f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f))
 
 	// Create a non-uniform scaling transform (pbrt 2.7.4)
-	def scale(fx: Double, fy: Double, fz: Double) = new Transform(
-		new Matrix(fx, 0.0, 0.0, 0.0, 0.0, fy, 0.0, 0.0, 0.0, 0.0, fz, 0.0, 0.0, 0.0, 0.0, 1.0),
-		new Matrix(1.0 / fx, 0.0, 0.0, 0.0, 0.0, 1.0 / fy, 0.0, 0.0, 0.0, 0.0, 1.0 / fz, 0.0, 0.0, 0.0, 0.0, 1.0))
+	def scale(fx: Float, fy: Float, fz: Float) = new Transform(
+		new Matrix(fx, 0.0f, 0.0f, 0.0f, 0.0f, fy, 0.0f, 0.0f, 0.0f, 0.0f, fz, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f),
+		new Matrix(1.0f / fx, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f / fy, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f / fz, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f))
 
 	// Create a rotation around the X axis (pbrt 2.7.5)
-	def rotateX(angle: Double) = {
-		val ca = math.cos(angle)
-		val sa = math.sin(angle)
+	def rotateX(angle: Float) = {
+		val ca = math.cos(angle).toFloat
+		val sa = math.sin(angle).toFloat
 		new Transform(
-			new Matrix(1.0, 0.0, 0.0, 0.0, 0.0, ca, -sa, 0.0, 0.0, sa, ca, 0.0, 0.0, 0.0, 0.0, 1.0),
-			new Matrix(1.0, 0.0, 0.0, 0.0, 0.0, ca, sa, 0.0, 0.0, -sa, ca, 0.0, 0.0, 0.0, 0.0, 1.0))
+			new Matrix(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, ca, -sa, 0.0f, 0.0f, sa, ca, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f),
+			new Matrix(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, ca, sa, 0.0f, 0.0f, -sa, ca, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f))
 	}
 
 	// Create a rotation around the Y axis (pbrt 2.7.5)
-	def rotateY(angle: Double) = {
-		val ca = math.cos(angle)
-		val sa = math.sin(angle)
+	def rotateY(angle: Float) = {
+		val ca = math.cos(angle).toFloat
+		val sa = math.sin(angle).toFloat
 		new Transform(
-			new Matrix(ca, 0.0, sa, 0.0, 0.0, 1.0, 0.0, 0.0, -sa, 0.0, ca, 0.0, 0.0, 0.0, 0.0, 1.0),
-			new Matrix(ca, 0.0, -sa, 0.0, 0.0, 1.0, 0.0, 0.0, sa, 0.0, ca, 0.0, 0.0, 0.0, 0.0, 1.0))
+			new Matrix(ca, 0.0f, sa, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -sa, 0.0f, ca, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f),
+			new Matrix(ca, 0.0f, -sa, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, sa, 0.0f, ca, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f))
 	}
 
 	// Create a rotation around the Z axis (pbrt 2.7.5)
-	def rotateZ(angle: Double) = {
-		val ca = math.cos(angle)
-		val sa = math.sin(angle)
+	def rotateZ(angle: Float) = {
+		val ca = math.cos(angle).toFloat
+		val sa = math.sin(angle).toFloat
 		new Transform(
-			new Matrix(ca, -sa, 0.0, 0.0, sa, ca, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0),
-			new Matrix(ca, sa, 0.0, 0.0, -sa, ca, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0))
+			new Matrix(ca, -sa, 0.0f, 0.0f, sa, ca, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f),
+			new Matrix(ca, sa, 0.0f, 0.0f, -sa, ca, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f))
 	}
 
 	// Create a rotation around an arbitrary axis (pbrt 2.7.6)
-	def rotate(angle: Double, axis: Vector) = {
+	def rotate(angle: Float, axis: Vector) = {
 		val a = axis.normalize
-		val c = math.cos(angle)
-		val s = math.sin(angle)
+		val c = math.cos(angle).toFloat
+		val s = math.sin(angle).toFloat
 
-		val cc = 1.0 - c
+		val cc = 1.0f - c
 
 		val t1 = a.x * a.y * cc
 		val t2 = a.x * a.z * cc
@@ -125,10 +125,10 @@ object Transform {
 		val u3 = a.z * s
 
 		val m = new Matrix(
-			a.x * a.x * cc + c, t1 - u3, t2 + u2, 0.0,
-			t1 + u3, a.y * a.y * cc + c, t3 - u1, 0.0,
-			t2 - u2, t3 + u1, a.z * a.z * cc + c, 0.0,
-			0.0, 0.0, 0.0, 1.0)
+			a.x * a.x * cc + c, t1 - u3, t2 + u2, 0.0f,
+			t1 + u3, a.y * a.y * cc + c, t3 - u1, 0.0f,
+			t2 - u2, t3 + u1, a.z * a.z * cc + c, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f)
 
 		new Transform(m, m.transpose)
 	}
@@ -143,18 +143,18 @@ object Transform {
 			left.x, newUp.x, dir.x, pos.x,
 			left.y, newUp.y, dir.y, pos.y,
 			left.z, newUp.z, dir.z, pos.z,
-			0.0, 0.0, 0.0, 1.0)
+			0.0f, 0.0f, 0.0f, 1.0f)
 
 		new Transform(m.inverse, m)
 	}
 
 	// Orthographic transform (pbrt 6.2.1)
-//	def orthographic(near: Double, far: Double) = scale(1.0, 1.0, 1.0 / (far - near)) * translate(0.0, 0.0, -near)
+//	def orthographic(near: Float, far: Float) = scale(1.0f, 1.0f, 1.0f / (far - near)) * translate(0.0f, 0.0f, -near)
 
 	// Perspective transform (pbrt 6.2.2)
-//	def perspective(angleOfView: Double, near: Double, far: Double) = {
-//		val s = 1.0 / math.tan(angleOfView * 0.5)
-//		val m = new Matrix(s, 0.0, 0.0, 0.0, 0.0, s, 0.0, 0.0, 0.0, 0.0, far / (far - near), -far * near / (far - near), 0.0, 0.0, 1.0, 0.0)
+//	def perspective(angleOfView: Float, near: Float, far: Float) = {
+//		val s = 1.0f / math.tan(angleOfView * 0.5f).toFloat
+//		val m = new Matrix(s, 0.0f, 0.0f, 0.0f, 0.0f, s, 0.0f, 0.0f, 0.0f, 0.0f, far / (far - near), -far * near / (far - near), 0.0f, 0.0f, 1.0f, 0.0f)
 //		new Transform(m, m.inverse)
 //	}
 }

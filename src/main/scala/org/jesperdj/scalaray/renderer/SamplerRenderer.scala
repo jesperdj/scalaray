@@ -23,7 +23,6 @@ import org.jesperdj.scalaray.raster.Raster
 import org.jesperdj.scalaray.sampler.{ Sample, Sampler }
 import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath.Ray
 
 // Sampler renderer
@@ -61,7 +60,7 @@ final class SamplerRenderer (scene: Scene, sampler: Sampler, surfaceIntegrator: 
 		while (!executorService.isTerminated()) {
 			executorService.awaitTermination(10, TimeUnit.SECONDS)
 			println("%d/%d tasks done (%d%%)" format
-					(numSamplers - runningTasks.intValue, numSamplers, 100 - (100f * runningTasks.floatValue / numSamplers).toInt))
+					(numSamplers - runningTasks.intValue, numSamplers, 100 - (100.0f * runningTasks.floatValue / numSamplers).toInt))
 		}
 	}
 

@@ -44,10 +44,10 @@ final class BSDF (dg: DifferentialGeometry, bxdfs: IndexedSeq[BxDF]) {
 		Spectrum.Unit // TODO
 
 	// TODO: Description. Returns reflectance, wi and pdf
-	def sample(wo: Vector, u1: Double, u2: Double, u3: Double): (Spectrum, Vector, Double) =
-		(Spectrum.Unit, Vector(-wo.x, -wo.y, wo.z), 1.0) // TODO
+	def sample(wo: Vector, u1: Float, u2: Float, u3: Float): (Spectrum, Vector, Float) =
+		(Spectrum.Unit, Vector(-wo.x, -wo.y, wo.z), 1.0f) // TODO
 
 	// TODO: Description
-	def pdf(wo: Vector, wi: Vector): Double =
-		if (wo.z * wi.z > 0.0) math.abs(wi.z) / π else 0.0 // TODO
+	def pdf(wo: Vector, wi: Vector): Float =
+		if (wo.z * wi.z > 0.0f) wi.z.abs / π else 0.0f // TODO
 }

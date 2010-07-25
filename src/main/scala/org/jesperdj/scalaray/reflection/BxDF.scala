@@ -28,7 +28,7 @@ sealed abstract class BxDF {
 	def apply(wo: Vector, wi: Vector): Spectrum
 
 	// TODO: Description. Returns reflectance, wi and pdf
-	def sample(wo: Vector, u1: Double, u2: Double): (Spectrum, Vector, Double)
+	def sample(wo: Vector, u1: Float, u2: Float): (Spectrum, Vector, Float)
 }
 
 // Bidirectional Reflectance Distribution Function

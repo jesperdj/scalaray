@@ -20,13 +20,13 @@ package org.jesperdj.scalaray.sampler
 import scala.collection.immutable.{ IndexedSeq, Map }
 
 // Camera sample
-sealed class CameraSample (val imageX: Double, val imageY: Double, val lensU: Double, val lensV: Double, val time: Double) {
+sealed class CameraSample (val imageX: Float, val imageY: Float, val lensU: Float, val lensV: Float, val time: Float) {
 	override def toString = "CameraSample(imageX=%g, imageY=%g, lensU=%g, lensV=%g, time=%g)" format (imageX, imageY, lensU, lensV, time)
 }
 
 // Sample, a camera sample with 1D and 2D sample patterns
-final class Sample (imageX: Double, imageY: Double, lensU: Double, lensV: Double, time: Double, val samples1D: Map[Int, IndexedSeq[Double]],
-					val samples2D: Map[Int, IndexedSeq[(Double, Double)]]) extends CameraSample (imageX, imageY, lensU, lensV, time) {
+final class Sample (imageX: Float, imageY: Float, lensU: Float, lensV: Float, time: Float, val samples1D: Map[Int, IndexedSeq[Float]],
+					val samples2D: Map[Int, IndexedSeq[(Float, Float)]]) extends CameraSample (imageX, imageY, lensU, lensV, time) {
 
 	override def toString = "Sample(imageX=%g, imageY=%g, lensU=%g, lensV=%g, time=%g, samples1D=%s, samples2D=%s)" format
 		(imageX, imageY, lensU, lensV, time, samples1D, samples2D)

@@ -22,13 +22,13 @@ import org.jesperdj.scalaray.spectrum._
 // Pixel (mutable)
 final class Pixel {
 	private var value = Spectrum.Black
-	private var weight = 0.0
+	private var weight = 0.0f
 
 	// Add a spectrum with the specified weight to this pixel
-	def add(s: Spectrum, w: Double): Unit = synchronized { value +*= (s, w); weight += w }
+	def add(s: Spectrum, w: Float): Unit = synchronized { value +*= (s, w); weight += w }
 
 	// Get the spectrum of this pixel
-	def spectrum: Spectrum = if (weight == 0.0) Spectrum.Black else value / weight
+	def spectrum: Spectrum = if (weight == 0.0f) Spectrum.Black else value / weight
 
 	override def toString = "Pixel(value=%s, weight=%g)" format (value, weight)
 }

@@ -29,7 +29,7 @@ final class Scene (primitive: Primitive, val lightSources: Traversable[LightSour
 	def boundingBox: BoundingBox = primitive.boundingBox
 
 	// Bounding sphere of the whole scene
-	def boundingSphere: (Point, Double) = boundingBox.boundingSphere
+	def boundingSphere: (Point, Float) = boundingBox.boundingSphere
 
 	// Compute intersection between a ray and primitives in the scene
 	def intersect(ray: Ray): Option[Intersection] = primitive intersect ray

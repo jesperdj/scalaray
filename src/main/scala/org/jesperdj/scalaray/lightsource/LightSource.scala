@@ -54,7 +54,7 @@ final class AreaLightSource (val shape: Shape, shapeToWorld: Transform, power: S
 
 	// Sample the incident radiance of this light source at the point using the random variables u1, u2 (pbrt 15.6.3)
 	// Returns the radiance, a ray from light source to the point and the value of the probability distribution function for this sample
-	def sampleRadiance(point: Point, u1: Double, u2: Double): (Spectrum, Ray, Double) = {
+	def sampleRadiance(point: Point, u1: Float, u2: Float): (Spectrum, Ray, Float) = {
 		// Sample a point on the surface of the area light with respect to the given point
 		val (sp, sn, pdf) = shape.sampleSurface(worldToShape * point, u1, u2)
 
@@ -63,20 +63,20 @@ final class AreaLightSource (val shape: Shape, shapeToWorld: Transform, power: S
 		val n = shapeToWorld * sn
 
 		// Point for shadow ray calculations just above light surface to avoid self-intersection
-		val lightPoint = p + n * 1e-6
+		val lightPoint = p + n * 1e-6f
 
 		// Ray direction from point on light source to given point
 		val rd = point - lightPoint
 
 		// Return the radiance only if the light shines from the right side of the surface of the light source
-		(if (n * rd > 0.0) power else Spectrum.Black, new Ray(lightPoint, rd, 0.0, 1.0), pdf)
+		(if (n * rd > 0.0f) power else Spectrum.Black, new Ray(lightPoint, rd, 0.0f, 1.0f), pdf)
 	}
 
 	// Get the value of the probability density function for the incoming direction wi (pbrt 15.6.3)
-	def pdf(ray: Ray): Double = shape.pdf(worldToShape * ray)
+	def pdf(ray: Ray): Float = shape.pdf(worldToShape * ray)
 
 	// The area light's emitted radiance from a given point with the given normal on the surface of the light in the given direction (pbrt 13.4)
-	def emittedRadiance(point: Point, normal: Normal, direction: Vector): Spectrum = if (normal * direction > 0.0) power else Spectrum.Black
+	def emittedRadiance(point: Point, normal: Normal, direction: Vector): Spectrum = if (normal * direction > 0.0f) power else Spectrum.Black
 
 	override def toString = "AreaLightSource(shape=%s, power=%s)" format (shape, power)
 }

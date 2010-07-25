@@ -21,23 +21,23 @@ package org.jesperdj.scalaray
 
 package object vecmath {
 	// Implicit conversion for scaling vectors by multiplying a numeric type with a vector
-	implicit def implicitScaleVector[@specialized(Double, Int) N <% Double](f: N) = new ImplicitScaleVector(f)
+	implicit def implicitScaleVector[@specialized(Int, Float) N <% Float](f: N) = new ImplicitScaleVector(f)
 
-	final class ImplicitScaleVector[@specialized(Double, Int) N <% Double](f: N) {
+	final class ImplicitScaleVector[@specialized(Int, Float) N <% Float](f: N) {
 		def *(v: Vector) = v * f
 	}
 
 	// Implicit conversion for scaling normals by multiplying a numeric type with a normal
-	implicit def implicitScaleNormal[@specialized(Double, Int) N <% Double](f: N) = new ImplicitScaleNormal(f)
+	implicit def implicitScaleNormal[@specialized(Int, Float) N <% Float](f: N) = new ImplicitScaleNormal(f)
 
-	final class ImplicitScaleNormal[@specialized(Double, Int) N <% Double](f: N) {
+	final class ImplicitScaleNormal[@specialized(Int, Float) N <% Float](f: N) {
 		def *(n: Normal) = n * f
 	}
 
 	// Implicit conversion for multiplying a point by a weight
-	implicit def implicitScalePoint[@specialized(Double, Int) N <% Double](f: N) = new ImplicitScalePoint(f)
+	implicit def implicitScalePoint[@specialized(Int, Float) N <% Float](f: N) = new ImplicitScalePoint(f)
 
-	final class ImplicitScalePoint[@specialized(Double, Int) N <% Double](f: N) {
+	final class ImplicitScalePoint[@specialized(Int, Float) N <% Float](f: N) {
 		def *(p: Point) = p * f
 	}
 }
