@@ -49,7 +49,7 @@ object Main {
 
 		val rect = new Rectangle(0, 0, 799, 599)
 
-		val filter: Filter = new MitchellFilter
+		val filter: Filter = new BoxFilter
 		val raster = new Raster(rect, filter)
 
 		val surfaceIntegrator: SurfaceIntegrator = DirectLightingSurfaceIntegrator(scene)
@@ -79,26 +79,30 @@ object Main {
 	}
 
 	def createScene(): Scene = {
-		val simpleBxDFs: IndexedSeq[BxDF] = IndexedSeq(new Lambertian(Spectrum.Unit))
+		val simpleMaterial1: Material = new Material {
+			private val simpleBxDFs: IndexedSeq[BxDF] = IndexedSeq(new Lambertian(new Spectrum(1.0f, 1.0f, 0.5f)))
+			def bsdf(dgGeom: DifferentialGeometry, dgShading: DifferentialGeometry): BSDF = new BSDF(simpleBxDFs, dgShading, dgGeom.normal)
+		}
 
-		val simpleMaterial = new Material {
+		val simpleMaterial2: Material = new Material {
+			private val simpleBxDFs: IndexedSeq[BxDF] = IndexedSeq(new Lambertian(new Spectrum(1.0f, 1.0f, 1.0f)))
 			def bsdf(dgGeom: DifferentialGeometry, dgShading: DifferentialGeometry): BSDF = new BSDF(simpleBxDFs, dgShading, dgGeom.normal)
 		}
 
 //		val s1 = new Sphere(0.75f, -1.0f, 1.0f, π * 4.0f / 3.0f)
-//		val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, simpleMaterial), Transform.translate(0.0f, 0.75, 4.0f) * Transform.rotateY(π / 4.0f) * Transform.rotateZ(π / 2.0f))
-		val p1 = new TransformedPrimitive(createCube(0.5f, simpleMaterial), Transform.translate(0.0f, 0.75f, 4.0f) * Transform.rotateY(-π / 6.0f) * Transform.rotateX(-π / 6.0f))
+//		val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, simpleMaterial1), Transform.translate(0.0f, 0.75, 4.0f) * Transform.rotateY(π / 4.0f) * Transform.rotateZ(π / 2.0f))
+		val p1 = new TransformedPrimitive(createCube(0.5f, simpleMaterial1), Transform.translate(0.0f, 0.75f, 4.0f) * Transform.rotateY(-π / 6.0f) * Transform.rotateX(-π / 6.0f))
 
 		val s2 = new Disk(3.0f)
-		val p2 = new TransformedPrimitive(new GeometricPrimitive(s2, simpleMaterial), Transform.translate(0.0f, 0.0f, 4.0f) * Transform.rotateX(-π / 2.0f))
+		val p2 = new TransformedPrimitive(new GeometricPrimitive(s2, simpleMaterial2), Transform.translate(0.0f, 0.0f, 4.0f) * Transform.rotateX(-π / 2.0f))
 
 //		val l1 = new DirectionalLightSource(new Vector(-0.5f, -1.25f, 4.0f), new Spectrum(0.4f, 0.4f, 0.4f))
 		val l1 = new PointLightSource(new Point(0.5f, 2.0f, 0.0f), new Spectrum(30.0f, 30.0f, 30.0f))
 
 		val s3 = new Disk(1.5f)
 		val t3 = Transform.translate(-0.3f, 5.0f, 3.5f) * Transform.rotateX(π / 2.0f)
-		val l2 = new AreaLightSource(s3, t3, new Spectrum(0.7f, 0.7f, 0.7f), 10)
-		val p3 = new TransformedPrimitive(new GeometricPrimitive(l2, simpleMaterial), t3)
+		val l2 = new AreaLightSource(s3, t3, new Spectrum(0.7f, 0.7f, 0.7f), 4)
+		val p3 = new TransformedPrimitive(new GeometricPrimitive(l2, simpleMaterial1), t3)
 
 		new Scene(new CompositePrimitive(p1, p2, p3), Traversable(l1, l2))
 	}
