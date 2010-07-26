@@ -94,7 +94,7 @@ final class DirectLightingSurfaceIntegrator private (
 		if (reflectance.isBlack) return Spectrum.Black
 
 		// Trace shadow ray
-		if (scene.intersect(ray).isDefined) return Spectrum.Black
+		if (scene.checkIntersect(ray)) return Spectrum.Black
 
 		radiance * reflectance * (wi * normal).abs
 	}
@@ -112,14 +112,11 @@ final class DirectLightingSurfaceIntegrator private (
 			if (lightPdf > 0.0f && !radiance.isBlack) {
 				val wi = -ray.direction.normalize
 
-				// Evaluate BSDF
+				// Evaluate BSDF; trace shadow ray
 				val reflectance = bsdf(wo, wi)
-				if (!reflectance.isBlack) {
-					// Trace shadow ray
-					if (scene.intersect(ray).isEmpty) {
-						// Add weighed contribution for this sample to total
-						lightContrib +*= (radiance * reflectance, (wi * normal).abs * powerHeuristic(1, lightPdf, 1, bsdf.pdf(wo, wi)) / lightPdf)
-					}
+				if (!reflectance.isBlack && !scene.checkIntersect(ray)) {
+					// Add weighed contribution for this sample to total
+					lightContrib +*= (radiance * reflectance, (wi * normal).abs * powerHeuristic(1, lightPdf, 1, bsdf.pdf(wo, wi)) / lightPdf)
 				}
 			}
 		}

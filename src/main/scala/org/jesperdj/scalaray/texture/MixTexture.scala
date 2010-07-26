@@ -17,7 +17,15 @@
  */
 package org.jesperdj.scalaray.texture
 
-import org.jesperdj.scalaray.shape.DifferentialGeometry
+//import org.jesperdj.scalaray.shape.DifferentialGeometry
 
-// Texture (pbrt 10.3)
-abstract class Texture[T] extends (DifferentialGeometry => T)
+// TODO: You can do this with C++ templates, but generics are not the same thing as templates: tex1(dg) * (1.0f - t) + tex2(dg) * t
+// Explore how to solve this with type classes; write a generic interpolate() method that can work on Float, Vector, Spectrum
+
+// Mix texture (pbrt 10.3.3)
+//final class MixTexture[@specialized(Float) T] (tex1: Texture[T], tex2: Texture[T], amount: Texture[Float]) extends Texture[T] {
+//	def apply(dg: DifferentialGeometry): T = {
+//		val t = amount(dg)
+//		tex1(dg) * (1.0f - t) + tex2(dg) * t
+//	}
+//}

@@ -31,7 +31,7 @@ final class Disk (radius: Float = 1.0f, innerRadius: Float = 0.0f, maxPhi: Float
 	// Bounding box that contains the shape (pbrt 3.4.2)
 	val boundingBox: BoundingBox = BoundingBox(Point(-radius, -radius, 0.0f), Point(radius, radius, 0.0f))
 
-	// Compute intersection between a ray and this shape, returns differential geometry and distance of intersection along ray (pbrt 3.4.3)
+	// Compute closest intersection between a ray and this shape, returns differential geometry and distance of intersection along ray (pbrt 3.4.3)
 	def intersect(ray: Ray): Option[(DifferentialGeometry, Float)] = {
 		// Check if ray is (almost) parallel to the plane of the disk
 		if (ray.direction.z.abs < 1e-9) return None

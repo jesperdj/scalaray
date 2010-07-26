@@ -31,9 +31,13 @@ final class KdTreeAccelerator (primitives: Traversable[Primitive]) extends Primi
 	override def boundingBox(transform: Transform): BoundingBox =
 		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement boundingBox
 	
-	// Compute intersection between a ray and this primitive
+	// Compute closest intersection between a ray and this primitive
 	def intersect(ray: Ray): Option[Intersection] =
 		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement intersect
+
+	// Check if a ray intersects this primitive
+	override def checkIntersect(ray: Ray): Boolean =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement checkIntersect
 
 	override def toString = "KdTreeAccelerator"
 }

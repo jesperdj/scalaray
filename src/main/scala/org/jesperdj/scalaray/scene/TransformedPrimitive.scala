@@ -30,8 +30,11 @@ final class TransformedPrimitive (primitive: Primitive, transform: Transform) ex
 	// Bounding box when primitive is transformed
 	override def boundingBox(tr: Transform): BoundingBox = primitive.boundingBox(tr * transform)
 
-	// Compute intersection between a ray and this primitive
+	// Compute closest intersection between a ray and this primitive
 	def intersect(ray: Ray): Option[Intersection] = primitive intersect (inverse * ray) map { case intersection => transform * intersection }
+
+	// Check if a ray intersects this primitive
+	override def checkIntersect(ray: Ray): Boolean = primitive checkIntersect (inverse * ray)
 
 	override def toString = "TransformedPrimitive(primitive=%s, transform=%s)" format (primitive, transform)
 }

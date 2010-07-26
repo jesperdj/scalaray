@@ -68,7 +68,7 @@ sealed class BoundingBox (points: Traversable[Point]) {
 		(max.y >= bb.min.y) && (min.y <= bb.max.y) &&
 		(max.z >= bb.min.z) && (min.z <= bb.max.z)
 
-	// Compute intersection between a ray and this bounding box (pbrt 4.2.1)
+	// Compute intersection between a ray and this bounding box; returns an Option with the range of the ray that's inside the box (pbrt 4.2.1)
 	def intersect(ray: Ray): Option[(Float, Float)] = {
 		var minT = ray.minDistance
 		var maxT = ray.maxDistance

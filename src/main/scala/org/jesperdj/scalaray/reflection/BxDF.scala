@@ -35,7 +35,7 @@ abstract class BxDF {
 
 	// Sample the BxDF for the given outgoing direction; returns reflectance or transmittance, incoming direction and value of the pdf (pbrt 14.5)
 	def sample(wo: Vector, u1: Float, u2: Float): (Spectrum, Vector, Float) = {
-		val wi = { val w = Vector(SampleTransforms.cosineSampleHemisphere(u1, u2)); if (wo.z >= 0.0f) w else Vector(w.x, w.y, -w.z) }
+		val wi = { val p = SampleTransforms.cosineSampleHemisphere(u1, u2); if (wo.z >= 0.0f) Vector(p) else Vector(p.x, p.y, -p.z) }
 		(apply(wo, wi), wi, pdf(wo, wi))
 	}
 

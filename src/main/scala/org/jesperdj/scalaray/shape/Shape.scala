@@ -28,8 +28,11 @@ import org.jesperdj.scalaray.vecmath._
 
 // Shape, describes geometry of a surface (pbrt 3.1)
 abstract class Shape extends HasBoundingBox {
-	// Compute intersection between a ray and this shape, returns differential geometry and distance of intersection along ray (pbrt 3.1.3)
+	// Compute closest intersection between a ray and this shape, returns differential geometry and distance of intersection along ray (pbrt 3.1.3)
 	def intersect(ray: Ray): Option[(DifferentialGeometry, Float)]
+
+	// Check if a ray intersects this shape; override this if the shape can provide a more efficient implementation (pbrt 3.1.3)
+	def checkIntersect(ray: Ray): Boolean = intersect(ray).isDefined
 
 	// Get shading geometry (pbrt 3.1.5)
 	def shadingGeometry(objectToWorld: Transform, dg: DifferentialGeometry): DifferentialGeometry = dg

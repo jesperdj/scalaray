@@ -35,7 +35,7 @@ final class CompositePrimitive (primitives: Traversable[Primitive]) extends Prim
 	// Bounding box when primitive is transformed
 	override def boundingBox(transform: Transform): BoundingBox = (BoundingBox.Empty /: primitives) { (bb, p) => bb union p.boundingBox(transform) }
 
-	// Compute intersection between a ray and this primitive
+	// Compute closest intersection between a ray and this primitive
 	def intersect(ray: Ray): Option[Intersection] = {
 		// Check against bounding box
 		val bi = boundingBox intersect ray
@@ -51,6 +51,9 @@ final class CompositePrimitive (primitives: Traversable[Primitive]) extends Prim
 			if (pi.isEmpty) o else { r = Ray(r.origin, r.direction, r.minDistance, pi.get.distance); pi }
 		}
 	}
+
+	// Check if a ray intersects this primitive
+	override def checkIntersect(ray: Ray): Boolean = primitives exists (_ checkIntersect ray)
 
 	override def toString = "CompositePrimitive(primitives=%s)" format (primitives)
 }

@@ -40,7 +40,7 @@ final class Triangle (v0: Vertex, v1: Vertex, v2: Vertex) extends Shape {
 	// Bounding box when object is transformed
 	override def boundingBox(transform: Transform): BoundingBox = BoundingBox(transform * v0.point, transform * v1.point, transform * v2.point)
 
-	// Compute intersection between a ray and this shape, returns differential geometry and distance of intersection along ray
+	// Compute closest intersection between a ray and this shape, returns differential geometry and distance of intersection along ray
 	def intersect(ray: Ray): Option[(DifferentialGeometry, Float)] = {
 		val s1 = ray.direction ** e2
 		val div = s1 * e1

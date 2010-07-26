@@ -46,11 +46,11 @@ final class SamplerRenderer (scene: Scene, sampler: Sampler, surfaceIntegrator: 
 
 		// Determine number of tasks to create
 		val processors = Runtime.getRuntime().availableProcessors()
-		val numTasks = math.max(32 * processors, raster.rectangle.width * raster.rectangle.height / 256)
+		println("Number of processors: " + processors)
 
 		// Create executor service and tasks
 		val executorService = Executors.newFixedThreadPool(processors)
-		val samplers = sampler.split(numTasks)
+		val samplers = sampler.split(math.max(32 * processors, raster.rectangle.width * raster.rectangle.height / 256))
 		samplers.foreach { s => runningTasks.incrementAndGet; executorService.submit(new SamplerRendererTask(camera, raster, s)) }
 
 		val numSamplers = samplers.size
@@ -60,7 +60,7 @@ final class SamplerRenderer (scene: Scene, sampler: Sampler, surfaceIntegrator: 
 		while (!executorService.isTerminated()) {
 			executorService.awaitTermination(10, TimeUnit.SECONDS)
 			println("%d/%d tasks done (%d%%)" format
-					(numSamplers - runningTasks.intValue, numSamplers, 100 - (100.0f * runningTasks.floatValue / numSamplers).toInt))
+					(numSamplers - runningTasks.intValue, numSamplers, 100 - ((100 * runningTasks.get) / numSamplers)))
 		}
 	}
 

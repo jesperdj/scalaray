@@ -21,6 +21,12 @@ package org.jesperdj.scalaray.util
 trait UniqueId {
 	// Unique identifier
 	val id = UniqueId.nextId.getAndIncrement
+
+	// Compare instances by their unique identifier
+	override def equals(other: Any): Boolean = other match {
+		case that: UniqueId => that.id == id
+		case _ => false
+	}
 }
 
 object UniqueId {

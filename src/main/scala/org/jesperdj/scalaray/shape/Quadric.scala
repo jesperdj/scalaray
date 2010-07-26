@@ -22,7 +22,7 @@ import org.jesperdj.scalaray.vecmath._
 
 // Quadric, superclass for quadric shapes
 abstract class Quadric extends Shape {
-	// Compute intersection between a ray and this shape, returns differential geometry and distance of intersection along ray
+	// Compute closest intersection between a ray and this shape, returns differential geometry and distance of intersection along ray
 	def intersect(ray: Ray): Option[(DifferentialGeometry, Float)] = {
 		// Get differential geometry and distance if the intersection point is in the range of the ray
 		def getResult(distance: Float): Option[(DifferentialGeometry, Float)] =
