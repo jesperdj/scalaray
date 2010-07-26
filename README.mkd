@@ -1,6 +1,6 @@
 # ScalaRay
 
-This is ScalaRay, a [ray tracer](http://en.wikipedia.org/wiki/Ray_tracing_%28graphics%29) written in [Scala](http://www.scala-lang.org/) 2.8. It is based on [pbrt](http://pbrt.org/), the ray tracer described in the book *Physically Based Rendering - From Theory to Implementation* by Matt Pharr and Greg Humphreys, publisher: Morgan Kaufmann, ISBN: 0-12-553180-X
+This is ScalaRay, a [ray tracer](http://en.wikipedia.org/wiki/Ray_tracing_%28graphics%29) written in [Scala](http://www.scala-lang.org/) 2.8. It is based on [pbrt](http://pbrt.org/), the ray tracer described in the book *Physically Based Rendering - From Theory to Implementation* by Matt Pharr and Greg Humphreys, publisher: Morgan Kaufmann, ISBN: 0-12-553180-X; second edition ISBN: 978-0-12-375079-2
 
 Note: The second edition of this book came out in July 2010. I initially based ScalaRay on the first edition, but I now also have the second edition and parts of ScalaRay are based on pbrt version 2.
 
