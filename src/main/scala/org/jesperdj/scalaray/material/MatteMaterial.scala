@@ -30,5 +30,5 @@ import org.jesperdj.scalaray.texture.Texture
 final class MatteMaterial (texture: Texture[Spectrum]) extends Material {
 	// Select a BSDF for the given differential geometries
 	def bsdf(dgGeom: DifferentialGeometry, dgShading: DifferentialGeometry): BSDF =
-		new BSDF(IndexedSeq(new Lambertian(texture(dgGeom))), dgGeom, dgGeom.normal)
+		new BSDF(IndexedSeq(new Lambertian(texture(dgShading))), dgShading, dgGeom.normal)
 }
