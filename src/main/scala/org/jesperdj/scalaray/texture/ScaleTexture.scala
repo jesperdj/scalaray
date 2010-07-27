@@ -17,12 +17,10 @@
 
 package org.jesperdj.scalaray.texture
 
-//import org.jesperdj.scalaray.shape.DifferentialGeometry
-
-// TODO: Same kind of problem as with MixTexture; you can't just * two unknown types T1 and T2 in Scala,
-// because generics are not the same thing as templates in C++
+import org.jesperdj.scalaray.shape.DifferentialGeometry
+import org.jesperdj.scalaray.util._
 
 // Scale texture (pbrt 10.3.2)
-//final class ScaleTexture[@specialized(Float) T1, @specialized(Float) T2] (tex1: Texture[T1], tex2: Texture[T2]) extends Texture[T2] {
-//	def apply(dg: DifferentialGeometry): T2 = tex1(dg) * tex2(dg)
-//}
+final class ScaleTexture[@specialized(Float) T1 <% Multipliable[T2, T2], @specialized(Float) T2] (tex1: Texture[T1], tex2: Texture[T2]) extends Texture[T2] {
+	def apply(dg: DifferentialGeometry): T2 = tex1(dg) * tex2(dg)
+}

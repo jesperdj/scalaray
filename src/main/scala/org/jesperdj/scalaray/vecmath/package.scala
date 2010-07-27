@@ -17,27 +17,21 @@
  */
 package org.jesperdj.scalaray
 
-// NOTE: See http://www.scala-notes.org/2010/06/avoid-structural-types-when-pimping-libraries/
+import org.jesperdj.scalaray.util._
 
 package object vecmath {
 	// Implicit conversion for scaling vectors by multiplying a numeric type with a vector
-	implicit def implicitScaleVector[@specialized(Int, Float) N <% Float](f: N) = new ImplicitScaleVector(f)
-
-	final class ImplicitScaleVector[@specialized(Int, Float) N <% Float](f: N) {
-		def *(v: Vector) = v * f
-	}
+	implicit def implicitScaleVector[@specialized(Int, Float) N <% Float](f: N) = new ImplicitScale[Vector] { def *(v: Vector) = v * f }
 
 	// Implicit conversion for scaling normals by multiplying a numeric type with a normal
-	implicit def implicitScaleNormal[@specialized(Int, Float) N <% Float](f: N) = new ImplicitScaleNormal(f)
-
-	final class ImplicitScaleNormal[@specialized(Int, Float) N <% Float](f: N) {
-		def *(n: Normal) = n * f
-	}
+	implicit def implicitScaleNormal[@specialized(Int, Float) N <% Float](f: N) = new ImplicitScale[Normal] { def *(n: Normal) = n * f }
 
 	// Implicit conversion for multiplying a point by a weight
-	implicit def implicitScalePoint[@specialized(Int, Float) N <% Float](f: N) = new ImplicitScalePoint(f)
+	implicit def implicitScalePoint[@specialized(Int, Float) N <% Float](f: N) = new ImplicitScale[Point] { def *(p: Point) = p * f }
 
-	final class ImplicitScalePoint[@specialized(Int, Float) N <% Float](f: N) {
-		def *(p: Point) = p * f
+	// Implicit conversion to enable Vector to be used in interpolate()
+	implicit def vectorToInterpolatable(v1: Vector) = new util.Interpolatable[Vector] {
+		def *(t: Float): Vector = v1 * t
+		def +(v2: Vector): Vector = v1 + v2
 	}
 }

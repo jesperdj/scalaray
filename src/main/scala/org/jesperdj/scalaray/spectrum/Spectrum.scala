@@ -20,17 +20,17 @@ package org.jesperdj.scalaray.spectrum
 // Spectrum
 sealed class Spectrum (private val red: Float, private val green: Float, private val blue: Float) {
 	// Add two spectra
-	def +(s: Spectrum) = new Spectrum(red + s.red, green + s.green, blue + s.blue)
+	def +(s: Spectrum): Spectrum = new Spectrum(red + s.red, green + s.green, blue + s.blue)
 
 	// Multiply two spectra
-	def *(s: Spectrum) = new Spectrum(red * s.red, green * s.green, blue * s.blue)
+	def *(s: Spectrum): Spectrum = new Spectrum(red * s.red, green * s.green, blue * s.blue)
 
 	// Scale this spectrum
-	def *(f: Float) = new Spectrum(red * f, green * f, blue * f)
-	def /(f: Float) = new Spectrum(red / f, green / f, blue / f)
+	def *(f: Float): Spectrum = new Spectrum(red * f, green * f, blue * f)
+	def /(f: Float): Spectrum = new Spectrum(red / f, green / f, blue / f)
 
 	// Add another spectrum to this spectrum with a weight
-	def +*(s: Spectrum, w: Float) = new Spectrum(red + s.red * w, green + s.green * w, blue + s.blue * w)
+	def +*(s: Spectrum, w: Float): Spectrum = new Spectrum(red + s.red * w, green + s.green * w, blue + s.blue * w)
 
 	def isBlack = red == 0.0f && green == 0.0f && blue == 0.0f
 

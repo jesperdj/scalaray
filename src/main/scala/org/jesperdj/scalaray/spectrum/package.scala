@@ -17,11 +17,15 @@
  */
 package org.jesperdj.scalaray
 
+import org.jesperdj.scalaray.util._
+
 package object spectrum {
 	// Implicit conversion for scaling spectra by multiplying a numeric type with a spectrum
-	implicit def implicitScaleSpectrum[@specialized(Int, Float) N <% Float](f: N) = new ImplicitScaleSpectrum(f)
+	implicit def implicitScaleSpectrum[@specialized(Int, Float) N <% Float](f: N) = new ImplicitScale[Spectrum] { def *(s: Spectrum): Spectrum = s * f }
 
-	final class ImplicitScaleSpectrum[@specialized(Int, Float) N <% Float](f: N) {
-		def *(s: Spectrum): Spectrum = s * f
+	// Implicit conversion to enable Spectrum to be used in interpolate()
+	implicit def spectrumToInterpolatable(s1: Spectrum) = new util.Interpolatable[Spectrum] {
+		def *(t: Float): Spectrum = s1 * t
+		def +(s2: Spectrum): Spectrum = s1 + s2
 	}
 }
