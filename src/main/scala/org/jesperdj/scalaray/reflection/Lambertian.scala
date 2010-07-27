@@ -17,6 +17,8 @@
 
 package org.jesperdj.scalaray.reflection
 
+import scala.collection.immutable.Traversable
+
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
@@ -29,4 +31,9 @@ final class Lambertian (reflectance: Spectrum) extends BxDF {
 	// Evaluate the BxDF for the given pair of directions
 	def apply(wo: Vector, wi: Vector): Spectrum = reflectance / π
 
+	// Compute hemispherical-directional reflectance
+	override def rho(wo: Vector, samples: Traversable[(Double, Double)]): Spectrum = reflectance
+
+	// Compute hemispherical-hemispherical reflectance
+	override def rho(samples1: Traversable[(Double, Double)], samples2: Traversable[(Double, Double)]): Spectrum = reflectance
 }

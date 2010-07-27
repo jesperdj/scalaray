@@ -17,6 +17,8 @@
  */
 package org.jesperdj.scalaray.reflection
 
+import scala.collection.immutable.Traversable
+
 import org.jesperdj.scalaray.sampler.SampleTransforms
 import org.jesperdj.scalaray.spectrum._
 import org.jesperdj.scalaray.util._
@@ -41,4 +43,12 @@ abstract class BxDF {
 
 	// Get the value of the probability distribition function that matches the sampling method of sample(Vector, Float, Float) (pbrt 14.5)
 	def pdf(wo: Vector, wi: Vector): Float = if (wo.z * wi.z > 0.0f) wi.z.abs / π else 0.0f
+
+	// Compute hemispherical-directional reflectance (pbrt 8.1.1, 14.5.5)
+	def rho(wo: Vector, samples: Traversable[(Double, Double)]): Spectrum =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
+
+	// Compute hemispherical-hemispherical reflectance (pbrt 8.1.1, 14.5.5)
+	def rho(samples1: Traversable[(Double, Double)], samples2: Traversable[(Double, Double)]): Spectrum =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
 }

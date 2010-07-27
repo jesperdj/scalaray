@@ -21,5 +21,5 @@ import org.jesperdj.scalaray.shape.DifferentialGeometry
 
 // Constant texture (pbrt 10.3.1)
 final class ConstantTexture[@specialized(Float) T] (value: T) extends Texture[T] {
-	@inline def apply(dg: DifferentialGeometry): T = value
+	def apply(dg: DifferentialGeometry): T = value
 }

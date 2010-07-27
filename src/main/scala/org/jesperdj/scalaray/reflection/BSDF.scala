@@ -25,9 +25,9 @@ import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 // Bidirectional Scattering Distribution Function (pbrt 9.1)
-final class BSDF (bxdfs: IndexedSeq[BxDF], dg: DifferentialGeometry, ng: Normal, eta: Float = 1.0f) {
-	private val nn = dg.normal
-	private val sn = dg.dpdu.normalize
+final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: Normal, eta: Float = 1.0f) {
+	private val nn = dgShading.normal
+	private val sn = dgShading.dpdu.normalize
 	private val tn = nn ** sn
 
 	// Transform a vector from world coordinates to the local BxDF coordinate system

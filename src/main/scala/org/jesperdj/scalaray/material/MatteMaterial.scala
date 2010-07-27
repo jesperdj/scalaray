@@ -17,12 +17,18 @@
  */
 package org.jesperdj.scalaray.material
 
+import scala.collection.immutable.IndexedSeq
+
+import org.jesperdj.scalaray.reflection.{ BSDF, Lambertian }
 import org.jesperdj.scalaray.shape.DifferentialGeometry
-import org.jesperdj.scalaray.reflection.BSDF
+import org.jesperdj.scalaray.spectrum.Spectrum
+import org.jesperdj.scalaray.texture.Texture
+
+// TODO: Implement this fully (OrenNayar reflection model, sigma, bump mapping)
 
 // Matte material (pbrt 9.2.1)
-final class MatteMaterial extends Material {
+final class MatteMaterial (texture: Texture[Spectrum]) extends Material {
 	// Select a BSDF for the given differential geometries
 	def bsdf(dgGeom: DifferentialGeometry, dgShading: DifferentialGeometry): BSDF =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO
+		new BSDF(IndexedSeq(new Lambertian(texture(dgGeom))), dgGeom, dgGeom.normal)
 }
