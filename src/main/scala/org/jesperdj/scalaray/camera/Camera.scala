@@ -20,6 +20,10 @@ package org.jesperdj.scalaray.camera
 import org.jesperdj.scalaray.sampler.CameraSample
 import org.jesperdj.scalaray.vecmath.{ Ray, RayDifferential }
 
+// NOTE: In pbrt, the camera contains the Film. This is a nice analogy with how old photo cameras work, but the camera itself doesn't do anything
+// with the film, so from an object oriented design point of view there's no good reason why the camera should contain it.
+// The only responsibility of Camera is to generate camera rays.
+
 // Camera (pbrt 6.1)
 abstract class Camera {
 	// Generate a camera ray for a sample (pbrt 6.1)

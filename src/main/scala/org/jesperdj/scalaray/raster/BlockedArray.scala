@@ -18,7 +18,7 @@
 package org.jesperdj.scalaray.raster
 
 // Blocked array (pbrt A.2.5)
-private final class BlockedArray[T: ClassManifest] (val sizeX: Int, val sizeY: Int, logBlockSize: Int = 4) {
+private final class BlockedArray[T : ClassManifest] (val sizeX: Int, val sizeY: Int, logBlockSize: Int = 4) {
 	// Size of the side of a block
 	private val blockSize = 1 << logBlockSize
 	private val blockSizeSquared = blockSize * blockSize

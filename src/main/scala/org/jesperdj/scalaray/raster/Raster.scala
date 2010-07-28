@@ -17,49 +17,12 @@
  */
 package org.jesperdj.scalaray.raster
 
-import java.awt.image.BufferedImage
-
-import org.jesperdj.scalaray.filter.Filter
 import org.jesperdj.scalaray.sampler.CameraSample
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.util._
 
-// Raster (mutable)
-final class Raster (val rectangle: Rectangle, filter: Filter) {
-	// The pixels in the raster
-	private val pixels = {
-		val array = new BlockedArray[Pixel](rectangle.width, rectangle.height)
-		for (y <- rectangle.top to rectangle.bottom; x <- rectangle.left to rectangle.right) array(x - rectangle.left, y - rectangle.top) = new Pixel
-		array
-	}
+// NOTE: I didn't want to call this "Film" like in pbrt, because cameras don't work with film anymore.
 
-	def addSample(sample: CameraSample, spectrum: Spectrum): Unit = {
-		// Determine the raster extent of the sample
-		val ix = sample.imageX - 0.5f
-		val iy = sample.imageY - 0.5f
-
-		val minX = math.max((ix - filter.extentX).ceil.toInt, rectangle.left)
-		val maxX = math.min((ix + filter.extentX).floor.toInt, rectangle.right)
-		val minY = math.max((iy - filter.extentY).ceil.toInt, rectangle.top)
-		val maxY = math.min((iy + filter.extentY).floor.toInt, rectangle.bottom)
-
-		// Add radiance to relevant pixels in the raster, weighted by reconstruction filter
-		for (y <- minY to maxY; x <- minX to maxX) pixels(x, y).add(spectrum, filter(x - ix, y - iy))
-	
-	}
-
-	// Convert raster to an image (NOTE: for now a simplistic implementation without tone mapping)
-	def toImage = {
-		val image = new BufferedImage(rectangle.width, rectangle.height, BufferedImage.TYPE_INT_RGB)
-
-		for (y <- rectangle.top to rectangle.bottom; x <- rectangle.left to rectangle.right) {
-			val px = x - rectangle.left; val py = y - rectangle.top
-			val (red, green, blue) = pixels(px, py).spectrum.toRGB
-			image.setRGB(px, py, (clamp(red, 0.0f, 1.0f) * 255.0f).toInt << 16 | (clamp(green, 0.0f, 1.0f) * 255.0f).toInt << 8 | (clamp(blue, 0.0f, 1.0f) * 255.0f).toInt)
-		}
-
-		image
-	}
-
-	override def toString = "Raster(rectangle=%s, filter=%s, pixels=%s)" format (rectangle, filter, pixels)
+// Raster (replaces pbrt's Film)
+abstract class Raster (val rectangle: Rectangle) {
+	def addSample(sample: CameraSample, spectrum: Spectrum): Unit
 }

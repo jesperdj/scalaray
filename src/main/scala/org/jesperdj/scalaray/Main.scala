@@ -51,7 +51,7 @@ object Main {
 		val rect = new Rectangle(0, 0, 799, 599)
 
 		val filter: Filter = new BoxFilter
-		val raster = new Raster(rect, filter)
+		val raster = new PixelRaster(rect, filter)
 
 		val surfaceIntegrator: SurfaceIntegrator = DirectLightingSurfaceIntegrator(scene)
 		val volumeIntegrator: VolumeIntegrator = VacuumVolumeIntegrator
