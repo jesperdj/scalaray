@@ -35,7 +35,7 @@ abstract class Shape extends HasBoundingBox {
 	def checkIntersect(ray: Ray): Boolean = intersect(ray).isDefined
 
 	// Get shading geometry (pbrt 3.1.5)
-	def shadingGeometry(objectToWorld: Transform, dg: DifferentialGeometry): DifferentialGeometry = dg
+	def shadingGeometry(dg: DifferentialGeometry, objectToWorld: Transform): DifferentialGeometry = dg
 
 	// Surface area
 	def surfaceArea: Float

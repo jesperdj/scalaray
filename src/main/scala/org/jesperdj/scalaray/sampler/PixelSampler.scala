@@ -17,7 +17,7 @@
  */
 package org.jesperdj.scalaray.sampler
 
-import scala.collection.immutable.{ IndexedSeq, Traversable }
+import scala.collection.immutable.Traversable
 
 import org.jesperdj.scalaray.raster.Rectangle
 
@@ -30,5 +30,5 @@ abstract class PixelSampler (rectangle: Rectangle, samplesPerPixel: Int) extends
 	}
 
 	// Generate samples for one pixel
-	protected def generateSamples(x: Int, y: Int): IndexedSeq[Sample]
+	protected def generateSamples(x: Int, y: Int): Traversable[Sample]
 }

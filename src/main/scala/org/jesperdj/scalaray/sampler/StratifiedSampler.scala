@@ -18,7 +18,6 @@
 package org.jesperdj.scalaray.sampler
 
 import scala.collection.immutable.{ IndexedSeq, Traversable }
-import scala.collection.mutable.{ Map => MutableMap }
 
 import org.jesperdj.scalaray.raster.Rectangle
 import org.jesperdj.scalaray.util._
@@ -28,7 +27,9 @@ final class StratifiedSampler (rectangle: Rectangle, samplesPerPixelX: Int, samp
 	extends PixelSampler(rectangle, samplesPerPixelX * samplesPerPixelY) {
 
 	// Generate samples for one pixel
-	protected def generateSamples(x: Int, y: Int): IndexedSeq[Sample] = {
+	protected def generateSamples(x: Int, y: Int): Traversable[Sample] = {
+		import scala.collection.mutable.{ Map => MutableMap }
+
 		// Generate image, lens and time samples
 		val imageSamples = StratifiedSampler.generateSamples2D(samplesPerPixelX, samplesPerPixelY)
 		val lensSamples = StratifiedSampler.generateSamples2D(samplesPerPixelX, samplesPerPixelY)
