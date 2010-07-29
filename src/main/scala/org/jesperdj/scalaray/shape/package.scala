@@ -17,20 +17,17 @@
  */
 package org.jesperdj.scalaray
 
+import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 package object shape {
 	// Implicit conversion for transforming a bounding box (pbrt 2.8.5)
-	implicit def implicitTransformBoundingBox(t: Transform) = new ImplicitTransformBoundingBox(t)
-
-	final class ImplicitTransformBoundingBox (t: Transform) {
+	implicit def implicitTransformBoundingBox(t: Transform) = new MultipliableSame[BoundingBox] {
 		def *(bb: BoundingBox) = new BoundingBox(bb.corners map (t * _ ))
 	}
 
 	// Implicit conversion for transforming a DifferentialGeometry
-	implicit def implicitTransformDifferentialGeometry(t: Transform) = new ImplicitTransformDifferentialGeometry(t)
-
-	final class ImplicitTransformDifferentialGeometry (t: Transform) {
+	implicit def implicitTransformDifferentialGeometry(t: Transform) = new MultipliableSame[DifferentialGeometry] {
 		def *(dg: DifferentialGeometry) = new DifferentialGeometry {
 			// NOTE: This class depends on the fact that the fields of DifferentialGeometry have value semantics (the fields must be vals, not defs)
 			// If the fields in DifferentialGeometry would be defs, they should be defs here as well instead of (lazy) vals

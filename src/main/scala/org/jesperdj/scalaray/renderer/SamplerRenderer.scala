@@ -21,37 +21,35 @@ import org.jesperdj.scalaray.camera.Camera
 import org.jesperdj.scalaray.integrator.{ SurfaceIntegrator, VolumeIntegrator }
 import org.jesperdj.scalaray.raster.Raster
 import org.jesperdj.scalaray.sampler.{ Sample, Sampler }
-import org.jesperdj.scalaray.scene.Scene
+import org.jesperdj.scalaray.scene._
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.vecmath.Ray
+import org.jesperdj.scalaray.vecmath.RayDifferential
 
-// Sampler renderer
-final class SamplerRenderer (scene: Scene, sampler: Sampler, surfaceIntegrator: SurfaceIntegrator, volumeIntegrator: VolumeIntegrator) extends Renderer {
-
-	private var runningTasks = new java.util.concurrent.atomic.AtomicInteger
-
-	private final class SamplerRendererTask (camera: Camera, raster: Raster, sampler: Sampler) extends Runnable {
-		def run() {
-			for (sample <- sampler.samples) {
-				val (rad, _) = radiance(camera.generateRay(sample), sample)
-				raster.addSample(sample, rad)
-			}
-			runningTasks.decrementAndGet
-		}
-	}
-
-	// Render a frame using the given camera and store the result in the given raster
-	def render(camera: Camera, raster: Raster): Unit = {
+// Sampler renderer (pbrt 1.3.3)
+final class SamplerRenderer (scene: Scene, sampler: Sampler, camera: Camera, raster: Raster,
+							 surfaceIntegrator: SurfaceIntegrator, volumeIntegrator: VolumeIntegrator) extends Renderer {
+	// Render the scene
+	def render(): Unit = {
 		import java.util.concurrent._
+		import java.util.concurrent.atomic.AtomicInteger
 
-		// Determine number of tasks to create
+		var runningTasks = new AtomicInteger
+
+		final class Task (sampler: Sampler) extends Runnable {
+			def run() {
+				val scale: Float = 1.0f / math.sqrt(sampler.samplesPerPixel).toFloat
+				sampler.samples foreach { sample => raster.addSample(sample, radiance(camera.generateRayDifferential(sample, scale), sample)) }
+				runningTasks.decrementAndGet
+			}
+		}
+
 		val processors = Runtime.getRuntime().availableProcessors()
 		println("Number of processors: " + processors)
 
-		// Create executor service and tasks
+		// Create executor service and submit tasks
 		val executorService = Executors.newFixedThreadPool(processors)
 		val samplers = sampler.split(math.max(32 * processors, raster.rectangle.width * raster.rectangle.height / 256))
-		samplers.foreach { s => runningTasks.incrementAndGet; executorService.submit(new SamplerRendererTask(camera, raster, s)) }
+		samplers.foreach { s => runningTasks.incrementAndGet; executorService.submit(new Task(s)) }
 
 		val numSamplers = samplers.size
 
@@ -62,16 +60,26 @@ final class SamplerRenderer (scene: Scene, sampler: Sampler, surfaceIntegrator: 
 			println("%d/%d tasks done (%d%%)" format
 					(numSamplers - runningTasks.intValue, numSamplers, 100 - ((100 * runningTasks.get) / numSamplers)))
 		}
+
 	}
 
-	// Compute the radiance along the given ray; returns radiance and transmittance
-	def radiance(ray: Ray, sample: Sample): (Spectrum, Spectrum) = {
-		val (rad, trn) = volumeIntegrator.radiance(ray, sample)
-		(trn * surfaceIntegrator.radiance(ray, sample) + rad, trn)
+	// Compute the incident radiance along the given ray (pbrt 1.3.4)
+	def radiance(ray: RayDifferential, sample: Sample): Spectrum = {
+		val li = scene intersect ray match {
+			// If the ray intersects geometry in the scene, get the reflected radiance from the surface integrator
+			case Some(intersection) => surfaceIntegrator.radiance(this, ray, intersection, sample)
+
+			// TODO: If the ray does not intersect any geometry, accumulate the contributions of infinite area light sources along the ray
+			case _ => Spectrum.Black
+		}
+
+		val (lvi, t) = volumeIntegrator.radiance(this, ray, sample)
+
+		t * li + lvi
 	}
 
-	// Compute the transmittance along the given ray
-	def transmittance(ray: Ray, sample: Sample): Spectrum = volumeIntegrator.transmittance(ray, sample)
+	// Compute the fraction of light that is attenuated by volumetric scattering along the ray (pbrt 1.3.4)
+	def transmittance(ray: RayDifferential, sample: Sample): Spectrum = volumeIntegrator.transmittance(this, ray, sample)
 
 	override def toString = "SamplerRenderer"
 }

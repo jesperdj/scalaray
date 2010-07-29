@@ -22,18 +22,18 @@ import org.jesperdj.scalaray.spectrum._
 import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
-// Directional light source (pbrt 13.3)
+// Directional light source (pbrt 12.3)
 final class DirectionalLightSource (direction: Vector, intensity: Spectrum) extends DeltaLightSource {
 	// Create a new directional light source using a transform to specify the direction
 	def this(lightToWorld: Transform, intensity: Spectrum) = this(lightToWorld * Vector.ZAxis, intensity)
 
-	// Total emitted power of this light source onto the scene (pbrt 13.3)
+	// Total emitted power of this light source onto the scene
 	def totalPower(scene: Scene): Spectrum = {
 		val (p, r) = scene.boundingSphere
 		intensity * (π * r * r)
 	}
 
-	// Gets the incident radiance of this light source at the point (pbrt 13.1)
+	// Gets the incident radiance of this light source at the point
 	// Returns the radiance and a ray from the light source to the point
 	def incidentRadiance(point: Point): (Spectrum, Ray) = (intensity, new Ray(point, direction, Float.NegativeInfinity, 0.0f))
 

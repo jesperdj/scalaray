@@ -19,20 +19,21 @@ package org.jesperdj.scalaray.integrator
 
 import scala.collection.immutable.Traversable
 
+import org.jesperdj.scalaray.renderer.Renderer
 import org.jesperdj.scalaray.sampler.{ Sample, SampleSpec }
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.vecmath.Ray
+import org.jesperdj.scalaray.vecmath.RayDifferential
 
 // Volume integrator that does nothing
 object VacuumVolumeIntegrator extends VolumeIntegrator {
 	// Sample specifications for the sample patterns that this integrator needs
 	val sampleSpecs: Traversable[SampleSpec] = Traversable()
 
-	// Radiance along the ray; returns radiance and transmittance
-	def radiance(ray: Ray, sample: Sample): (Spectrum, Spectrum) = (Spectrum.Black, Spectrum.Unit)
-	
-	// Transmittance along the ray
-	def transmittance(ray: Ray, sample: Sample): Spectrum = Spectrum.Unit
+	// TODO: Description
+	def radiance(renderer: Renderer, ray: RayDifferential, sample: Sample): (Spectrum, Spectrum) = (Spectrum.Black, Spectrum.Unit)
+
+	// TODO: Description
+	def transmittance(renderer: Renderer, ray: RayDifferential, sample: Sample): Spectrum = Spectrum.Unit
 
 	override def toString = "VacuumVolumeIntegrator"
 }

@@ -18,13 +18,12 @@
 package org.jesperdj.scalaray
 
 import org.jesperdj.scalaray.shape._
+import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 package object scene {
 	// Implicit conversion for transforming an intersection
-	implicit def implicitTransformIntersection(t: Transform) = new ImplicitTransformIntersection(t)
-
-	final class ImplicitTransformIntersection (t: Transform) {
-		def *(i: Intersection): Intersection = new Intersection(t * i.differentialGeometry, i.distance, i.primitive)
+	implicit def implicitTransformIntersection(t: Transform) = new MultipliableSame[Intersection] {
+		def *(i: Intersection): Intersection = new Intersection(t * i.dg, i.distance, i.primitive)
 	}
 }

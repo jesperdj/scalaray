@@ -32,11 +32,16 @@ package object util {
 		if (a <= b) (a, b) else (b, a)
 	}
 
+	// Traits for types that can be multiplied with a T or to which a T can be added, resulting in an R
 	trait Multipliable[-T, +R] { def *(value: T): R }
 	trait Addable[-T, +R] { def +(value: T): R }
 
+	// Traits for types that can be multiplied with a T or to which a T can be added, resulting in the same type T
+	trait MultipliableSame[T] extends Multipliable[T, T]
+	trait AddableSame[T] extends Addable[T, T]
+
 	// Operations that a type must have to be used in interpolate()
-	trait Interpolatable[T] extends Multipliable[Float, T] with Addable[T, T]
+	trait Interpolatable[T] extends Multipliable[Float, T] with AddableSame[T]
 
 	// Linearly interpolate a value
 	@inline def interpolate[@specialized(Float) T <% Interpolatable[T]](t: Float, a: T, b: T): T = a * (1.0f - t) + b * t
@@ -46,9 +51,6 @@ package object util {
 		def *(t: Float): Float = f1 * t
 		def +(f2: Float): Float = f1 + f2
 	}
-
-	// Used in for example package objects vecmath and spectrum
-	trait ImplicitScale[T] extends Multipliable[T, T]
 
 	// Randomly permutate an array - Fisher-Yates shuffle (see: http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
 	// This method can also take a custom swap method, which is useful for example for Latin hypercube sampling

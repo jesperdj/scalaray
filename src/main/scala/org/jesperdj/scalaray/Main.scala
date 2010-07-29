@@ -50,15 +50,17 @@ object Main {
 
 		val rect = new Rectangle(0, 0, 799, 599)
 
+		val camera: Camera = new PerspectiveCamera(Transform.translate(0.0f, 0.75f, 0.0f), π / 4.0f, rect.width, rect.height)
+
 		val filter: Filter = new BoxFilter
 		val raster = new PixelRaster(rect, filter)
 
 		val surfaceIntegrator: SurfaceIntegrator = DirectLightingSurfaceIntegrator(scene)
 		val volumeIntegrator: VolumeIntegrator = VacuumVolumeIntegrator
-		val sampler: Sampler = new StratifiedSampler(rect, 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
-		val renderer: Renderer = new SamplerRenderer(scene, sampler, surfaceIntegrator, volumeIntegrator)
 
-		val camera: Camera = new PerspectiveCamera(Transform.translate(0.0f, 0.75f, 0.0f), π / 4.0f, rect.width, rect.height)
+		val sampler: Sampler = new StratifiedSampler(rect, 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
+
+		val renderer: Renderer = new SamplerRenderer(scene, sampler, camera, raster, surfaceIntegrator, volumeIntegrator)
 
 		println("- Surface integrator: " + surfaceIntegrator)
 		println("- Volume integrator: " + volumeIntegrator)
@@ -70,7 +72,7 @@ object Main {
 		println()
 		println("Rendering...")
 		val timer = new Timer("Total rendering time")
-		timer.time { renderer.render(camera, raster) }
+		timer.time { renderer.render() }
 		println(timer.toString)
 
 		ImageIO.write(raster.toImage, "png", new File("output.png"))
@@ -82,16 +84,6 @@ object Main {
 	def createScene(): Scene = {
 		val mat1 = new MatteMaterial(new ConstantTexture(new Spectrum(1.0f, 1.0f, 0.5f)))
 		val mat2 = new MatteMaterial(new ConstantTexture(new Spectrum(1.0f, 1.0f, 1.0f)))
-
-//		val mat1: Material = new Material {
-//			private val simpleBxDFs: IndexedSeq[BxDF] = IndexedSeq(new Lambertian(new Spectrum(1.0f, 1.0f, 0.5f)))
-//			def bsdf(dgGeom: DifferentialGeometry, dgShading: DifferentialGeometry): BSDF = new BSDF(simpleBxDFs, dgShading, dgGeom.normal)
-//		}
-
-//		val mat2: Material = new Material {
-//			private val simpleBxDFs: IndexedSeq[BxDF] = IndexedSeq(new Lambertian(new Spectrum(1.0f, 1.0f, 1.0f)))
-//			def bsdf(dgGeom: DifferentialGeometry, dgShading: DifferentialGeometry): BSDF = new BSDF(simpleBxDFs, dgShading, dgGeom.normal)
-//		}
 
 //		val s1 = new Sphere(0.75f, -1.0f, 1.0f, π * 4.0f / 3.0f)
 //		val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, mat1), Transform.translate(0.0f, 0.75, 4.0f) * Transform.rotateY(π / 4.0f) * Transform.rotateZ(π / 2.0f))

@@ -19,27 +19,29 @@ package org.jesperdj.scalaray.integrator
 
 import scala.collection.immutable.Traversable
 
+import org.jesperdj.scalaray.renderer.Renderer
 import org.jesperdj.scalaray.sampler.{ Sample, SampleSpec }
+import org.jesperdj.scalaray.scene.Intersection
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.vecmath.Ray
+import org.jesperdj.scalaray.vecmath.RayDifferential
 
-// Integrator (pbrt 16)
+// Integrator (pbrt 15)
 sealed abstract class Integrator {
 	// Sample specifications for the sample patterns that this integrator needs
 	val sampleSpecs: Traversable[SampleSpec]
 }
 
-// Surface integrator (pbrt 16)
+// Surface integrator (pbrt 15)
 abstract class SurfaceIntegrator extends Integrator {
-	// Radiance along the ray (pbrt 16)
-	def radiance(ray: Ray, sample: Sample): Spectrum
+	// Compute the incident radiance along the given ray
+	def radiance(renderer: Renderer, ray: RayDifferential, intersection: Intersection, sample: Sample): Spectrum
 }
 
-// Volume integrator (pbrt 17.2)
+// Volume integrator (pbrt 16.2)
 abstract class VolumeIntegrator extends Integrator {
-	// Radiance along the ray; returns radiance and transmittance
-	def radiance(ray: Ray, sample: Sample): (Spectrum, Spectrum)
+	// TODO
+	def radiance(renderer: Renderer, ray: RayDifferential, sample: Sample): (Spectrum, Spectrum)
 
-	// Transmittance along the ray (pbrt 17.2)
-	def transmittance(ray: Ray, sample: Sample): Spectrum
+	// TODO
+	def transmittance(renderer: Renderer, ray: RayDifferential, sample: Sample): Spectrum
 }

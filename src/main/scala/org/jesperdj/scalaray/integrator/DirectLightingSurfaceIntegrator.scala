@@ -22,6 +22,7 @@ import scala.collection.mutable.ListBuffer
 
 import org.jesperdj.scalaray.lightsource._
 import org.jesperdj.scalaray.reflection.BSDF
+import org.jesperdj.scalaray.renderer.Renderer
 import org.jesperdj.scalaray.sampler.{ Sample, SampleSpec, SampleSpec1D, SampleSpec2D }
 import org.jesperdj.scalaray.scene.{ Intersection, Scene }
 import org.jesperdj.scalaray.spectrum.Spectrum
@@ -33,33 +34,29 @@ private final class SampleIDs (val lightSampleID: Int, val bsdfSampleID: Int, va
 	override def toString = "SampleIDs(lightSampleID=%d, bsdfSampleID=%d, bsdfComponentSampleID=%d)" format (lightSampleID, bsdfSampleID, bsdfComponentSampleID)
 }
 
-// Direct lighting surface integrator (pbrt 16.1)
+// Direct lighting surface integrator (pbrt 15.1)
 final class DirectLightingSurfaceIntegrator private (
 	scene: Scene, val sampleSpecs: Traversable[SampleSpec],
 	deltaLights: Traversable[DeltaLightSource], areaLights: Traversable[(AreaLightSource, SampleIDs)]) extends SurfaceIntegrator {
 
-	// Radiance along the ray (pbrt 16)
-	def radiance(ray: Ray, sample: Sample): Spectrum = scene intersect ray match {
-		case Some(intersection) =>
-			val dg = intersection.differentialGeometry
-			val wo = -ray.direction.normalize
+	// Compute the incident radiance along the given ray
+	def radiance(renderer: Renderer, ray: RayDifferential, intersection: Intersection, sample: Sample): Spectrum = {
+		val dg = intersection.dg
+		val wo = -ray.direction.normalize
 
-			// Get emitted radiance if intersection point is on an area light source
-			val emitted = intersection.emittedRadiance(wo)
+		// Get emitted radiance if intersection point is on an area light source
+		val emitted = intersection.emittedRadiance(wo)
 
-			// TODO: This does not work if the light source is on the wrong side of the surface. Solve the self-intersection problem differently.
-			// Point for shadow ray calculations just above surface to avoid self-intersection
-			val shadowPoint = dg.point + dg.normal * 1e-6f
+		// TODO: This does not work if the light source is on the wrong side of the surface. Solve the self-intersection problem differently.
+		// Point for shadow ray calculations just above surface to avoid self-intersection
+		val shadowPoint = dg.point + dg.normal * 1e-6f
 
-			// Get radiance of direct light from light sources on the intersection point
-			val direct = uniformSampleAllLights(shadowPoint, dg.normal, wo, intersection.bsdf, sample)
+		// Get radiance of direct light from light sources on the intersection point
+		val direct = uniformSampleAllLights(shadowPoint, dg.normal, wo, intersection.bsdf, sample)
 
-			// TODO: trace rays for specular reflection and refraction (make recursion stop at a depth limit)
+		// TODO: trace rays for specular reflection and refraction (make recursion stop at a depth limit)
 
-			emitted + direct
-
-		case None => // No intersection
-			Spectrum.Black
+		emitted + direct
 	}
 
 	// Sample direct light from all light sources on the intersection point (pbrt 16.1)
@@ -157,11 +154,11 @@ final class DirectLightingSurfaceIntegrator private (
 		lightContrib / lightSamples.size + bsdfContrib / bsdfSamples.size
 	}
 
-	// Balance heuristic weighing function for multiple importance sampling (pbrt 15.4.1)
+	// Balance heuristic weighing function for multiple importance sampling (pbrt 14.4.1)
 	private def balanceHeuristic(nf: Int, fPdf: Float, ng: Int, gPdf: Float): Float =
 		(nf * fPdf) / (nf * fPdf + ng * gPdf)
 
-	// Power heuristic weighing function for multiple importance sampling (pbrt 15.4.1)
+	// Power heuristic weighing function for multiple importance sampling (pbrt 14.4.1)
 	private def powerHeuristic(nf: Int, fPdf: Float, ng: Int, gPdf: Float): Float = {
 		val f = nf * fPdf; val g = ng * gPdf
 		(f * f) / (f * f + g * g)

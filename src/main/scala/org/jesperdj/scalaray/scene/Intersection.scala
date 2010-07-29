@@ -23,19 +23,19 @@ import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath._
 
 // Intersection with a primitive (pbrt 4.1)
-final class Intersection (val differentialGeometry: DifferentialGeometry, val distance: Float, val primitive: GeometricPrimitive) {
+final class Intersection (val dg: DifferentialGeometry, val distance: Float, val primitive: GeometricPrimitive) {
 	// TODO
-	def bsdf: BSDF = primitive.bsdf(differentialGeometry, Transform.Identity) // TODO: How to deal with objectToWorld transform?
+	def bsdf: BSDF = primitive.bsdf(dg, Transform.Identity) // TODO: How to deal with objectToWorld transform?
 
 	// Emitted radiance if the intersection is on an area light (pbrt 13.4)
 	def emittedRadiance(direction: Vector): Spectrum = primitive.areaLightSource match {
-		case Some(areaLightSource) => areaLightSource.emittedRadiance(differentialGeometry.point, differentialGeometry.normal, direction)
+		case Some(areaLightSource) => areaLightSource.emittedRadiance(dg.point, dg.normal, direction)
 		case None => Spectrum.Black
 	}
 
-	override def toString = "Intersection(differentialGeometry=%s, distance=%g, primitive=%s)" format (differentialGeometry, distance, primitive)
+	override def toString = "Intersection(differentialGeometry=%s, distance=%g, primitive=%s)" format (dg, distance, primitive)
 }
 
 object Intersection {
-	def unapply(intersection: Intersection) = Some((intersection.differentialGeometry, intersection.distance, intersection.primitive))
+	def unapply(intersection: Intersection) = Some((intersection.dg, intersection.distance, intersection.primitive))
 }
