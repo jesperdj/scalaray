@@ -63,7 +63,7 @@ final class PixelRaster (rectangle: Rectangle, filter: Filter) extends Raster(re
 		image
 	}
 
-	override def toString = "Raster(rectangle=%s, filter=%s, pixels=%s)" format (rectangle, filter, pixels)
+	override def toString = "PixelRaster(rectangle=%s, filter=%s, pixels=%s)" format (rectangle, filter, pixels)
 }
 
 object PixelRaster {

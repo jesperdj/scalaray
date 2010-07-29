@@ -20,13 +20,13 @@ package org.jesperdj.scalaray.renderer
 import org.jesperdj.scalaray.camera.Camera
 import org.jesperdj.scalaray.integrator.{ SurfaceIntegrator, VolumeIntegrator }
 import org.jesperdj.scalaray.raster.Raster
-import org.jesperdj.scalaray.sampler.{ Sample, Sampler }
+import org.jesperdj.scalaray.sampler.{ Sample, Sampler, SamplerFactory }
 import org.jesperdj.scalaray.scene._
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath.RayDifferential
 
 // Sampler renderer (pbrt 1.3.3)
-final class SamplerRenderer (scene: Scene, sampler: Sampler, camera: Camera, raster: Raster,
+final class SamplerRenderer (scene: Scene, samplerFactory: SamplerFactory, camera: Camera, raster: Raster,
 							 surfaceIntegrator: SurfaceIntegrator, volumeIntegrator: VolumeIntegrator) extends Renderer {
 	// Render the scene
 	def render(): Unit = {
@@ -48,7 +48,7 @@ final class SamplerRenderer (scene: Scene, sampler: Sampler, camera: Camera, ras
 
 		// Create executor service and submit tasks
 		val executorService = Executors.newFixedThreadPool(processors)
-		val samplers = sampler.split(math.max(32 * processors, raster.rectangle.width * raster.rectangle.height / 256))
+		val samplers = samplerFactory.createSamplers(math.max(32 * processors, raster.rectangle.width * raster.rectangle.height / 256))
 		samplers.foreach { s => runningTasks.incrementAndGet; executorService.submit(new Task(s)) }
 
 		val numSamplers = samplers.size

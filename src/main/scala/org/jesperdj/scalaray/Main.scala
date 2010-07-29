@@ -58,13 +58,13 @@ object Main {
 		val surfaceIntegrator: SurfaceIntegrator = DirectLightingSurfaceIntegrator(scene)
 		val volumeIntegrator: VolumeIntegrator = VacuumVolumeIntegrator
 
-		val sampler: Sampler = new StratifiedSampler(rect, 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
+		val samplerFactory: SamplerFactory = new StratifiedSamplerFactory(rect, 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
 
-		val renderer: Renderer = new SamplerRenderer(scene, sampler, camera, raster, surfaceIntegrator, volumeIntegrator)
+		val renderer: Renderer = new SamplerRenderer(scene, samplerFactory, camera, raster, surfaceIntegrator, volumeIntegrator)
 
 		println("- Surface integrator: " + surfaceIntegrator)
 		println("- Volume integrator: " + volumeIntegrator)
-		println("- Sampler: " + sampler)
+		println("- Sampler factory: " + samplerFactory)
 		println("- Filter: " + filter)
 		println("- Renderer: " + renderer)
 		println("- Camera: " + camera)
