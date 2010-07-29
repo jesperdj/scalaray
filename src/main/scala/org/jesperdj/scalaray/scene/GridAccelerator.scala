@@ -31,8 +31,8 @@ final class GridAccelerator (primitives: Traversable[Primitive]) extends Primiti
 	override def boundingBox(transform: Transform): BoundingBox =
 		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement boundingBox
 
-	// Compute closest intersection between a ray and this primitive
-	def intersect(ray: Ray): Option[Intersection] =
+	// Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
+	def intersect(ray: Ray): Option[(Intersection, Float)] =
 		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement intersect
 
 	// Check if a ray intersects this primitive

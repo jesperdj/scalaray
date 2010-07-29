@@ -37,8 +37,10 @@ final class GeometricPrimitive private (shape: Shape, material: Material, val ar
 	// Bounding box when primitive is transformed
 	override def boundingBox(transform: Transform): BoundingBox = shape.boundingBox(transform)
 
-	// Compute closest intersection between a ray and this primitive
-	def intersect(ray: Ray): Option[Intersection] = shape intersect ray map { case (dg, distance) => new Intersection(dg, distance, this, Transform.Identity) }
+	// Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
+	def intersect(ray: Ray): Option[(Intersection, Float)] = shape intersect ray map {
+		case (dg, distance) => (new Intersection(dg, this, Transform.Identity), distance)
+	}
 
 	// Check if a ray intersects this primitive
 	override def checkIntersect(ray: Ray): Boolean = shape checkIntersect ray

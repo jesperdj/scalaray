@@ -46,8 +46,8 @@ final class BoundingVolumeHierarchyAccelerator (
 	// Bounding box when primitive is transformed
 	override def boundingBox(transform: Transform): BoundingBox = root.boundingBox(transform)
 
-	// Compute closest intersection between a ray and this primitive
-	def intersect(ray: Ray): Option[Intersection] = root intersect ray
+	// Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
+	def intersect(ray: Ray): Option[(Intersection, Float)] = root intersect ray
 
 	// Check if a ray intersects this primitive
 	override def checkIntersect(ray: Ray): Boolean = root checkIntersect ray

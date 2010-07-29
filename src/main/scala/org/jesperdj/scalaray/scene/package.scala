@@ -23,7 +23,7 @@ import org.jesperdj.scalaray.vecmath._
 
 package object scene {
 	// Implicit conversion for transforming an intersection
-	implicit def implicitTransformIntersection(t: Transform) = new MultipliableSame[Intersection] {
-		def *(i: Intersection): Intersection = new Intersection(t * i.dg, i.distance, i.primitive, t * i.objectToWorld)
+	implicit def implicitTransformIntersection(transform: Transform) = new MultipliableSame[Intersection] {
+		def *(its: Intersection): Intersection = new Intersection(transform * its.dg, its.primitive, transform * its.objectToWorld)
 	}
 }

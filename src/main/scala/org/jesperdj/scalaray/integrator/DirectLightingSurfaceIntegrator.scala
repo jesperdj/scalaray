@@ -131,7 +131,7 @@ final class DirectLightingSurfaceIntegrator private (
 				if (lightPdf > 0.0f) {
 					// Evaluate radiance from area light source
 					val radiance = scene.intersect(ray) match {
-						case Some(Intersection(dg, _, prim)) if (prim.areaLightSource.isDefined && prim.areaLightSource.get == areaLight) =>
+						case Some(Intersection(dg, prim, _)) if (prim.areaLightSource.isDefined && prim.areaLightSource.get == areaLight) =>
 							// Ray intersects with area light source and point isn't shadowed
 							areaLight.emittedRadiance(dg.point, dg.normal, -wi)
 

@@ -35,20 +35,26 @@ final class CompositePrimitive (primitives: Traversable[Primitive]) extends Prim
 	// Bounding box when primitive is transformed
 	override def boundingBox(transform: Transform): BoundingBox = (BoundingBox.Empty /: primitives) { (bb, p) => bb union p.boundingBox(transform) }
 
-	// Compute closest intersection between a ray and this primitive
-	def intersect(ray: Ray): Option[Intersection] = {
+	// Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
+	def intersect(ray: Ray): Option[(Intersection, Float)] = {
 		// Check against bounding box
-		val bi = boundingBox intersect ray
-		if (bi.isEmpty) return None
+		val range = boundingBox intersect ray
+		if (range.isEmpty) return None
 
 		// Initialize the range of the ray with the range inside the bounding box
-		val (minT, maxT) = bi.get
-		var r = Ray(ray.origin, ray.direction, minT, maxT)
+		val (minDistance, maxDistance) = range.get
+		var r = Ray(ray.origin, ray.direction, minDistance, maxDistance)
 
 		// Find the closest intersection between the ray and one of the primitives
-		((None: Option[Intersection]) /: primitives) { (o: Option[Intersection], p: Primitive) =>
-			val pi = p intersect r
-			if (pi.isEmpty) o else { r = Ray(r.origin, r.direction, r.minDistance, pi.get.distance); pi }
+		((None: Option[(Intersection, Float)]) /: primitives) { (result: Option[(Intersection, Float)], prim: Primitive) =>
+			prim intersect r match {
+				case Some((its, distance)) =>
+					// Found a closer intersection; update max distance of the ray for subsequent intersection tests
+					r = Ray(r.origin, r.direction, r.minDistance, distance)
+					Some(its, distance)
+
+				case None => result
+			}
 		}
 	}
 

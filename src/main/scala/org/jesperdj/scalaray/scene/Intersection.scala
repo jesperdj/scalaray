@@ -23,7 +23,7 @@ import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath._
 
 // Intersection with a primitive (pbrt 4.1)
-final class Intersection (val dg: DifferentialGeometry, val distance: Float, val primitive: GeometricPrimitive, val objectToWorld: Transform) {
+final class Intersection (val dg: DifferentialGeometry, val primitive: GeometricPrimitive, val objectToWorld: Transform) {
 	// Get the BSDF at the intersection point
 	def bsdf: BSDF = primitive.bsdf(dg, objectToWorld)
 
@@ -33,9 +33,9 @@ final class Intersection (val dg: DifferentialGeometry, val distance: Float, val
 		case None => Spectrum.Black
 	}
 
-	override def toString = "Intersection(differentialGeometry=%s, distance=%g, primitive=%s)" format (dg, distance, primitive)
+	override def toString = "Intersection(differentialGeometry=%s, primitive=%s, objectToWorld=%s)" format (dg, primitive, objectToWorld)
 }
 
 object Intersection {
-	def unapply(intersection: Intersection) = Some((intersection.dg, intersection.distance, intersection.primitive))
+	def unapply(intersection: Intersection) = Some((intersection.dg, intersection.primitive, intersection.objectToWorld))
 }
