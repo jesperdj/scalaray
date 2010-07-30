@@ -98,8 +98,8 @@ final class DirectLightingSurfaceIntegrator private (
 
 	// Sample direct light from an area light source on the intersection point
 	private def estimateDirect(areaLight: AreaLightSource, point: Point, normal: Normal, wo: Vector, bsdf: BSDF,
-							   lightSamples: IndexedSeq[(Float, Float)],
-							   bsdfSamples: IndexedSeq[(Float, Float)], bsdfComponentSamples: IndexedSeq[Float]): Spectrum = {
+							   lightSamples: IndexedSeq[FloatPair],
+							   bsdfSamples: IndexedSeq[FloatPair], bsdfComponentSamples: IndexedSeq[Float]): Spectrum = {
 		// Sample light source
 		var lightContrib = Spectrum.Black
 		for (i <- 0 until lightSamples.size) {

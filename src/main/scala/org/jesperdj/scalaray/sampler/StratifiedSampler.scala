@@ -38,7 +38,7 @@ final class StratifiedSampler (rectangle: Rectangle, samplesPerPixelX: Int, samp
 		for (i <- 0 until samplesPerPixel) yield {
 			// Generate 1D and 2D sample patterns for the current sample
 			val samples1D = MutableMap[Int, IndexedSeq[Float]]()
-			val samples2D = MutableMap[Int, IndexedSeq[(Float, Float)]]()
+			val samples2D = MutableMap[Int, IndexedSeq[FloatPair]]()
 
 			sampleSpecs foreach {
 				_ match {
@@ -47,11 +47,11 @@ final class StratifiedSampler (rectangle: Rectangle, samplesPerPixelX: Int, samp
 				}
 			}
 
-			val (ix, iy) = imageSamples(i)
-			val (lu, lv) = lensSamples(i)
+			val is = imageSamples(i)
+			val ls = lensSamples(i)
 
 			// Create Sample object, shift image samples to pixel position
-			new Sample(ix + x, iy + y, lu, lv, timeSamples(i), samples1D.toMap, samples2D.toMap)
+			new Sample(is._1 + x, is._2 + y, ls._1, ls._2, timeSamples(i), samples1D.toMap, samples2D.toMap)
 		}
 	}
 
@@ -71,34 +71,34 @@ object StratifiedSampler {
 		for (x <- 0 until count) array(x) = (x.toFloat + random.nextFloat) / count
 
 		// Shuffle samples to decorrelate dimensions
-		ArrayIndexedSeq(shuffle(array))
+		arrayToIndexedSeq(shuffle(array))
 	}
 
 	// Generate a set of stratified 2D samples
-	private def generateSamples2D(countX: Int, countY: Int): IndexedSeq[(Float, Float)] = {
-		val array = new Array[(Float, Float)](countX * countY)
+	private def generateSamples2D(countX: Int, countY: Int): IndexedSeq[FloatPair] = {
+		val array = new Array[FloatPair](countX * countY)
 
 		// Generate stratified 2D samples
 		for (y <- 0 until countY; x <- 0 until countX)
-			array(x + countX * y) = ((x.toFloat + random.nextFloat) / countX, (y.toFloat + random.nextFloat) / countY)
+			array(x + countX * y) = FloatPair((x.toFloat + random.nextFloat) / countX, (y.toFloat + random.nextFloat) / countY)
 
 		// Shuffle samples to decorrelate dimensions
-		ArrayIndexedSeq(shuffle(array))
+		arrayToIndexedSeq(shuffle(array))
 	}
 
 	// Generate a set of 2D samples using Latin hypercube sampling
-	private def generateSamples2D(count: Int): IndexedSeq[(Float, Float)] = {
-		val array = new Array[(Float, Float)](count)
+	private def generateSamples2D(count: Int): IndexedSeq[FloatPair] = {
+		val array = new Array[FloatPair](count)
 
 		// Generate Latin hypercube samples along diagonal
-		for (i <- 0 until count) array(i) = ((i.toFloat + random.nextFloat) / count, (i.toFloat + random.nextFloat) / count)
+		for (i <- 0 until count) array(i) = FloatPair((i.toFloat + random.nextFloat) / count, (i.toFloat + random.nextFloat) / count)
 
 		// Swap functions to swap the X or Y components of two samples
-		def swapX(a: (Float, Float), b: (Float, Float)): ((Float, Float), (Float, Float)) = ((b._1, a._2), (a._1, b._2))
-		def swapY(a: (Float, Float), b: (Float, Float)): ((Float, Float), (Float, Float)) = ((a._1, b._2), (b._1, a._2))
+		def swapX(a: FloatPair, b: FloatPair): (FloatPair, FloatPair) = (FloatPair(b._1, a._2), FloatPair(a._1, b._2))
+		def swapY(a: FloatPair, b: FloatPair): (FloatPair, FloatPair) = (FloatPair(a._1, b._2), FloatPair(b._1, a._2))
 
 		// Shuffle along both dimensions independently
-		ArrayIndexedSeq(shuffle(shuffle(array, swapX), swapY))
+		arrayToIndexedSeq(shuffle(shuffle(array, swapX), swapY))
 	}
 }
 

@@ -17,6 +17,8 @@
  */
 package org.jesperdj.scalaray
 
+import scala.collection.immutable.IndexedSeq
+
 package object util {
 	val π = math.Pi.toFloat
 
@@ -50,6 +52,13 @@ package object util {
 	implicit def floatToInterpolatable(f1: Float) = new Interpolatable[Float] {
 		def *(t: Float): Float = f1 * t
 		def +(f2: Float): Float = f1 + f2
+	}
+
+	// Create an immutable IndexedSeq that wraps an Array. Note that Scala already contains a method wrapFloatArray(), but this returns a mutable WrappedArray.
+	// Also, this version is @specialized on Float to avoid unnecessary boxing and unboxing.
+	def arrayToIndexedSeq[@specialized(Float) T](array: Array[T]): IndexedSeq[T] = new IndexedSeq[T] {
+		def apply(idx: Int): T = array(idx)
+		def length: Int = array.length
 	}
 
 	// Randomly permutate an array - Fisher-Yates shuffle (see: http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
