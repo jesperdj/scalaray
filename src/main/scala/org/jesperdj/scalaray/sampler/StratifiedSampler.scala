@@ -42,8 +42,8 @@ final class StratifiedSampler (rectangle: Rectangle, samplesPerPixelX: Int, samp
 
 			sampleSpecs foreach {
 				_ match {
-					case spec: SampleSpec1D => samples1D += spec.id -> (IndexedSeq() ++ StratifiedSampler.generateSamples1D(spec.count))
-					case spec: SampleSpec2D => samples2D += spec.id -> (IndexedSeq() ++ StratifiedSampler.generateSamples2D(spec.count))
+					case spec: SampleSpec1D => samples1D += spec.id -> StratifiedSampler.generateSamples1D(spec.count)
+					case spec: SampleSpec2D => samples2D += spec.id -> StratifiedSampler.generateSamples2D(spec.count)
 				}
 			}
 
@@ -64,18 +64,18 @@ object StratifiedSampler {
 	private val random = new scala.util.Random
 
 	// Generate a set of stratified 1D samples
-	private def generateSamples1D(count: Int): Array[Float] = {
+	private def generateSamples1D(count: Int): IndexedSeq[Float] = {
 		val array = new Array[Float](count)
 
 		// Generate stratified 1D samples
 		for (x <- 0 until count) array(x) = (x.toFloat + random.nextFloat) / count
 
 		// Shuffle samples to decorrelate dimensions
-		shuffle(array)
+		ArrayIndexedSeq(shuffle(array))
 	}
 
 	// Generate a set of stratified 2D samples
-	private def generateSamples2D(countX: Int, countY: Int): Array[(Float, Float)] = {
+	private def generateSamples2D(countX: Int, countY: Int): IndexedSeq[(Float, Float)] = {
 		val array = new Array[(Float, Float)](countX * countY)
 
 		// Generate stratified 2D samples
@@ -83,11 +83,11 @@ object StratifiedSampler {
 			array(x + countX * y) = ((x.toFloat + random.nextFloat) / countX, (y.toFloat + random.nextFloat) / countY)
 
 		// Shuffle samples to decorrelate dimensions
-		shuffle(array)
+		ArrayIndexedSeq(shuffle(array))
 	}
 
 	// Generate a set of 2D samples using Latin hypercube sampling
-	private def generateSamples2D(count: Int): Array[(Float, Float)] = {
+	private def generateSamples2D(count: Int): IndexedSeq[(Float, Float)] = {
 		val array = new Array[(Float, Float)](count)
 
 		// Generate Latin hypercube samples along diagonal
@@ -98,7 +98,7 @@ object StratifiedSampler {
 		def swapY(a: (Float, Float), b: (Float, Float)): ((Float, Float), (Float, Float)) = ((a._1, b._2), (b._1, a._2))
 
 		// Shuffle along both dimensions independently
-		shuffle(shuffle(array, swapX), swapY)
+		ArrayIndexedSeq(shuffle(shuffle(array, swapX), swapY))
 	}
 }
 
