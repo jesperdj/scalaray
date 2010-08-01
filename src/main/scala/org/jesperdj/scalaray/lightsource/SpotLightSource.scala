@@ -23,7 +23,7 @@ import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 // Spot light source (pbrt 12.2.1)
-final class SpotLightSource (position: Point, direction: Vector, widthAngle: Float, falloffAngle: Float, intensity: Spectrum) extends LightSource {
+final class SpotLightSource (position: Point, direction: Vector, widthAngle: Float, falloffAngle: Float, intensity: Spectrum) extends DeltaLightSource {
 	require(direction.length > 0.999f && direction.length < 1.001f, "SpotLightSource requires that the direction vector is normalized")
 	require(widthAngle > falloffAngle, "SpotLightSource requires that the width angle must be greater than the falloff angle")
 
@@ -34,15 +34,9 @@ final class SpotLightSource (position: Point, direction: Vector, widthAngle: Flo
 	def this(lightToWorld: Transform, widthAngle: Float, falloffAngle: Float, intensity: Spectrum) =
 		this(lightToWorld * Point.Origin, lightToWorld * Vector.ZAxis, widthAngle, falloffAngle, intensity)
 
-	// Indicates whether the light is described by a delta distribution
-	val isDeltaLight: Boolean = true
-
-	// Number of samples to take from this light source
-	val numberOfSamples: Int = 1
-
-	// Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
-	// Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-	def sampleRadiance(point: Point, u1: Float, u2: Float): (Spectrum, Ray, Float) = {
+	// Radiance of this light source at the given point
+	// Returns the radiance and a ray from the light source to the given point
+	def radiance(point: Point): (Spectrum, Ray) = {
 		val rd = point - position
 
 		// Compute falloff factor
@@ -52,12 +46,8 @@ final class SpotLightSource (position: Point, direction: Vector, widthAngle: Flo
 			delta * delta * delta * delta
 		}
 
-		(if (falloff > 0.0f) intensity * (falloff / rd.lengthSquared) else Spectrum.Black, Ray(position, rd, 0.0f, 1.0f), 1.0f)
+		(if (falloff > 0.0f) intensity * (falloff / rd.lengthSquared) else Spectrum.Black, Ray(position, rd, 0.0f, 1.0f))
 	}
-
-	// Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
-	// that sampleRadiance(point: Point, u1: Float, u2: Float) uses to sample points (pbrt 14.6.1)
-	def pdf(point: Point, wi: Vector): Float = 0.0f
 
 	// Total emitted power of this light source onto the scene
 	def totalPower(scene: Scene): Spectrum = intensity * (2.0f * π * (1.0f - 0.5f * (cosFalloff + cosWidth)))

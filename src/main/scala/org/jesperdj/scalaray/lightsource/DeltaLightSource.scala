@@ -17,25 +17,25 @@
  */
 package org.jesperdj.scalaray.lightsource
 
-import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
-// Point light source (pbrt 12.2)
-final class PointLightSource (position: Point, intensity: Spectrum) extends DeltaLightSource {
-	// Create a point light source using a light-to-world transform
-	def this(lightToWorld: Transform, intensity: Spectrum) = this(lightToWorld * Point.Origin, intensity)
+abstract class DeltaLightSource extends LightSource {
+	// Indicates whether the light is described by a delta distribution
+	val isDeltaLight: Boolean = true
+
+	// Number of samples to take from this light source
+	val numberOfSamples: Int = 1
 
 	// Radiance of this light source at the given point
 	// Returns the radiance and a ray from the light source to the given point
-	def radiance(point: Point): (Spectrum, Ray) = {
-		val rd = point - position
-		(intensity / rd.lengthSquared, Ray(position, rd, 0.0f, 1.0f))
-	}
+	def radiance(point: Point): (Spectrum, Ray)
 
-	// Total emitted power of this light source onto the scene
-	def totalPower(scene: Scene): Spectrum = intensity * (4.0f * π)
+	// Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
+	// Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
+	def sampleRadiance(point: Point, u1: Float, u2: Float): (Spectrum, Ray, Float) = { val (rad, ray) = radiance(point); (rad, ray, 1.0f) }
 
-	override def toString = "PointLightSource(position=%s, intensity=%s)" format (position, intensity)
+	// Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
+	// that sampleRadiance(point: Point, u1: Float, u2: Float) uses to sample points (pbrt 14.6.1)
+	def pdf(point: Point, wi: Vector): Float = 0.0f
 }

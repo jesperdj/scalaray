@@ -24,7 +24,7 @@ import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 // Diffuse area light source (pbrt 12.4)
-final class DiffuseAreaLightSource (val shape: Shape, lightToWorld: Transform, emitted: Spectrum, val numberOfSamples: Int) extends AreaLightSource {
+final class DiffuseAreaLightSource (shape: Shape, lightToWorld: Transform, emitted: Spectrum, val numberOfSamples: Int) extends AreaLightSource {
 	require(!lightToWorld.hasScale, "DiffuseAreaLightSource requires that the light-to-world transform has no scale factor")
 
 	private val worldToLight = lightToWorld.inverse
