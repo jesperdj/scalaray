@@ -19,27 +19,33 @@ package org.jesperdj.scalaray.lightsource
 
 import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.spectrum.Spectrum
+import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
-// Light source (pbrt 12.1)
-abstract class LightSource {
+// Distant light source (pbrt 12.3)
+final class DistantLightSource (direction: Vector, radiance: Spectrum) extends LightSource {
+	// Create a distant light source using a light-to-world transform
+	def this(lightToWorld: Transform, radiance: Spectrum) = this(lightToWorld * Vector.ZAxis, radiance)
+
 	// Indicates whether the light is described by a delta distribution
-	val isDeltaLight: Boolean
+	val isDeltaLight: Boolean = true
 
 	// Number of samples to take from this light source
-	val numberOfSamples: Int
+	val numberOfSamples: Int = 1
 
 	// Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
 	// Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-	def sampleRadiance(point: Point, u1: Float, u2: Float): (Spectrum, Ray, Float)
+	def sampleRadiance(point: Point, u1: Float, u2: Float): (Spectrum, Ray, Float) = (radiance, Ray(point, direction, Float.NegativeInfinity, 0.0f), 1.0f)
 
 	// Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
 	// that sampleRadiance(point: Point, u1: Float, u2: Float) uses to sample points (pbrt 14.6.1)
-	def pdf(point: Point, wi: Vector): Float
+	def pdf(point: Point, wi: Vector): Float = 0.0f
 
 	// Total emitted power of this light source onto the scene
-	def totalPower(scene: Scene): Spectrum
+	def totalPower(scene: Scene): Spectrum = {
+		val (center, radius) = scene.boundingSphere
+		radiance * (π * radius * radius)
+	}
 
-	// Emitted radiance along a ray that does not intersect with geometry in the scene (for infinite area lights) (pbrt 12.5)
-	def emittedRadiance(ray: Ray): Spectrum = Spectrum.Black
+	override def toString = "DistantLightSource(direction=%s, radiance=%s)" format (direction, radiance)
 }

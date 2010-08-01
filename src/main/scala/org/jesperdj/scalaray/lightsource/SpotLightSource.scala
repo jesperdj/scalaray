@@ -18,41 +18,50 @@
 package org.jesperdj.scalaray.lightsource
 
 import org.jesperdj.scalaray.scene.Scene
-import org.jesperdj.scalaray.spectrum._
+import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
-// Spot light source (pbrt 13.2.1)
-final class SpotLightSource (position: Point, direction: Vector, falloffAngle: Float, widthAngle: Float, intensity: Spectrum) extends DeltaLightSource {
-	require(widthAngle > falloffAngle, "Width angle must be greater than falloff angle for a spotlight")
+// Spot light source (pbrt 12.2.1)
+final class SpotLightSource (position: Point, direction: Vector, widthAngle: Float, falloffAngle: Float, intensity: Spectrum) extends LightSource {
+	require(direction.length > 0.999f && direction.length < 1.001f, "SpotLightSource requires that the direction vector is normalized")
+	require(widthAngle > falloffAngle, "SpotLightSource requires that the width angle must be greater than the falloff angle")
 
-	// Create a new spot light source using a transform to specify the position and direction
-	def this(lightToWorld: Transform, falloffAngle: Float, widthAngle: Float, intensity: Spectrum) =
-		this(lightToWorld * Point.Origin, (lightToWorld * Vector.ZAxis).normalize, falloffAngle, widthAngle, intensity)
-
-	private val cosFalloff = math.cos(falloffAngle).toFloat
 	private val cosWidth = math.cos(widthAngle).toFloat
+	private val cosFalloff = math.cos(falloffAngle).toFloat
 
-	// Total emitted power of this light source onto the scene (pbrt 13.2.1)
-	def totalPower(scene: Scene): Spectrum = intensity * (2.0f * π * (1.0f - 0.5f * (cosFalloff + cosWidth)))
+	// Create a spot light source using a light-to-world transform
+	def this(lightToWorld: Transform, widthAngle: Float, falloffAngle: Float, intensity: Spectrum) =
+		this(lightToWorld * Point.Origin, lightToWorld * Vector.ZAxis, widthAngle, falloffAngle, intensity)
 
-	// Gets the incident radiance of this light source at the point (pbrt 13.2.1)
-	// Returns the radiance and a ray from the light source to the point
-	def incidentRadiance(point: Point): (Spectrum, Ray) = {
-		// Ray direction vector from light source to intersection point
-		var rd = point - position
+	// Indicates whether the light is described by a delta distribution
+	val isDeltaLight: Boolean = true
+
+	// Number of samples to take from this light source
+	val numberOfSamples: Int = 1
+
+	// Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
+	// Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
+	def sampleRadiance(point: Point, u1: Float, u2: Float): (Spectrum, Ray, Float) = {
+		val rd = point - position
 
 		// Compute falloff factor
 		val c = direction * rd.normalize
-		val f = if (c < cosWidth) 0.0f else if (c > cosFalloff) 1.0f else {
-			val d = (c - cosWidth) / (cosFalloff - cosWidth)
-			d * d * d * d
+		val falloff = if (c < cosWidth) 0.0f else if (c > cosFalloff) 1.0f else {
+			val delta = (c - cosWidth) / (cosFalloff - cosWidth)
+			delta * delta * delta * delta
 		}
 
-		// Compute radiance, attenuates by falloff factor and distance
-		(if (f > 0.0f) intensity * (f / rd.lengthSquared) else Spectrum.Black, new Ray(position, rd, 0.0f, 1.0f))
+		(if (falloff > 0.0f) intensity * (falloff / rd.lengthSquared) else Spectrum.Black, Ray(position, rd, 0.0f, 1.0f), 1.0f)
 	}
 
-	override def toString = "SpotLightSource(position=%s, direction=%s, falloffAngle=%g, widthAndle=%g, intensity=%s)" format
-		(position, direction, falloffAngle, widthAngle, intensity)
+	// Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
+	// that sampleRadiance(point: Point, u1: Float, u2: Float) uses to sample points (pbrt 14.6.1)
+	def pdf(point: Point, wi: Vector): Float = 0.0f
+
+	// Total emitted power of this light source onto the scene
+	def totalPower(scene: Scene): Spectrum = intensity * (2.0f * π * (1.0f - 0.5f * (cosFalloff + cosWidth)))
+
+	override def toString = "SpotLightSource(position=%s, direction=%s, widthAngle=%g, falloffAngle=%g, intensity=%s)" format
+		(position, direction, widthAngle, falloffAngle, intensity)
 }

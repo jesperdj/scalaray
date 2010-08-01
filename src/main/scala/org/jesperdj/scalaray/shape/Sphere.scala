@@ -108,8 +108,8 @@ final class Sphere (radius: Float = 1.0f, minZ: Float = Float.NegativeInfinity, 
 	override def sampleSurface(viewPoint: Point, u1: Float, u2: Float): (Point, Normal, Float) =
 		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement this; see pbrt 14.6.3 (page 720-722)
 
-	// Probability density at the given point on the surface with respect to the distribution that sampleSurface(viewPoint: Point, u1: Float, u2: Float)
-	// uses to sample points (pbrt 14.6.3)
+	// Probability density of the direction wi (from viewPoint to a point on the surface) being sampled with respect to the distribution
+	// that sampleSurface(viewPoint: Point, u1: Float, u2: Float) uses to sample points (pbrt 14.6.3)
 	override def pdf(viewPoint: Point, wi: Vector): Float =
 		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement this; see pbrt 14.6.3 (page 720-722)
 

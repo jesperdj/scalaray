@@ -92,13 +92,12 @@ object Main {
 		val s2 = new Disk(3.0f)
 		val p2 = new TransformedPrimitive(new GeometricPrimitive(s2, mat2), Transform.translate(0.0f, 0.0f, 4.0f) * Transform.rotateX(-π / 2.0f))
 
-//		val l1 = new DirectionalLightSource(new Vector(-0.5f, -1.25f, 4.0f), new Spectrum(0.4f, 0.4f, 0.4f))
 		val l1 = new PointLightSource(new Point(0.5f, 2.0f, 0.0f), new Spectrum(30.0f, 30.0f, 30.0f))
 
 		val s3 = new Disk(1.5f)
 		val t3 = Transform.translate(-0.3f, 5.0f, 3.5f) * Transform.rotateX(π / 2.0f)
-		val l2 = new AreaLightSource(s3, t3, new Spectrum(0.7f, 0.7f, 0.7f), 4)
-		val p3 = new TransformedPrimitive(new GeometricPrimitive(l2, mat1), t3)
+		val l2 = new DiffuseAreaLightSource(s3, t3, new Spectrum(0.7f, 0.7f, 0.7f), 4)
+		val p3 = new TransformedPrimitive(new GeometricPrimitive(s3, mat1, l2), t3)
 
 		new Scene(new CompositePrimitive(p1, p2, p3), Traversable(l1, l2))
 	}

@@ -44,7 +44,7 @@ abstract class Shape extends HasBoundingBox {
 	// Returns a point on the surface, the surface normal at that point and the probability density for this sample
 	def sampleSurface(u1: Float, u2: Float): (Point, Normal, Float)
 
-	// Probability density at the given point on the surface with respect to the distribution that sampleSurface(u1: Float, u2: Float)
+	// Probability density of the given point on the surface being sampled with respect to the distribution that sampleSurface(u1: Float, u2: Float)
 	// uses to sample points (pbrt 14.6.3)
 	// NOTE: This must be overriden if sampleSurface(u1: Float, u2: Float) does not sample the surface uniformly
 	def pdf(point: Point): Float = 1.0f / surfaceArea
@@ -52,9 +52,9 @@ abstract class Shape extends HasBoundingBox {
 	// Sample a point on the surface with respect to a point from which the shape is visible using the random variables u1, u2 (pbrt 14.6.3)
 	// Returns a point on the surface, the surface normal at that point and the probability density for this sample
 	def sampleSurface(viewPoint: Point, u1: Float, u2: Float): (Point, Normal, Float) = sampleSurface(u1, u2)
-	
-	// Probability density at the given point on the surface with respect to the distribution that sampleSurface(viewPoint: Point, u1: Float, u2: Float)
-	// uses to sample points (pbrt 14.6.3)
+
+	// Probability density of the direction wi (from viewPoint to a point on the surface) being sampled with respect to the distribution
+	// that sampleSurface(viewPoint: Point, u1: Float, u2: Float) uses to sample points (pbrt 14.6.3)
 	def pdf(viewPoint: Point, wi: Vector): Float = intersect(Ray(viewPoint, wi, 1e-3f)) match {
 		case Some((dg, _)) => val f = (dg.normal * -wi).abs; if (f > 0.0f) viewPoint.distanceSquared(dg.point) / (f * surfaceArea) else 0.0f
 		case None => 0.0f

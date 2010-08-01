@@ -28,8 +28,8 @@ final class GeometricPrimitive private (shape: Shape, material: Material, val ar
 	// Create a geometric primitive with a shape and material, no area light source
 	def this(shape: Shape, material: Material) = this(shape, material, None)
 
-	// Create a geometric primitive with an area light source and material
-	def this(areaLightSource: AreaLightSource, material: Material) = this(areaLightSource.shape, material, Some(areaLightSource))
+	// Create a geometric primitive with an area light source
+	def this(shape: Shape, material: Material, areaLightSource: AreaLightSource) = this(shape, material, Some(areaLightSource))
 
 	// Bounding box that contains the primitive
 	val boundingBox: BoundingBox = shape.boundingBox

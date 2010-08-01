@@ -29,6 +29,9 @@ import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
+// TODO: This needs to be refactored, can be substantially simplified now that the light source interface has been refactored.
+// Has been patched to work with the new light source interface, but needs to be cleaned up thoroughly.
+
 // Identifiers of sample patterns for an area light source
 private final class SampleIDs (val lightSampleID: Int, val bsdfSampleID: Int, val bsdfComponentSampleID: Int) {
 	override def toString = "SampleIDs(lightSampleID=%d, bsdfSampleID=%d, bsdfComponentSampleID=%d)" format (lightSampleID, bsdfSampleID, bsdfComponentSampleID)
@@ -37,7 +40,7 @@ private final class SampleIDs (val lightSampleID: Int, val bsdfSampleID: Int, va
 // Direct lighting surface integrator (pbrt 15.1)
 final class DirectLightingSurfaceIntegrator private (
 	scene: Scene, val sampleSpecs: Traversable[SampleSpec],
-	deltaLights: Traversable[DeltaLightSource], areaLights: Traversable[(AreaLightSource, SampleIDs)]) extends SurfaceIntegrator {
+	deltaLights: Traversable[LightSource], areaLights: Traversable[(LightSource, SampleIDs)]) extends SurfaceIntegrator {
 
 	// Compute the incident radiance along the given ray
 	def radiance(renderer: Renderer, ray: RayDifferential, intersection: Intersection, sample: Sample): Spectrum = {
@@ -80,8 +83,8 @@ final class DirectLightingSurfaceIntegrator private (
 	// TODO: Take transmittance along rays between light source and intersection point into account
 
 	// Compute direct light from a delta light source on the intersection point
-	private def estimateDirect(deltaLight: DeltaLightSource, point: Point, normal: Normal, wo: Vector, bsdf: BSDF): Spectrum = {
-		val (radiance, ray) = deltaLight.incidentRadiance(point)
+	private def estimateDirect(deltaLight: LightSource, point: Point, normal: Normal, wo: Vector, bsdf: BSDF): Spectrum = {
+		val (radiance, ray, _) = deltaLight.sampleRadiance(point, 0.0f, 0.0f)
 		if (radiance.isBlack) return Spectrum.Black
 
 		val wi = -ray.direction.normalize
@@ -97,7 +100,7 @@ final class DirectLightingSurfaceIntegrator private (
 	}
 
 	// Sample direct light from an area light source on the intersection point
-	private def estimateDirect(areaLight: AreaLightSource, point: Point, normal: Normal, wo: Vector, bsdf: BSDF,
+	private def estimateDirect(areaLight: LightSource, point: Point, normal: Normal, wo: Vector, bsdf: BSDF,
 							   lightSamples: IndexedSeq[FloatPair],
 							   bsdfSamples: IndexedSeq[FloatPair], bsdfComponentSamples: IndexedSeq[Float]): Spectrum = {
 		// Sample light source
@@ -131,7 +134,7 @@ final class DirectLightingSurfaceIntegrator private (
 					val radiance = scene.intersect(Ray(point, wi)) match {
 						case Some(Intersection(dg, prim, _)) if (prim.areaLightSource.isDefined && prim.areaLightSource.get == areaLight) =>
 							// Ray intersects with area light source and point isn't shadowed
-							areaLight.emittedRadiance(dg.point, dg.normal, -wi)
+							areaLight.asInstanceOf[AreaLightSource].emittedRadiance(dg.point, dg.normal, -wi)
 
 						case None => // No intersection
 							// TODO: In pbrt wordt hier light->Le(ray) genomen, waarom? Waarschijnlijk voor infinite area light source.
@@ -168,19 +171,18 @@ final class DirectLightingSurfaceIntegrator private (
 object DirectLightingSurfaceIntegrator {
 	def apply(scene: Scene): DirectLightingSurfaceIntegrator = {
 		val sampleSpecs = ListBuffer[SampleSpec]()
-		val deltaLights = ListBuffer[DeltaLightSource]()
-		val areaLights = ListBuffer[(AreaLightSource, SampleIDs)]()
+		val deltaLights = ListBuffer[LightSource]()
+		val areaLights = ListBuffer[(LightSource, SampleIDs)]()
 
-		scene.lightSources foreach {
-			_ match {
-				case lightSource: DeltaLightSource =>
-					deltaLights += lightSource
-
-				case lightSource: AreaLightSource =>
-					val lightSampleSpec = new SampleSpec2D(lightSource.numberOfSamples); sampleSpecs += lightSampleSpec
-					val bsdfSampleSpec = new SampleSpec2D(lightSource.numberOfSamples); sampleSpecs += bsdfSampleSpec
-					val bsdfComponentSampleSpec = new SampleSpec1D(lightSource.numberOfSamples); sampleSpecs += bsdfComponentSampleSpec
-					areaLights += ((lightSource, new SampleIDs(lightSampleSpec.id, bsdfSampleSpec.id, bsdfComponentSampleSpec.id)))
+		scene.lightSources foreach { lightSource =>
+			if (lightSource.isDeltaLight) {
+				deltaLights += lightSource
+			}
+			else {
+				val lightSampleSpec = new SampleSpec2D(lightSource.numberOfSamples); sampleSpecs += lightSampleSpec
+				val bsdfSampleSpec = new SampleSpec2D(lightSource.numberOfSamples); sampleSpecs += bsdfSampleSpec
+				val bsdfComponentSampleSpec = new SampleSpec1D(lightSource.numberOfSamples); sampleSpecs += bsdfComponentSampleSpec
+				areaLights += ((lightSource, new SampleIDs(lightSampleSpec.id, bsdfSampleSpec.id, bsdfComponentSampleSpec.id)))
 			}
 		}
 

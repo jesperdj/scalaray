@@ -21,25 +21,28 @@ import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath._
 
-// Light source (pbrt 12.1)
-abstract class LightSource {
+// Infinite area light source (pbrt 12.5)
+final class InfiniteAreaLightSource (val numberOfSamples: Int) extends LightSource {
 	// Indicates whether the light is described by a delta distribution
-	val isDeltaLight: Boolean
-
-	// Number of samples to take from this light source
-	val numberOfSamples: Int
+	val isDeltaLight: Boolean = false
 
 	// Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
 	// Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-	def sampleRadiance(point: Point, u1: Float, u2: Float): (Spectrum, Ray, Float)
+	def sampleRadiance(point: Point, u1: Float, u2: Float): (Spectrum, Ray, Float) =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
 
 	// Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
 	// that sampleRadiance(point: Point, u1: Float, u2: Float) uses to sample points (pbrt 14.6.1)
-	def pdf(point: Point, wi: Vector): Float
+	def pdf(point: Point, wi: Vector): Float =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
 
 	// Total emitted power of this light source onto the scene
-	def totalPower(scene: Scene): Spectrum
+	def totalPower(scene: Scene): Spectrum =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
 
 	// Emitted radiance along a ray that does not intersect with geometry in the scene (for infinite area lights) (pbrt 12.5)
-	def emittedRadiance(ray: Ray): Spectrum = Spectrum.Black
+	override def emittedRadiance(ray: Ray): Spectrum =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO
+
+	override def toString = "InfiniteAreaLightSource(numberOfSamples=%d)" format (numberOfSamples) // TODO
 }
