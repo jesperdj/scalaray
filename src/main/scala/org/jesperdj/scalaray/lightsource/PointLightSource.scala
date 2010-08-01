@@ -34,7 +34,7 @@ final class PointLightSource (position: Point, intensity: Spectrum) extends Delt
 	// Returns the radiance and a ray from the light source to the point
 	def incidentRadiance(point: Point): (Spectrum, Ray) = {
 		var rd = point - position
-		(intensity / (rd.x * rd.x + rd.y * rd.y + rd.z * rd.z), new Ray(position, rd, 0.0f, 1.0f))
+		(intensity / rd.lengthSquared, new Ray(position, rd, 0.0f, 1.0f))
 	}
 
 	override def toString = "PointLightSource(position=%s, intensity=%s)" format (position, intensity)

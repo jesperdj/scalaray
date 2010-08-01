@@ -24,7 +24,7 @@ import org.jesperdj.scalaray.sampler.CameraSample
 import org.jesperdj.scalaray.spectrum._
 import org.jesperdj.scalaray.util._
 
-// Raster (mutable)
+// Pixel raster
 final class PixelRaster (rectangle: Rectangle, filter: Filter) extends Raster(rectangle) {
 	import PixelRaster._
 

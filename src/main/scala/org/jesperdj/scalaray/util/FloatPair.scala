@@ -17,7 +17,7 @@
  */
 package org.jesperdj.scalaray.util
 
-// A pair of Floats. Use this instead of Tuple2[Float, Float]; Tuple2 is not @specialized in Scala 2.8, so it will do unnecessary boxing and unboxing.
+// A pair of Floats. Use this instead of Tuple2[Float, Float]; Tuple2 is not @specialized for Float in Scala 2.8, so it will do unnecessary boxing and unboxing.
 final class FloatPair (val _1: Float, val _2: Float) {
 	override def toString = "(" + _1 + ", " + _2 + ")"
 }

@@ -50,7 +50,7 @@ final class SpotLightSource (position: Point, direction: Vector, falloffAngle: F
 		}
 
 		// Compute radiance, attenuates by falloff factor and distance
-		(if (f > 0.0f) intensity * (f / (rd.x * rd.x + rd.y * rd.y + rd.z * rd.z)) else Spectrum.Black, new Ray(position, rd, 0.0f, 1.0f))
+		(if (f > 0.0f) intensity * (f / rd.lengthSquared) else Spectrum.Black, new Ray(position, rd, 0.0f, 1.0f))
 	}
 
 	override def toString = "SpotLightSource(position=%s, direction=%s, falloffAngle=%g, widthAndle=%g, intensity=%s)" format
