@@ -87,8 +87,8 @@ final class Cylinder (radius: Float = 1.0f, minZ: Float = -1.0f, maxZ: Float = 1
 	// Surface area (pbrt 3.3.5)
 	val surfaceArea: Float = maxPhi * radius * (maxZ - minZ)
 
-	// Sample a point on the surface using the random variables u1, u2 (pbrt 15.6.3)
-	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
+	// Sample a point on the surface using the random variables u1, u2 (pbrt 14.6.3)
+	// Returns a point on the surface, the surface normal at that point and the probability density for this sample
 	def sampleSurface(u1: Float, u2: Float): (Point, Normal, Float) = {
 		val phi = u2 * maxPhi
 		val (x, y) = (math.cos(phi).toFloat, math.sin(phi).toFloat)

@@ -77,12 +77,12 @@ final class Disk (radius: Float = 1.0f, innerRadius: Float = 0.0f, maxPhi: Float
 	// Surface area (pbrt 3.4.4)
 	val surfaceArea: Float = 0.5f * maxPhi * (radius * radius - innerRadius * innerRadius)
 
-	// Sample a point on the surface using the random variables u1, u2 (pbrt 15.6.3)
-	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
+	// Sample a point on the surface using the random variables u1, u2 (pbrt 14.6.3)
+	// Returns a point on the surface, the surface normal at that point and the probability density for this sample
 	def sampleSurface(u1: Float, u2: Float): (Point, Normal, Float) = {
 		val (x, y) = SampleTransforms.concentricSampleDisk(u1, u2)
 		(Point(x * radius, y * radius, 0.0f), Normal.ZAxis, 1.0f / surfaceArea)
-		// TODO: We are not taking partial disks into account (innerRadius and maxPhi). See pbrt exercise 15.1 (page 716).
+		// TODO: We are not taking partial disks into account (innerRadius and maxPhi). See pbrt exercise 14.3 (page 734).
 	}
 
 	override def toString = "Disk(radius=%g, innerRadius=%g, maxPhi=%g)" format (radius, innerRadius, maxPhi)

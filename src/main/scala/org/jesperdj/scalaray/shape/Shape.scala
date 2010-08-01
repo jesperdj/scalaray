@@ -40,26 +40,23 @@ abstract class Shape extends HasBoundingBox {
 	// Surface area
 	def surfaceArea: Float
 
-	// Sample a point on the surface using the random variables u1, u2 (pbrt 15.6.3)
-	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
+	// Sample a point on the surface using the random variables u1, u2 (pbrt 14.6.3)
+	// Returns a point on the surface, the surface normal at that point and the probability density for this sample
 	def sampleSurface(u1: Float, u2: Float): (Point, Normal, Float)
 
-	// Get the value of the probability density function at the given point on the surface with respect to
-	// the distribution that sampleSurface(u1: Float, u2: Float) uses to sample points (pbrt 15.6.3)
+	// Probability density at the given point on the surface with respect to the distribution that sampleSurface(u1: Float, u2: Float)
+	// uses to sample points (pbrt 14.6.3)
 	// NOTE: This must be overriden if sampleSurface(u1: Float, u2: Float) does not sample the surface uniformly
 	def pdf(point: Point): Float = 1.0f / surfaceArea
 
-	// Sample a point on the surface with respect to a point from which the shape is visible using the random variables u1, u2 (pbrt 15.6.3)
-	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
+	// Sample a point on the surface with respect to a point from which the shape is visible using the random variables u1, u2 (pbrt 14.6.3)
+	// Returns a point on the surface, the surface normal at that point and the probability density for this sample
 	def sampleSurface(viewPoint: Point, u1: Float, u2: Float): (Point, Normal, Float) = sampleSurface(u1, u2)
 	
-	// Get the value of the probability density function at the intersection point between the given ray and this shape with respect to
-	// the distribution that sampleSurface(viewPoint: Point, u1: Float, u2: Float) uses to sample points (pbrt 15.6.3)
-	def pdf(ray: Ray): Float = intersect(ray) match {
-		case Some((dg, _)) =>
-			val f = (dg.normal * -ray.direction).abs
-			if (f > 0.0f) ray.origin.distanceSquared(dg.point) / (f * surfaceArea) else 0.0f
-
+	// Probability density at the given point on the surface with respect to the distribution that sampleSurface(viewPoint: Point, u1: Float, u2: Float)
+	// uses to sample points (pbrt 14.6.3)
+	def pdf(viewPoint: Point, wi: Vector): Float = intersect(Ray(viewPoint, wi, 1e-3f)) match {
+		case Some((dg, _)) => val f = (dg.normal * -wi).abs; if (f > 0.0f) viewPoint.distanceSquared(dg.point) / (f * surfaceArea) else 0.0f
 		case None => 0.0f
 	}
 }

@@ -73,7 +73,7 @@ final class AreaLightSource (val shape: Shape, shapeToWorld: Transform, power: S
 	}
 
 	// Get the value of the probability density function for the incoming direction wi (pbrt 14.6.3)
-	def pdf(ray: Ray): Float = shape.pdf(worldToShape * ray)
+	def pdf(point: Point, wi: Vector): Float = shape.pdf(worldToShape * point, worldToShape * wi)
 
 	// The area light's emitted radiance from a given point with the given normal on the surface of the light in the given direction
 	def emittedRadiance(point: Point, normal: Normal, direction: Vector): Spectrum = if (normal * direction > 0.0f) power else Spectrum.Black

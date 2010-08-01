@@ -102,8 +102,8 @@ final class Triangle (v0: Vertex, v1: Vertex, v2: Vertex) extends Shape {
 	// Surface area
 	val surfaceArea: Float = 0.5f * (e1 ** e2).length
 
-	// Sample a point on the surface using the random variables u1, u2
-	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
+	// Sample a point on the surface using the random variables u1, u2 (pbrt 14.6.3)
+	// Returns a point on the surface, the surface normal at that point and the probability density for this sample
 	def sampleSurface(u1: Float, u2: Float): (Point, Normal, Float) = {
 		val (b1, b2) = SampleTransforms.uniformSampleTriangle(u1, u2)
 		(v0.point + (e1 * b1 + e2 * b2), normal, 1.0f / surfaceArea)

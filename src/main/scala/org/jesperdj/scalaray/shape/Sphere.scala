@@ -95,23 +95,23 @@ final class Sphere (radius: Float = 1.0f, minZ: Float = Float.NegativeInfinity, 
 	// Surface area (pbrt 3.2.7)
 	val surfaceArea: Float = maxPhi * radius * (maxZ - minZ)
 
-	// Sample a point on the surface using the random variables u1, u2 (pbrt 15.6.3)
-	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
+	// Sample a point on the surface using the random variables u1, u2 (pbrt 14.6.3)
+	// Returns a point on the surface, the surface normal at that point and the probability density for this sample
 	def sampleSurface(u1: Float, u2: Float): (Point, Normal, Float) = {
 		val p = SampleTransforms.uniformSampleSphere(u1, u2)
 		(p * radius, Normal(p), 1.0f / surfaceArea)
-		// TODO: We are not taking partial spheres into account (innerRadius and maxPhi). See pbrt exercise 15.1 (page 716).
+		// TODO: We are not taking partial spheres into account (innerRadius and maxPhi). See pbrt exercise 14.3 (page 734).
 	}
 
-	// Sample a point on the surface with respect to a point from which the shape is visible using the random variables u1, u2 (pbrt 15.6.3)
-	// Returns a point on the surface, the surface normal at that point and the value of the probability distribution function for this sample
+	// Sample a point on the surface with respect to a point from which the shape is visible using the random variables u1, u2 (pbrt 14.6.3)
+	// Returns a point on the surface, the surface normal at that point and the probability density for this sample
 	override def sampleSurface(viewPoint: Point, u1: Float, u2: Float): (Point, Normal, Float) =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement this; see pbrt 15.6.3 (page 705-708)
+		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement this; see pbrt 14.6.3 (page 720-722)
 
-	// Get the value of the probability density function at the intersection point between the given ray and this shape with respect to
-	// the distribution that sampleSurface(viewPoint: Point, u1: Float, u2: Float) uses to sample points (pbrt 15.6.3)
-	override def pdf(ray: Ray): Float =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement this; see pbrt 15.6.3 (page 708)
+	// Probability density at the given point on the surface with respect to the distribution that sampleSurface(viewPoint: Point, u1: Float, u2: Float)
+	// uses to sample points (pbrt 14.6.3)
+	override def pdf(viewPoint: Point, wi: Vector): Float =
+		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement this; see pbrt 14.6.3 (page 720-722)
 
 	override def toString = "Sphere(radius=%g, minZ=%g, maxZ=%g, maxPhi=%g)" format (radius, minZ, maxZ, maxPhi)
 }

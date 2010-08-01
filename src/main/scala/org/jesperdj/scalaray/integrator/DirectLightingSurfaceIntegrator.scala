@@ -125,12 +125,10 @@ final class DirectLightingSurfaceIntegrator private (
 
 			val (reflectance, wi, bsdfPdf, _) = bsdf.sample(wo, bss._1, bss._2, bcs)
 			if (bsdfPdf > 0.0f && !reflectance.isBlack) {
-				val ray = Ray(point, wi)
-
-				val lightPdf = areaLight.pdf(ray)
+				val lightPdf = areaLight.pdf(point, wi)
 				if (lightPdf > 0.0f) {
 					// Evaluate radiance from area light source
-					val radiance = scene.intersect(ray) match {
+					val radiance = scene.intersect(Ray(point, wi)) match {
 						case Some(Intersection(dg, prim, _)) if (prim.areaLightSource.isDefined && prim.areaLightSource.get == areaLight) =>
 							// Ray intersects with area light source and point isn't shadowed
 							areaLight.emittedRadiance(dg.point, dg.normal, -wi)
