@@ -1,2 +1,4 @@
+.idea/
+scalaray.iml
 target/
 output*.png
