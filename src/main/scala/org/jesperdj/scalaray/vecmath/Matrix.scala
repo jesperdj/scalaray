@@ -93,6 +93,7 @@ private object Matrix {
 		override def *(v: Vector) = v
 		override def *(n: Normal) = n
 		override def *(r: Ray) = r
+    override def *(rd: RayDifferential) = rd
 		override def *(m: Matrix) = m
 		override def transpose = this
 		override def inverse = this

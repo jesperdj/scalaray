@@ -57,8 +57,10 @@ object Transform {
 		override def *(v: Vector) = v
 		override def *(n: Normal) = n
 		override def *(r: Ray) = r
+    override def *(rd: RayDifferential) = rd
 		override def *(t: Transform) = t
 		override def inverse = this
+    override def hasScale = false
 
 		override def toString = "Transform.Identity"
 	}
