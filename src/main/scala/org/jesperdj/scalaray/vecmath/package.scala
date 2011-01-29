@@ -35,6 +35,11 @@ package object vecmath {
 		def *(p: Point) = p * f
 	}
 
+  // Implicit conversion for scaling quaternions by multiplying a numeric type with a quaternion
+  implicit def implicitScaleQuaternion[@specialized(Int, Float) N <% Float](f: N) = new MultipliableSame[Quaternion] {
+    def *(q: Quaternion) = q * f
+  }
+
 	// Implicit conversion to enable Vector to be used in interpolate()
 	implicit def vectorToInterpolatable(v1: Vector) = new Interpolatable[Vector] {
 		def *(t: Float): Vector = v1 * t

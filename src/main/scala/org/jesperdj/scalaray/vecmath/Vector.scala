@@ -76,7 +76,7 @@ object Vector {
 	// Create a vector from a point
 	def apply(p: Point) = new Vector(p)
 
-	// Coordinate system from a vector
+	// Coordinate system from a vector (pbrt 2.2.5)
 	def coordinateSystem(v1: Vector): (Vector, Vector) = {
 		val v2 = if (v1.x.abs > v1.y.abs) {
 			val len = math.sqrt(v1.x * v1.x + v1.z * v1.z).toFloat

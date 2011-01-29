@@ -35,7 +35,7 @@ abstract class Quadric extends Shape {
 		val d = b * b - 4.0f * a * c
 		if (d < 0.0f) None else {
 			val q = if (b < 0.0f) -0.5f * (b - math.sqrt(d).toFloat) else -0.5f * (b + math.sqrt(d).toFloat)
-			var (t0, t1) = minmax(q / a, c / q)
+			val (t0, t1) = minmax(q / a, c / q)
 
 			// Return differential geometry and distance for closest valid intersection point
 			getResult(t0) orElse getResult(t1)

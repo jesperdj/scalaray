@@ -17,7 +17,6 @@
  */
 package org.jesperdj.scalaray.shape
 
-import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 // NOTE: In contrast to pbrt, shapes in ScalaRay do not have a shape-to-world transform. Transformations have been abstracted away to TransformedPrimitive.

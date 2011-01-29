@@ -151,12 +151,12 @@ object Transform {
 	}
 
 	// Orthographic transform (pbrt 6.2.1)
-//	def orthographic(near: Float, far: Float) = scale(1.0f, 1.0f, 1.0f / (far - near)) * translate(0.0f, 0.0f, -near)
+	def orthographic(near: Float, far: Float) = scale(1.0f, 1.0f, 1.0f / (far - near)) * translate(0.0f, 0.0f, -near)
 
 	// Perspective transform (pbrt 6.2.2)
-//	def perspective(angleOfView: Float, near: Float, far: Float) = {
-//		val s = 1.0f / math.tan(angleOfView * 0.5f).toFloat
-//		val m = new Matrix(s, 0.0f, 0.0f, 0.0f, 0.0f, s, 0.0f, 0.0f, 0.0f, 0.0f, far / (far - near), -far * near / (far - near), 0.0f, 0.0f, 1.0f, 0.0f)
-//		new Transform(m, m.inverse)
-//	}
+	def perspective(angleOfView: Float, near: Float, far: Float) = {
+		val s = 1.0f / math.tan(angleOfView * 0.5f).toFloat
+		val m = new Matrix(s, 0.0f, 0.0f, 0.0f, 0.0f, s, 0.0f, 0.0f, 0.0f, 0.0f, far / (far - near), -far * near / (far - near), 0.0f, 0.0f, 1.0f, 0.0f)
+		new Transform(m, m.inverse)
+	}
 }
