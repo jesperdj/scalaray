@@ -29,7 +29,7 @@ final class Quaternion (val v: Vector, val w: Float) {
 	def -(q: Quaternion) = new Quaternion(v - q.v, w - q.w)
 
 	// Scale a quaternion
-	def *(f: Float) = new Quaternion(v * f, w * f)
+	def *(f: Float): Quaternion = new Quaternion(v * f, w * f)
 	def /(f: Float) = new Quaternion(v / f, w / f)
 
 	// Dot product
