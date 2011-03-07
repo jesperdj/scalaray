@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ package org.jesperdj.scalaray.filter
 
 // Triangle filter (pbrt 7.6.1)
 final class TriangleFilter (extentX: Float = 2.0f, extentY: Float = 2.0f) extends Filter(extentX, extentY) {
-	def apply(x: Float, y: Float) = math.max(0.0f, extentX - x.abs) * math.max(0.0f, extentY - y.abs)
+  def apply(x: Float, y: Float) = math.max(0.0f, extentX - x.abs) * math.max(0.0f, extentY - y.abs)
 
-	override def toString = "TriangleFilter(extentX=%g, extentY=%g)" format (extentX, extentY)
+  override def toString = "TriangleFilter(extentX=%g, extentY=%g)" format (extentX, extentY)
 }

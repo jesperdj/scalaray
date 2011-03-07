@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +23,13 @@ import org.jesperdj.scalaray.util._
 
 // Camera sample
 sealed class CameraSample (val imageX: Float, val imageY: Float, val lensU: Float, val lensV: Float, val time: Float) {
-	override def toString = "CameraSample(imageX=%g, imageY=%g, lensU=%g, lensV=%g, time=%g)" format (imageX, imageY, lensU, lensV, time)
+  override def toString = "CameraSample(imageX=%g, imageY=%g, lensU=%g, lensV=%g, time=%g)" format (imageX, imageY, lensU, lensV, time)
 }
 
 // Sample, a camera sample with 1D and 2D sample patterns
 final class Sample (imageX: Float, imageY: Float, lensU: Float, lensV: Float, time: Float, val samples1D: Map[Int, IndexedSeq[Float]],
-					val samples2D: Map[Int, IndexedSeq[FloatPair]]) extends CameraSample (imageX, imageY, lensU, lensV, time) {
+          val samples2D: Map[Int, IndexedSeq[FloatPair]]) extends CameraSample (imageX, imageY, lensU, lensV, time) {
 
-	override def toString = "Sample(imageX=%g, imageY=%g, lensU=%g, lensV=%g, time=%g, samples1D=%s, samples2D=%s)" format
-		(imageX, imageY, lensU, lensV, time, samples1D, samples2D)
+  override def toString = "Sample(imageX=%g, imageY=%g, lensU=%g, lensV=%g, time=%g, samples1D=%s, samples2D=%s)" format
+    (imageX, imageY, lensU, lensV, time, samples1D, samples2D)
 }

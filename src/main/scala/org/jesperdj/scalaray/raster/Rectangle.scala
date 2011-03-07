@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@ package org.jesperdj.scalaray.raster
 
 // Rectangle in raster coordinates
 final class Rectangle (val left: Int, val top: Int, val right: Int, val bottom: Int) {
-	val width = right - left + 1
-	val height = bottom - top + 1
+  val width = right - left + 1
+  val height = bottom - top + 1
 
-	override def toString = "Rectangle(left=%d, top=%d, right=%d, bottom=%d)" format (left, top, right, bottom)
+  override def toString = "Rectangle(left=%d, top=%d, right=%d, bottom=%d)" format (left, top, right, bottom)
 }
 
 object Rectangle {
-	def apply(left: Int, top: Int, right: Int, bottom: Int) = new Rectangle(left, top, right, bottom)
+  def apply(left: Int, top: Int, right: Int, bottom: Int) = new Rectangle(left, top, right, bottom)
 }

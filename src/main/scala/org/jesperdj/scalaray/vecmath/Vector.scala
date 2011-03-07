@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,74 +19,74 @@ package org.jesperdj.scalaray.vecmath
 
 // Vector (pbrt 2.2)
 final class Vector (val x: Float, val y: Float, val z: Float) {
-	// Create a vector from a normal
-	def this(n: Normal) = this(n.x, n.y, n.z)
+  // Create a vector from a normal
+  def this(n: Normal) = this(n.x, n.y, n.z)
 
-	// Create a vector from a point
-	def this(p: Point) = this(p.x, p.y, p.z)
+  // Create a vector from a point
+  def this(p: Point) = this(p.x, p.y, p.z)
 
-	// Add two vectors
-	def +(v: Vector) = new Vector(x + v.x, y + v.y, z + v.z)
+  // Add two vectors
+  def +(v: Vector) = new Vector(x + v.x, y + v.y, z + v.z)
 
-	// Subtract two vectors
-	def -(v: Vector) = new Vector(x - v.x, y - v.y, z - v.z)
+  // Subtract two vectors
+  def -(v: Vector) = new Vector(x - v.x, y - v.y, z - v.z)
 
-	// Scale a vector
-	def *(f: Float) = new Vector(x * f, y * f, z * f)
-	def /(f: Float) = new Vector(x / f, y / f, z / f)
+  // Scale a vector
+  def *(f: Float) = new Vector(x * f, y * f, z * f)
+  def /(f: Float) = new Vector(x / f, y / f, z / f)
 
-	// Unary minus
-	def unary_- = new Vector(-x, -y, -z)
+  // Unary minus
+  def unary_- = new Vector(-x, -y, -z)
 
-	// Dot product
-	def *(v: Vector) = x * v.x + y * v.y + z * v.z
+  // Dot product
+  def *(v: Vector) = x * v.x + y * v.y + z * v.z
 
-	// Dot product with a normal
-	def *(n: Normal) = x * n.x + y * n.y + z * n.z
+  // Dot product with a normal
+  def *(n: Normal) = x * n.x + y * n.y + z * n.z
 
-	// Cross product
-	def **(v: Vector) = new Vector(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x)
+  // Cross product
+  def **(v: Vector) = new Vector(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x)
 
-	// Cross product with a normal
-	def **(n: Normal) = new Vector(y * n.z - z * n.y, z * n.x - x * n.z, x * n.y - y * n.x)
+  // Cross product with a normal
+  def **(n: Normal) = new Vector(y * n.z - z * n.y, z * n.x - x * n.z, x * n.y - y * n.x)
 
-	// Length
-	def length = math.sqrt(this * this).toFloat
-	def lengthSquared = this * this
+  // Length
+  def length = math.sqrt(this * this).toFloat
+  def lengthSquared = this * this
 
-	// Normalize
-	def normalize = this / length
+  // Normalize
+  def normalize = this / length
 
-	override def toString = "Vector(%g, %g, %g)" format (x, y, z)
+  override def toString = "Vector(%g, %g, %g)" format (x, y, z)
 }
 
 object Vector {
-	// Vector constants
-	val XAxis = new Vector(1.0f, 0.0f, 0.0f)
-	val YAxis = new Vector(0.0f, 1.0f, 0.0f)
-	val ZAxis = new Vector(0.0f, 0.0f, 1.0f)
-	val Zero = new Vector(0.0f, 0.0f, 0.0f)
+  // Vector constants
+  val XAxis = new Vector(1.0f, 0.0f, 0.0f)
+  val YAxis = new Vector(0.0f, 1.0f, 0.0f)
+  val ZAxis = new Vector(0.0f, 0.0f, 1.0f)
+  val Zero = new Vector(0.0f, 0.0f, 0.0f)
 
-	// Create a vector
-	def apply(x: Float, y: Float, z: Float) = new Vector(x, y, z)
+  // Create a vector
+  def apply(x: Float, y: Float, z: Float) = new Vector(x, y, z)
 
-	// Create a vector from a normal
-	def apply(n: Normal) = new Vector(n)
+  // Create a vector from a normal
+  def apply(n: Normal) = new Vector(n)
 
-	// Create a vector from a point
-	def apply(p: Point) = new Vector(p)
+  // Create a vector from a point
+  def apply(p: Point) = new Vector(p)
 
-	// Coordinate system from a vector (pbrt 2.2.5)
-	def coordinateSystem(v1: Vector): (Vector, Vector) = {
-		val v2 = if (v1.x.abs > v1.y.abs) {
-			val len = math.sqrt(v1.x * v1.x + v1.z * v1.z).toFloat
-			new Vector(-v1.z / len, 0.0f, v1.x / len)
-		}
-		else {
-			val len = math.sqrt(v1.y * v1.y + v1.z * v1.z).toFloat
-			new Vector(0.0f, v1.z / len, -v1.y / len)
-		}
+  // Coordinate system from a vector (pbrt 2.2.5)
+  def coordinateSystem(v1: Vector): (Vector, Vector) = {
+    val v2 = if (v1.x.abs > v1.y.abs) {
+      val len = math.sqrt(v1.x * v1.x + v1.z * v1.z).toFloat
+      new Vector(-v1.z / len, 0.0f, v1.x / len)
+    }
+    else {
+      val len = math.sqrt(v1.y * v1.y + v1.z * v1.z).toFloat
+      new Vector(0.0f, v1.z / len, -v1.y / len)
+    }
 
-		(v2, v1 ** v2)
-	}
+    (v2, v1 ** v2)
+  }
 }

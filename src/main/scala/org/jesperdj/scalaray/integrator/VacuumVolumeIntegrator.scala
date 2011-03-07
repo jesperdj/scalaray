@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,14 +26,14 @@ import org.jesperdj.scalaray.vecmath.RayDifferential
 
 // Volume integrator that does nothing
 object VacuumVolumeIntegrator extends VolumeIntegrator {
-	// Sample specifications for the sample patterns that this integrator needs
-	val sampleSpecs: Traversable[SampleSpec] = Traversable()
+  // Sample specifications for the sample patterns that this integrator needs
+  val sampleSpecs: Traversable[SampleSpec] = Traversable()
 
-	// TODO: Description
-	def radiance(renderer: Renderer, ray: RayDifferential, sample: Sample): (Spectrum, Spectrum) = (Spectrum.Black, Spectrum.Unit)
+  // TODO: Description
+  def radiance(renderer: Renderer, ray: RayDifferential, sample: Sample): (Spectrum, Spectrum) = (Spectrum.Black, Spectrum.Unit)
 
-	// TODO: Description
-	def transmittance(renderer: Renderer, ray: RayDifferential, sample: Sample): Spectrum = Spectrum.Unit
+  // TODO: Description
+  def transmittance(renderer: Renderer, ray: RayDifferential, sample: Sample): Spectrum = Spectrum.Unit
 
-	override def toString = "VacuumVolumeIntegrator"
+  override def toString = "VacuumVolumeIntegrator"
 }

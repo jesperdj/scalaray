@@ -25,15 +25,15 @@ import org.jesperdj.scalaray.vecmath._
 
 // Lambertian reflection (pbrt 8.3)
 final class Lambertian (reflectance: Spectrum) extends BxDF {
-	// BxDF type
-	val bxdfType: BxDFType = BxDFType.Reflection | BxDFType.Diffuse
+  // BxDF type
+  val bxdfType: BxDFType = BxDFType.Reflection | BxDFType.Diffuse
 
-	// Evaluate the BxDF for the given pair of directions
-	def apply(wo: Vector, wi: Vector): Spectrum = reflectance / π
+  // Evaluate the BxDF for the given pair of directions
+  def apply(wo: Vector, wi: Vector): Spectrum = reflectance / π
 
-	// Compute hemispherical-directional reflectance
-	override def rho(wo: Vector, samples: Traversable[(Double, Double)]): Spectrum = reflectance
+  // Compute hemispherical-directional reflectance
+  override def rho(wo: Vector, samples: Traversable[(Double, Double)]): Spectrum = reflectance
 
-	// Compute hemispherical-hemispherical reflectance
-	override def rho(samples1: Traversable[(Double, Double)], samples2: Traversable[(Double, Double)]): Spectrum = reflectance
+  // Compute hemispherical-hemispherical reflectance
+  override def rho(samples1: Traversable[(Double, Double)], samples2: Traversable[(Double, Double)]): Spectrum = reflectance
 }

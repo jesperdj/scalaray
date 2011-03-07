@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,21 +27,21 @@ import org.jesperdj.scalaray.vecmath.RayDifferential
 
 // Integrator (pbrt 15)
 sealed abstract class Integrator {
-	// Sample specifications for the sample patterns that this integrator needs
-	val sampleSpecs: Traversable[SampleSpec]
+  // Sample specifications for the sample patterns that this integrator needs
+  val sampleSpecs: Traversable[SampleSpec]
 }
 
 // Surface integrator (pbrt 15)
 abstract class SurfaceIntegrator extends Integrator {
-	// Compute the incident radiance along the given ray
-	def radiance(renderer: Renderer, ray: RayDifferential, intersection: Intersection, sample: Sample): Spectrum
+  // Compute the incident radiance along the given ray
+  def radiance(renderer: Renderer, ray: RayDifferential, intersection: Intersection, sample: Sample): Spectrum
 }
 
 // Volume integrator (pbrt 16.2)
 abstract class VolumeIntegrator extends Integrator {
-	// TODO
-	def radiance(renderer: Renderer, ray: RayDifferential, sample: Sample): (Spectrum, Spectrum)
+  // TODO
+  def radiance(renderer: Renderer, ray: RayDifferential, sample: Sample): (Spectrum, Spectrum)
 
-	// TODO
-	def transmittance(renderer: Renderer, ray: RayDifferential, sample: Sample): Spectrum
+  // TODO
+  def transmittance(renderer: Renderer, ray: RayDifferential, sample: Sample): Spectrum
 }

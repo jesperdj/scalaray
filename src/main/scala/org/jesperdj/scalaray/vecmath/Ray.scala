@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,42 +19,42 @@ package org.jesperdj.scalaray.vecmath
 
 // Ray (pbrt 2.5)
 sealed class Ray (val origin: Point, val direction: Vector, val minDistance: Float = 0.0f, val maxDistance: Float = Float.PositiveInfinity) {
-	// Check if distance t is in the valid range of this ray
-	def isInRange(t: Float) = t >= minDistance && t <= maxDistance
+  // Check if distance t is in the valid range of this ray
+  def isInRange(t: Float) = t >= minDistance && t <= maxDistance
 
-	// Get a point along the ray
-	def point(t: Float) = origin + direction * t
+  // Get a point along the ray
+  def point(t: Float) = origin + direction * t
 
-	override def toString = "Ray(origin=%s, direction=%s, minDistance=%g, maxDistance=%g)" format (origin, direction, minDistance, maxDistance)
+  override def toString = "Ray(origin=%s, direction=%s, minDistance=%g, maxDistance=%g)" format (origin, direction, minDistance, maxDistance)
 }
 
 object Ray {
-	// Create a ray
-	def apply(origin: Point, direction: Vector, minDistance: Float = 0.0f, maxDistance: Float = Float.PositiveInfinity) =
-		new Ray(origin, direction, minDistance, maxDistance)
+  // Create a ray
+  def apply(origin: Point, direction: Vector, minDistance: Float = 0.0f, maxDistance: Float = Float.PositiveInfinity) =
+    new Ray(origin, direction, minDistance, maxDistance)
 }
 
 // Ray differential (pbrt 2.5.1)
 final class RayDifferential (
-	origin: Point, direction: Vector, val rxOrigin: Point, val rxDirection: Vector, val ryOrigin: Point, val ryDirection: Vector,
-	minDistance: Float = 0.0f, maxDistance: Float = Float.PositiveInfinity) extends Ray(origin, direction, minDistance, maxDistance) {
+  origin: Point, direction: Vector, val rxOrigin: Point, val rxDirection: Vector, val ryOrigin: Point, val ryDirection: Vector,
+  minDistance: Float = 0.0f, maxDistance: Float = Float.PositiveInfinity) extends Ray(origin, direction, minDistance, maxDistance) {
 
-	// Create a ray differential from a ray
-	def this(ray: Ray, rxOrigin: Point, rxDirection: Vector, ryOrigin: Point, ryDirection: Vector) =
-		this(ray.origin, ray.direction, rxOrigin, rxDirection, ryOrigin, ryDirection, ray.minDistance, ray.maxDistance)
+  // Create a ray differential from a ray
+  def this(ray: Ray, rxOrigin: Point, rxDirection: Vector, ryOrigin: Point, ryDirection: Vector) =
+    this(ray.origin, ray.direction, rxOrigin, rxDirection, ryOrigin, ryDirection, ray.minDistance, ray.maxDistance)
 
-	override def toString =
-		"RayDifferential(origin=%s, direction=%s, rxOrigin=%s, rxDirection=%s, ryOrigin=%s, ryDirection=%s, minDistance=%g, maxDistance=%g)" format
-		(origin, direction, rxOrigin, rxDirection, ryOrigin, ryDirection, minDistance, maxDistance)
+  override def toString =
+    "RayDifferential(origin=%s, direction=%s, rxOrigin=%s, rxDirection=%s, ryOrigin=%s, ryDirection=%s, minDistance=%g, maxDistance=%g)" format
+    (origin, direction, rxOrigin, rxDirection, ryOrigin, ryDirection, minDistance, maxDistance)
 }
 
 object RayDifferential {
-	// Create a ray differential
-	def apply(origin: Point, direction: Vector, rxOrigin: Point, rxDirection: Vector, ryOrigin: Point, ryDirection: Vector,
-			  minDistance: Float = 0.0f, maxDistance: Float = Float.PositiveInfinity) =
-				  new RayDifferential(origin, direction, rxOrigin, rxDirection, ryOrigin, ryDirection, minDistance, maxDistance)
+  // Create a ray differential
+  def apply(origin: Point, direction: Vector, rxOrigin: Point, rxDirection: Vector, ryOrigin: Point, ryDirection: Vector,
+        minDistance: Float = 0.0f, maxDistance: Float = Float.PositiveInfinity) =
+          new RayDifferential(origin, direction, rxOrigin, rxDirection, ryOrigin, ryDirection, minDistance, maxDistance)
 
-	// Create a ray differential from a ray
-	def apply(ray: Ray, rxOrigin: Point, rxDirection: Vector, ryOrigin: Point, ryDirection: Vector) =
-		new RayDifferential(ray, rxOrigin, rxDirection, ryOrigin, ryDirection)
+  // Create a ray differential from a ray
+  def apply(ray: Ray, rxOrigin: Point, rxDirection: Vector, ryOrigin: Point, ryDirection: Vector) =
+    new RayDifferential(ray, rxOrigin, rxDirection, ryOrigin, ryDirection)
 }

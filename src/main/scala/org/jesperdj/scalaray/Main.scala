@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,107 +40,107 @@ import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 object Main {
-	def main(args: Array[String]) {
-		println("ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8")
-		println("Copyright (C) 2009, 2010  Jesper de Jong")
+  def main(args: Array[String]) {
+    println("ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala")
+    println("Copyright (C) 2009, 2010, 2011  Jesper de Jong")
 
-		println()
-		println("Setup...")
-		val scene = createScene()
+    println()
+    println("Setup...")
+    val scene = createScene()
 
-		val rect = new Rectangle(0, 0, 799, 599)
+    val rect = new Rectangle(0, 0, 799, 599)
 
-		val camera: Camera = new PerspectiveCamera(Transform.translate(0.0f, 0.75f, 0.0f), π / 4.0f, rect.width, rect.height)
+    val camera: Camera = new PerspectiveCamera(Transform.translate(0.0f, 0.75f, 0.0f), π / 4.0f, rect.width, rect.height)
 
-		val filter: Filter = new BoxFilter
-		val raster = new PixelRaster(rect, filter)
+    val filter: Filter = new BoxFilter
+    val raster = new PixelRaster(rect, filter)
 
-		val surfaceIntegrator: SurfaceIntegrator = DirectLightingSurfaceIntegrator(scene)
-		val volumeIntegrator: VolumeIntegrator = VacuumVolumeIntegrator
+    val surfaceIntegrator: SurfaceIntegrator = DirectLightingSurfaceIntegrator(scene)
+    val volumeIntegrator: VolumeIntegrator = VacuumVolumeIntegrator
 
-		val samplerFactory: SamplerFactory = new StratifiedSamplerFactory(rect, 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
+    val samplerFactory: SamplerFactory = new StratifiedSamplerFactory(rect, 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
 
-		val renderer: Renderer = new SamplerRenderer(scene, samplerFactory, camera, raster, surfaceIntegrator, volumeIntegrator)
+    val renderer: Renderer = new SamplerRenderer(scene, samplerFactory, camera, raster, surfaceIntegrator, volumeIntegrator)
 
-		println("- Surface integrator: " + surfaceIntegrator)
-		println("- Volume integrator: " + volumeIntegrator)
-		println("- Sampler factory: " + samplerFactory)
-		println("- Filter: " + filter)
-		println("- Renderer: " + renderer)
-		println("- Camera: " + camera)
+    println("- Surface integrator: " + surfaceIntegrator)
+    println("- Volume integrator: " + volumeIntegrator)
+    println("- Sampler factory: " + samplerFactory)
+    println("- Filter: " + filter)
+    println("- Renderer: " + renderer)
+    println("- Camera: " + camera)
 
-		println()
-		println("Rendering...")
-		val timer = new Timer("Total rendering time")
-		timer.time { renderer.render() }
-		println(timer.toString)
+    println()
+    println("Rendering...")
+    val timer = new Timer("Total rendering time")
+    timer.time { renderer.render() }
+    println(timer.toString)
 
-		ImageIO.write(raster.toImage, "png", new File("output.png"))
+    ImageIO.write(raster.toImage, "png", new File("output.png"))
 
-		println()
-		println("Finished")
-	}
+    println()
+    println("Finished")
+  }
 
-	def createScene(): Scene = {
-		val mat1 = new MatteMaterial(new ConstantTexture(new Spectrum(1.0f, 1.0f, 0.5f)))
-		val mat2 = new MatteMaterial(new ConstantTexture(new Spectrum(1.0f, 1.0f, 1.0f)))
+  def createScene(): Scene = {
+    val mat1 = new MatteMaterial(new ConstantTexture(new Spectrum(1.0f, 1.0f, 0.5f)))
+    val mat2 = new MatteMaterial(new ConstantTexture(new Spectrum(1.0f, 1.0f, 1.0f)))
 
-//		val s1 = new Sphere(0.75f, -1.0f, 1.0f, π * 4.0f / 3.0f)
-//		val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, mat1), Transform.translate(0.0f, 0.75, 4.0f) * Transform.rotateY(π / 4.0f) * Transform.rotateZ(π / 2.0f))
-		val p1 = new TransformedPrimitive(createCube(0.5f, mat1), Transform.translate(0.0f, 0.75f, 4.0f) * Transform.rotateY(-π / 6.0f) * Transform.rotateX(-π / 6.0f))
+//    val s1 = new Sphere(0.75f, -1.0f, 1.0f, π * 4.0f / 3.0f)
+//    val p1 = new TransformedPrimitive(new GeometricPrimitive(s1, mat1), Transform.translate(0.0f, 0.75, 4.0f) * Transform.rotateY(π / 4.0f) * Transform.rotateZ(π / 2.0f))
+    val p1 = new TransformedPrimitive(createCube(0.5f, mat1), Transform.translate(0.0f, 0.75f, 4.0f) * Transform.rotateY(-π / 6.0f) * Transform.rotateX(-π / 6.0f))
 
-		val s2 = new Disk(3.0f)
-		val p2 = new TransformedPrimitive(new GeometricPrimitive(s2, mat2), Transform.translate(0.0f, 0.0f, 4.0f) * Transform.rotateX(-π / 2.0f))
+    val s2 = new Disk(3.0f)
+    val p2 = new TransformedPrimitive(new GeometricPrimitive(s2, mat2), Transform.translate(0.0f, 0.0f, 4.0f) * Transform.rotateX(-π / 2.0f))
 
-		val l1 = new PointLightSource(new Point(0.5f, 2.0f, 0.0f), new Spectrum(30.0f, 30.0f, 30.0f))
+    val l1 = new PointLightSource(new Point(0.5f, 2.0f, 0.0f), new Spectrum(30.0f, 30.0f, 30.0f))
 
-		val s3 = new Disk(1.5f)
-		val t3 = Transform.translate(-0.3f, 5.0f, 3.5f) * Transform.rotateX(π / 2.0f)
-		val l2 = new DiffuseAreaLightSource(s3, t3, new Spectrum(0.7f, 0.7f, 0.7f), 4)
-		val p3 = new TransformedPrimitive(new GeometricPrimitive(s3, mat1, l2), t3)
+    val s3 = new Disk(1.5f)
+    val t3 = Transform.translate(-0.3f, 5.0f, 3.5f) * Transform.rotateX(π / 2.0f)
+    val l2 = new DiffuseAreaLightSource(s3, t3, new Spectrum(0.7f, 0.7f, 0.7f), 4)
+    val p3 = new TransformedPrimitive(new GeometricPrimitive(s3, mat1, l2), t3)
 
-		new Scene(new CompositePrimitive(p1, p2, p3), Traversable(l1, l2))
-	}
+    new Scene(new CompositePrimitive(p1, p2, p3), Traversable(l1, l2))
+  }
 
-	def createCube(size: Float, material: Material): Primitive = {
-		import scala.collection.immutable.IndexedSeq
+  def createCube(size: Float, material: Material): Primitive = {
+    import scala.collection.immutable.IndexedSeq
 
-		// TODO: Properly generate normals and u, v surface coordinates for vertices
+    // TODO: Properly generate normals and u, v surface coordinates for vertices
 
-		// Generate vertices
-		val v: IndexedSeq[Vertex] = for (i <- 0 to 7) yield
-			new Vertex(Point(if ((i & 1) != 0) size else -size, if ((i & 2) != 0) size else -size, if ((i & 4) != 0) size else -size), Normal.Zero, 0.0f, 0.0f)
+    // Generate vertices
+    val v: IndexedSeq[Vertex] = for (i <- 0 to 7) yield
+      new Vertex(Point(if ((i & 1) != 0) size else -size, if ((i & 2) != 0) size else -size, if ((i & 4) != 0) size else -size), Normal.Zero, 0.0f, 0.0f)
 
-		// Front
-		val ft1 = new GeometricPrimitive(new Triangle(v(0), v(2), v(3)), material)
-		val ft2 = new GeometricPrimitive(new Triangle(v(3), v(1), v(0)), material)
-		val f = new CompositePrimitive(ft1, ft2)
+    // Front
+    val ft1 = new GeometricPrimitive(new Triangle(v(0), v(2), v(3)), material)
+    val ft2 = new GeometricPrimitive(new Triangle(v(3), v(1), v(0)), material)
+    val f = new CompositePrimitive(ft1, ft2)
 
-		// Back
-		val bkt1 = new GeometricPrimitive(new Triangle(v(5), v(7), v(6)), material)
-		val bkt2 = new GeometricPrimitive(new Triangle(v(6), v(4), v(5)), material)
-		val bk = new CompositePrimitive(bkt1, bkt2)
+    // Back
+    val bkt1 = new GeometricPrimitive(new Triangle(v(5), v(7), v(6)), material)
+    val bkt2 = new GeometricPrimitive(new Triangle(v(6), v(4), v(5)), material)
+    val bk = new CompositePrimitive(bkt1, bkt2)
 
-		// Left
-		val lt1 = new GeometricPrimitive(new Triangle(v(4), v(6), v(2)), material)
-		val lt2 = new GeometricPrimitive(new Triangle(v(2), v(0), v(4)), material)
-		val l = new CompositePrimitive(lt1, lt2)
+    // Left
+    val lt1 = new GeometricPrimitive(new Triangle(v(4), v(6), v(2)), material)
+    val lt2 = new GeometricPrimitive(new Triangle(v(2), v(0), v(4)), material)
+    val l = new CompositePrimitive(lt1, lt2)
 
-		// Right
-		val rt1 = new GeometricPrimitive(new Triangle(v(1), v(3), v(7)), material)
-		val rt2 = new GeometricPrimitive(new Triangle(v(7), v(5), v(1)), material)
-		val r = new CompositePrimitive(rt1, rt2)
+    // Right
+    val rt1 = new GeometricPrimitive(new Triangle(v(1), v(3), v(7)), material)
+    val rt2 = new GeometricPrimitive(new Triangle(v(7), v(5), v(1)), material)
+    val r = new CompositePrimitive(rt1, rt2)
 
-		// Bottom
-		val btt1 = new GeometricPrimitive(new Triangle(v(4), v(0), v(1)), material)
-		val btt2 = new GeometricPrimitive(new Triangle(v(1), v(5), v(4)), material)
-		val bt = new CompositePrimitive(btt1, btt2)
+    // Bottom
+    val btt1 = new GeometricPrimitive(new Triangle(v(4), v(0), v(1)), material)
+    val btt2 = new GeometricPrimitive(new Triangle(v(1), v(5), v(4)), material)
+    val bt = new CompositePrimitive(btt1, btt2)
 
-		// Top
-		val tt1 = new GeometricPrimitive(new Triangle(v(7), v(3), v(2)), material)
-		val tt2 = new GeometricPrimitive(new Triangle(v(2), v(6), v(7)), material)
-		val t = new CompositePrimitive(tt1, tt2)
+    // Top
+    val tt1 = new GeometricPrimitive(new Triangle(v(7), v(3), v(2)), material)
+    val tt2 = new GeometricPrimitive(new Triangle(v(2), v(6), v(7)), material)
+    val t = new CompositePrimitive(tt1, tt2)
 
-		new CompositePrimitive(f, bk, l, r, bt, t)
-	}
+    new CompositePrimitive(f, bk, l, r, bt, t)
+  }
 }

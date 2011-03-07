@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,28 +25,28 @@ import org.jesperdj.scalaray.vecmath._
 
 // Geometric primitive: a primitive with a shape, material and optionally an area light source (pbrt 4.1.1)
 final class GeometricPrimitive private (shape: Shape, material: Material, val areaLightSource: Option[AreaLightSource]) extends Primitive {
-	// Create a geometric primitive with a shape and material, no area light source
-	def this(shape: Shape, material: Material) = this(shape, material, None)
+  // Create a geometric primitive with a shape and material, no area light source
+  def this(shape: Shape, material: Material) = this(shape, material, None)
 
-	// Create a geometric primitive with an area light source
-	def this(shape: Shape, material: Material, areaLightSource: AreaLightSource) = this(shape, material, Some(areaLightSource))
+  // Create a geometric primitive with an area light source
+  def this(shape: Shape, material: Material, areaLightSource: AreaLightSource) = this(shape, material, Some(areaLightSource))
 
-	// Bounding box that contains the primitive
-	val boundingBox: BoundingBox = shape.boundingBox
+  // Bounding box that contains the primitive
+  val boundingBox: BoundingBox = shape.boundingBox
 
-	// Bounding box when primitive is transformed
-	override def boundingBox(transform: Transform): BoundingBox = shape.boundingBox(transform)
+  // Bounding box when primitive is transformed
+  override def boundingBox(transform: Transform): BoundingBox = shape.boundingBox(transform)
 
-	// Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
-	def intersect(ray: Ray): Option[(Intersection, Float)] = shape intersect ray map {
-		case (dg, distance) => (new Intersection(dg, this, Transform.Identity), distance)
-	}
+  // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
+  def intersect(ray: Ray): Option[(Intersection, Float)] = shape intersect ray map {
+    case (dg, distance) => (new Intersection(dg, this, Transform.Identity), distance)
+  }
 
-	// Check if a ray intersects this primitive
-	override def checkIntersect(ray: Ray): Boolean = shape checkIntersect ray
+  // Check if a ray intersects this primitive
+  override def checkIntersect(ray: Ray): Boolean = shape checkIntersect ray
 
-	// Get the BSDF for a given differential geometry and object-to-world transform
-	def bsdf(dg: DifferentialGeometry, objectToWorld: Transform): BSDF = material.bsdf(dg, shape.shadingGeometry(dg, objectToWorld))
+  // Get the BSDF for a given differential geometry and object-to-world transform
+  def bsdf(dg: DifferentialGeometry, objectToWorld: Transform): BSDF = material.bsdf(dg, shape.shadingGeometry(dg, objectToWorld))
 
-	override def toString = "GeometricPrimitive(shape=%s, material=%s, areaLightSource=%s)" format (shape, material, areaLightSource)
+  override def toString = "GeometricPrimitive(shape=%s, material=%s, areaLightSource=%s)" format (shape, material, areaLightSource)
 }

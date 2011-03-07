@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@ import org.jesperdj.scalaray.vecmath._
 
 // Mixin for classes that have a bounding box
 trait HasBoundingBox {
-	// Bounding box that contains the object
-	val boundingBox: BoundingBox
+  // Bounding box that contains the object
+  val boundingBox: BoundingBox
 
-	// Bounding box when object is transformed (override this if the object can provide a tighter bound)
-	def boundingBox(transform: Transform): BoundingBox = transform * boundingBox
+  // Bounding box when object is transformed (override this if the object can provide a tighter bound)
+  def boundingBox(transform: Transform): BoundingBox = transform * boundingBox
 }

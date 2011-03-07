@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,26 +21,26 @@ import org.jesperdj.scalaray.vecmath._
 
 // Differential geometry, describes the geometry at a point on a surface (pbrt 2.9)
 abstract class DifferentialGeometry {
-	// Point on the surface
-	val point: Point
+  // Point on the surface
+  val point: Point
 
-	// Surface normal at the point
-	val normal: Normal
+  // Surface normal at the point
+  val normal: Normal
 
-	// Surface parameter coordinates
-	val u: Float
-	val v: Float
+  // Surface parameter coordinates
+  val u: Float
+  val v: Float
 
-	// Partial derivatives of the surface position
-	val dpdu: Vector
-	val dpdv: Vector
+  // Partial derivatives of the surface position
+  val dpdu: Vector
+  val dpdv: Vector
 
-	// Partial derivatives of the surface normal
-	val dndu: Normal
-	val dndv: Normal
+  // Partial derivatives of the surface normal
+  val dndu: Normal
+  val dndv: Normal
 
-	// Shape which defines the surface
-	val shape: Shape
+  // Shape which defines the surface
+  val shape: Shape
 
-	override def toString = "DifferentialGeometry(point=%s, normal=%s, u=%g, v=%g, shape=%s)" format (point, normal, u, v, shape)
+  override def toString = "DifferentialGeometry(point=%s, normal=%s, u=%g, v=%g, shape=%s)" format (point, normal, u, v, shape)
 }

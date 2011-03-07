@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,17 +19,17 @@ package org.jesperdj.scalaray.util
 
 // Trait that can be mixed in to give instances a unique identifier
 trait UniqueId {
-	// Unique identifier
-	val id = UniqueId.nextId.getAndIncrement
+  // Unique identifier
+  val id = UniqueId.nextId.getAndIncrement
 
-	// Compare instances by their unique identifier
-	override def equals(other: Any): Boolean = other match {
-		case that: UniqueId => that.id == id
-		case _ => false
-	}
+  // Compare instances by their unique identifier
+  override def equals(other: Any): Boolean = other match {
+    case that: UniqueId => that.id == id
+    case _ => false
+  }
 }
 
 object UniqueId {
-	// Generator for unique identifiers
-	private val nextId = new java.util.concurrent.atomic.AtomicInteger
+  // Generator for unique identifiers
+  private val nextId = new java.util.concurrent.atomic.AtomicInteger
 }

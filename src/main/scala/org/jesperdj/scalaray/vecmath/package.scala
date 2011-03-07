@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,29 +20,29 @@ package org.jesperdj.scalaray
 import org.jesperdj.scalaray.util._
 
 package object vecmath {
-	// Implicit conversion for scaling vectors by multiplying a numeric type with a vector
-	implicit def implicitScaleVector[@specialized(Int, Float) N <% Float](f: N) = new MultipliableSame[Vector] {
-		def *(v: Vector) = v * f
-	}
+  // Implicit conversion for scaling vectors by multiplying a numeric type with a vector
+  implicit def implicitScaleVector[@specialized(Int, Float) N <% Float](f: N) = new MultipliableSame[Vector] {
+    def *(v: Vector) = v * f
+  }
 
-	// Implicit conversion for scaling normals by multiplying a numeric type with a normal
-	implicit def implicitScaleNormal[@specialized(Int, Float) N <% Float](f: N) = new MultipliableSame[Normal] {
-		def *(n: Normal) = n * f
-	}
+  // Implicit conversion for scaling normals by multiplying a numeric type with a normal
+  implicit def implicitScaleNormal[@specialized(Int, Float) N <% Float](f: N) = new MultipliableSame[Normal] {
+    def *(n: Normal) = n * f
+  }
 
-	// Implicit conversion for multiplying a point by a weight
-	implicit def implicitScalePoint[@specialized(Int, Float) N <% Float](f: N) = new MultipliableSame[Point] {
-		def *(p: Point) = p * f
-	}
+  // Implicit conversion for multiplying a point by a weight
+  implicit def implicitScalePoint[@specialized(Int, Float) N <% Float](f: N) = new MultipliableSame[Point] {
+    def *(p: Point) = p * f
+  }
 
   // Implicit conversion for scaling quaternions by multiplying a numeric type with a quaternion
   implicit def implicitScaleQuaternion[@specialized(Int, Float) N <% Float](f: N) = new MultipliableSame[Quaternion] {
     def *(q: Quaternion) = q * f
   }
 
-	// Implicit conversion to enable Vector to be used in interpolate()
-	implicit def vectorToInterpolatable(v1: Vector) = new Interpolatable[Vector] {
-		def *(t: Float): Vector = v1 * t
-		def +(v2: Vector): Vector = v1 + v2
-	}
+  // Implicit conversion to enable Vector to be used in interpolate()
+  implicit def vectorToInterpolatable(v1: Vector) = new Interpolatable[Vector] {
+    def *(t: Float): Vector = v1 * t
+    def +(v2: Vector): Vector = v1 + v2
+  }
 }

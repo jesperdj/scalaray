@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,18 +24,18 @@ import org.jesperdj.scalaray.vecmath._
 
 // Intersection with a primitive (pbrt 4.1)
 final class Intersection (val dg: DifferentialGeometry, val primitive: GeometricPrimitive, val objectToWorld: Transform) {
-	// Get the BSDF at the intersection point
-	def bsdf: BSDF = primitive.bsdf(dg, objectToWorld)
+  // Get the BSDF at the intersection point
+  def bsdf: BSDF = primitive.bsdf(dg, objectToWorld)
 
-	// Get the emitted radiance from the intersection point if the intersection is on an area light (pbrt 13.4)
-	def emittedRadiance(direction: Vector): Spectrum = primitive.areaLightSource match {
-		case Some(areaLightSource) => areaLightSource.emittedRadiance(dg.point, dg.normal, direction)
-		case None => Spectrum.Black
-	}
+  // Get the emitted radiance from the intersection point if the intersection is on an area light (pbrt 13.4)
+  def emittedRadiance(direction: Vector): Spectrum = primitive.areaLightSource match {
+    case Some(areaLightSource) => areaLightSource.emittedRadiance(dg.point, dg.normal, direction)
+    case None => Spectrum.Black
+  }
 
-	override def toString = "Intersection(differentialGeometry=%s, primitive=%s, objectToWorld=%s)" format (dg, primitive, objectToWorld)
+  override def toString = "Intersection(differentialGeometry=%s, primitive=%s, objectToWorld=%s)" format (dg, primitive, objectToWorld)
 }
 
 object Intersection {
-	def unapply(intersection: Intersection) = Some((intersection.dg, intersection.primitive, intersection.objectToWorld))
+  def unapply(intersection: Intersection) = Some((intersection.dg, intersection.primitive, intersection.objectToWorld))
 }

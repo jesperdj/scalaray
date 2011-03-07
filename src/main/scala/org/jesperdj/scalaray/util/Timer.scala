@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,15 @@
 package org.jesperdj.scalaray.util
 
 class Timer (val name: String) {
-	private var totalTime: Long = 0L
-	private var startTime: Long = 0L
+  private var totalTime: Long = 0L
+  private var startTime: Long = 0L
 
-	def start() { startTime = System.nanoTime }
-	def stop() { totalTime += System.nanoTime - startTime }
+  def start() { startTime = System.nanoTime }
+  def stop() { totalTime += System.nanoTime - startTime }
 
-	def time[T](block: => T): T = { start; val result: T = block; stop; result }
+  def time[T](block: => T): T = { start; val result: T = block; stop; result }
 
-	def total = totalTime
+  def total = totalTime
 
-	override def toString = "%s: %g seconds" format (name, totalTime / 1e9)
+  override def toString = "%s: %g seconds" format (name, totalTime / 1e9)
 }

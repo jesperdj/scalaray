@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,38 +19,38 @@ package org.jesperdj.scalaray.reflection
 
 // BxDF type (pbrt 8.1)
 final class BxDFType private (val flags: Int) {
-	def &(other: BxDFType): BxDFType = new BxDFType(flags & other.flags)
-	def |(other: BxDFType): BxDFType = new BxDFType(flags | other.flags)
+  def &(other: BxDFType): BxDFType = new BxDFType(flags & other.flags)
+  def |(other: BxDFType): BxDFType = new BxDFType(flags | other.flags)
 
-	def unary_~ = new BxDFType(~flags)
+  def unary_~ = new BxDFType(~flags)
 
-	// Check if this BxDF type matches the given type
-	def matches(other: BxDFType) = (flags & other.flags) == flags
+  // Check if this BxDF type matches the given type
+  def matches(other: BxDFType) = (flags & other.flags) == flags
 
-	override def equals(other: Any): Boolean = other match {
-		case that: BxDFType => (that canEqual this) && (flags == that.flags)
-		case _ => false
-	}
+  override def equals(other: Any): Boolean = other match {
+    case that: BxDFType => (that canEqual this) && (flags == that.flags)
+    case _ => false
+  }
 
-	def canEqual(other: Any): Boolean = other.isInstanceOf[BxDFType]
+  def canEqual(other: Any): Boolean = other.isInstanceOf[BxDFType]
 
-	override def hashCode: Int = flags
+  override def hashCode: Int = flags
 
-	override def toString = "BxDFType(0x%02X)" format (flags)
+  override def toString = "BxDFType(0x%02X)" format (flags)
 }
 
 object BxDFType {
-	val None = new BxDFType(0)
+  val None = new BxDFType(0)
 
-	val Reflection = new BxDFType(1 << 0)
-	val Transmission = new BxDFType(1 << 1)
+  val Reflection = new BxDFType(1 << 0)
+  val Transmission = new BxDFType(1 << 1)
 
-	val Diffuse = new BxDFType(1 << 2)
-	val Glossy = new BxDFType(1 << 3)
-	val Specular = new BxDFType(1 << 4)
+  val Diffuse = new BxDFType(1 << 2)
+  val Glossy = new BxDFType(1 << 3)
+  val Specular = new BxDFType(1 << 4)
 
-	val AllTypes = Diffuse | Glossy | Specular
-	val AllReflection = Reflection | AllTypes
-	val AllTransmission = Transmission | AllTypes
-	val All = AllReflection | AllTransmission
+  val AllTypes = Diffuse | Glossy | Specular
+  val AllReflection = Reflection | AllTypes
+  val AllTransmission = Transmission | AllTypes
+  val All = AllReflection | AllTransmission
 }

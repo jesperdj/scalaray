@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,22 +26,22 @@ import org.jesperdj.scalaray.vecmath.{ Ray, RayDifferential }
 
 // Camera (pbrt 6.1)
 abstract class Camera {
-	// Generate a camera ray for a sample (pbrt 6.1)
-	def generateRay(sample: CameraSample): Ray
+  // Generate a camera ray for a sample (pbrt 6.1)
+  def generateRay(sample: CameraSample): Ray
 
-	// Generate a camera ray with differentials
-	def generateRayDifferential(sample: CameraSample, scale: Float = 1.0f): RayDifferential = {
-		val ray = generateRay(sample)
+  // Generate a camera ray with differentials
+  def generateRayDifferential(sample: CameraSample, scale: Float = 1.0f): RayDifferential = {
+    val ray = generateRay(sample)
 
-		val rx = generateRay(new CameraSample(sample.imageX + 1, sample.imageY, sample.lensU, sample.lensV, sample.time))
-		val ry = generateRay(new CameraSample(sample.imageX, sample.imageY + 1, sample.lensU, sample.lensV, sample.time))
+    val rx = generateRay(new CameraSample(sample.imageX + 1, sample.imageY, sample.lensU, sample.lensV, sample.time))
+    val ry = generateRay(new CameraSample(sample.imageX, sample.imageY + 1, sample.lensU, sample.lensV, sample.time))
 
-		val rxOrigin = ray.origin + (rx.origin - ray.origin) * scale
-		val rxDirection = ray.direction + (rx.direction - ray.direction) * scale
+    val rxOrigin = ray.origin + (rx.origin - ray.origin) * scale
+    val rxDirection = ray.direction + (rx.direction - ray.direction) * scale
 
-		val ryOrigin = ray.origin + (ry.origin - ray.origin) * scale
-		val ryDirection = ray.direction + (ry.direction - ray.direction) * scale
+    val ryOrigin = ray.origin + (ry.origin - ray.origin) * scale
+    val ryDirection = ray.direction + (ry.direction - ray.direction) * scale
 
-		RayDifferential(ray, rxOrigin, rxDirection, ryOrigin, ryDirection)
-	}
+    RayDifferential(ray, rxOrigin, rxDirection, ryOrigin, ryDirection)
+  }
 }

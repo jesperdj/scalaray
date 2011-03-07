@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@ sealed abstract class SampleSpec extends UniqueId
 
 // Sample specification for a 1D sample pattern
 final class SampleSpec1D (val count: Int) extends SampleSpec {
-	override def toString = "SampleSpec1D(id=%d, count=%d)" format (id, count)
+  override def toString = "SampleSpec1D(id=%d, count=%d)" format (id, count)
 }
 
 // Sample specification for a 2D sample pattern
 final class SampleSpec2D (val count: Int) extends SampleSpec {
-	override def toString = "SampleSpec2D(id=%d, count=%d)" format (id, count)
+  override def toString = "SampleSpec2D(id=%d, count=%d)" format (id, count)
 }

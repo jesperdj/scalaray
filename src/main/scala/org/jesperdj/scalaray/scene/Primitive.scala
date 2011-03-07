@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@ import org.jesperdj.scalaray.vecmath.Ray
 
 // Primitive (pbrt 4.1)
 abstract class Primitive extends HasBoundingBox {
-	// Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray (pbrt 4.1)
-	def intersect(ray: Ray): Option[(Intersection, Float)]
+  // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray (pbrt 4.1)
+  def intersect(ray: Ray): Option[(Intersection, Float)]
 
-	// Check if a ray intersects this primitive; override this if the primitive can provide a more efficient implementation (pbrt 4.1)
-	def checkIntersect(ray: Ray): Boolean = intersect(ray).isDefined
+  // Check if a ray intersects this primitive; override this if the primitive can provide a more efficient implementation (pbrt 4.1)
+  def checkIntersect(ray: Ray): Boolean = intersect(ray).isDefined
 }

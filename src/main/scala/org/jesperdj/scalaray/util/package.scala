@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,57 +20,57 @@ package org.jesperdj.scalaray
 import scala.collection.immutable.IndexedSeq
 
 package object util {
-	val π = math.Pi.toFloat
+  val π = math.Pi.toFloat
 
-	// Clamp a value between a low and high bound
-	@inline def clamp[@specialized(Int, Float) N : Ordering](value: N, low: N, high: N): N = {
-		import Ordered._
-		if (value < low) low else if (value > high) high else value
-	}
+  // Clamp a value between a low and high bound
+  @inline def clamp[@specialized(Int, Float) N : Ordering](value: N, low: N, high: N): N = {
+    import Ordered._
+    if (value < low) low else if (value > high) high else value
+  }
 
-	// Get the minimum and maximum of two values as a pair
-	@inline def minmax[@specialized(Int, Float) N : Ordering](a: N, b: N): (N, N) = {
-		import Ordered._
-		if (a <= b) (a, b) else (b, a)
-	}
+  // Get the minimum and maximum of two values as a pair
+  @inline def minmax[@specialized(Int, Float) N : Ordering](a: N, b: N): (N, N) = {
+    import Ordered._
+    if (a <= b) (a, b) else (b, a)
+  }
 
-	// Traits for types that can be multiplied with a T or to which a T can be added, resulting in an R
-	trait Multipliable[-T, +R] { def *(value: T): R }
-	trait Addable[-T, +R] { def +(value: T): R }
+  // Traits for types that can be multiplied with a T or to which a T can be added, resulting in an R
+  trait Multipliable[-T, +R] { def *(value: T): R }
+  trait Addable[-T, +R] { def +(value: T): R }
 
-	// Traits for types that can be multiplied with a T or to which a T can be added, resulting in the same type T
-	trait MultipliableSame[T] extends Multipliable[T, T]
-	trait AddableSame[T] extends Addable[T, T]
+  // Traits for types that can be multiplied with a T or to which a T can be added, resulting in the same type T
+  trait MultipliableSame[T] extends Multipliable[T, T]
+  trait AddableSame[T] extends Addable[T, T]
 
-	// Operations that a type must have to be used in interpolate()
-	trait Interpolatable[T] extends Multipliable[Float, T] with AddableSame[T]
+  // Operations that a type must have to be used in interpolate()
+  trait Interpolatable[T] extends Multipliable[Float, T] with AddableSame[T]
 
-	// Linearly interpolate a value
-	@inline def interpolate[@specialized(Float) T <% Interpolatable[T]](t: Float, a: T, b: T): T = a * (1.0f - t) + b * t
+  // Linearly interpolate a value
+  @inline def interpolate[@specialized(Float) T <% Interpolatable[T]](t: Float, a: T, b: T): T = a * (1.0f - t) + b * t
 
-	// Implicit conversion to enable Float to be used in interpolate()
-	implicit def floatToInterpolatable(f1: Float) = new Interpolatable[Float] {
-		def *(t: Float): Float = f1 * t
-		def +(f2: Float): Float = f1 + f2
-	}
+  // Implicit conversion to enable Float to be used in interpolate()
+  implicit def floatToInterpolatable(f1: Float) = new Interpolatable[Float] {
+    def *(t: Float): Float = f1 * t
+    def +(f2: Float): Float = f1 + f2
+  }
 
-	// Create an immutable IndexedSeq that wraps an Array. Note that Scala already contains a method wrapFloatArray(), but this returns a mutable WrappedArray.
-	// Also, this version is @specialized on Float to avoid unnecessary boxing and unboxing.
-	def arrayToIndexedSeq[@specialized(Float) T](array: Array[T]): IndexedSeq[T] = new IndexedSeq[T] {
-		def apply(idx: Int): T = array(idx)
-		def length: Int = array.length
-	}
+  // Create an immutable IndexedSeq that wraps an Array. Note that Scala already contains a method wrapFloatArray(), but this returns a mutable WrappedArray.
+  // Also, this version is @specialized on Float to avoid unnecessary boxing and unboxing.
+  def arrayToIndexedSeq[@specialized(Float) T](array: Array[T]): IndexedSeq[T] = new IndexedSeq[T] {
+    def apply(idx: Int): T = array(idx)
+    def length: Int = array.length
+  }
 
-	// Randomly permutate an array - Fisher-Yates shuffle (see: http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
-	// This method can also take a custom swap method, which is useful for example for Latin hypercube sampling
-	def shuffle[@specialized(Float) T](array: Array[T], swap: (T, T) => (T, T) = { (a: T, b: T) => (b, a) }): Array[T] = {
-		val random = new scala.util.Random
+  // Randomly permutate an array - Fisher-Yates shuffle (see: http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
+  // This method can also take a custom swap method, which is useful for example for Latin hypercube sampling
+  def shuffle[@specialized(Float) T](array: Array[T], swap: (T, T) => (T, T) = { (a: T, b: T) => (b, a) }): Array[T] = {
+    val random = new scala.util.Random
 
-		for (n <- array.length - 1 to 0 by -1) {
-			val k = random.nextInt(n + 1)
-			val (a, b) = swap(array(k), array(n)); array(k) = a; array(n) = b
-		}
+    for (n <- array.length - 1 to 0 by -1) {
+      val k = random.nextInt(n + 1)
+      val (a, b) = swap(array(k), array(n)); array(k) = a; array(n) = b
+    }
 
-		array
-	}
+    array
+  }
 }

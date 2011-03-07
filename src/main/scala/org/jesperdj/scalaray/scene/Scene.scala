@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,17 +25,17 @@ import org.jesperdj.scalaray.vecmath._
 
 // Scene (pbrt 1.3.2)
 final class Scene (primitive: Primitive, val lightSources: Traversable[LightSource]) {
-	// Bounding box of the whole scene
-	def boundingBox: BoundingBox = primitive.boundingBox
+  // Bounding box of the whole scene
+  def boundingBox: BoundingBox = primitive.boundingBox
 
-	// Bounding sphere of the whole scene
-	def boundingSphere: (Point, Float) = boundingBox.boundingSphere
+  // Bounding sphere of the whole scene
+  def boundingSphere: (Point, Float) = boundingBox.boundingSphere
 
-	// Compute closest intersection between a ray and primitives in the scene
-	def intersect(ray: Ray): Option[Intersection] = primitive intersect ray map { case (its, _) => its }
+  // Compute closest intersection between a ray and primitives in the scene
+  def intersect(ray: Ray): Option[Intersection] = primitive intersect ray map { case (its, _) => its }
 
-	// Check if a ray intersects a primitive in the scene
-	def checkIntersect(ray: Ray): Boolean = primitive checkIntersect ray
+  // Check if a ray intersects a primitive in the scene
+  def checkIntersect(ray: Ray): Boolean = primitive checkIntersect ray
 
-	override def toString = "Scene(primitive=%s, lightSources=%s)" format (primitive, lightSources)
+  override def toString = "Scene(primitive=%s, lightSources=%s)" format (primitive, lightSources)
 }

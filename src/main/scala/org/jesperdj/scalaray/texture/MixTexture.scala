@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,5 +22,5 @@ import org.jesperdj.scalaray.util._
 
 // Mix texture (pbrt 10.3.3)
 final class MixTexture[@specialized(Float) T <% Interpolatable[T]] (tex1: Texture[T], tex2: Texture[T], amount: Texture[Float]) extends Texture[T] {
-	def apply(dg: DifferentialGeometry): T = interpolate(amount(dg), tex1(dg), tex2(dg))
+  def apply(dg: DifferentialGeometry): T = interpolate(amount(dg), tex1(dg), tex2(dg))
 }

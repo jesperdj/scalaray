@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,37 +21,37 @@ import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 package object shape {
-	// Implicit conversion for transforming a bounding box (pbrt 2.8.5)
-	implicit def implicitTransformBoundingBox(t: Transform) = new MultipliableSame[BoundingBox] {
-		def *(bb: BoundingBox) = new BoundingBox(bb.corners map (t * _ ))
-	}
+  // Implicit conversion for transforming a bounding box (pbrt 2.8.5)
+  implicit def implicitTransformBoundingBox(t: Transform) = new MultipliableSame[BoundingBox] {
+    def *(bb: BoundingBox) = new BoundingBox(bb.corners map (t * _ ))
+  }
 
-	// Implicit conversion for transforming a DifferentialGeometry
-	implicit def implicitTransformDifferentialGeometry(t: Transform) = new MultipliableSame[DifferentialGeometry] {
-		def *(dg: DifferentialGeometry) = new DifferentialGeometry {
-			// NOTE: This class depends on the fact that the fields of DifferentialGeometry have value semantics (the fields must be vals, not defs)
-			// If the fields in DifferentialGeometry would be defs, they should be defs here as well instead of (lazy) vals
+  // Implicit conversion for transforming a DifferentialGeometry
+  implicit def implicitTransformDifferentialGeometry(t: Transform) = new MultipliableSame[DifferentialGeometry] {
+    def *(dg: DifferentialGeometry) = new DifferentialGeometry {
+      // NOTE: This class depends on the fact that the fields of DifferentialGeometry have value semantics (the fields must be vals, not defs)
+      // If the fields in DifferentialGeometry would be defs, they should be defs here as well instead of (lazy) vals
 
-			// Point on the surface
-			lazy val point: Point = t * dg.point
+      // Point on the surface
+      lazy val point: Point = t * dg.point
 
-			// Surface normal at the point
-			lazy val normal: Normal = (t * dg.normal).normalize
+      // Surface normal at the point
+      lazy val normal: Normal = (t * dg.normal).normalize
 
-			// Surface parameter coordinates
-			val u: Float = dg.u
-			val v: Float = dg.v
+      // Surface parameter coordinates
+      val u: Float = dg.u
+      val v: Float = dg.v
 
-			// Partial derivatives of the surface position
-			lazy val dpdu: Vector = t * dg.dpdu
-			lazy val dpdv: Vector = t * dg.dpdv
+      // Partial derivatives of the surface position
+      lazy val dpdu: Vector = t * dg.dpdu
+      lazy val dpdv: Vector = t * dg.dpdv
 
-			// Partial derivatives of the surface normal
-			lazy val dndu: Normal = t * dg.dndu
-			lazy val dndv: Normal = t * dg.dndv
+      // Partial derivatives of the surface normal
+      lazy val dndu: Normal = t * dg.dndu
+      lazy val dndv: Normal = t * dg.dndv
 
-			// Shape which defines the surface
-			val shape = dg.shape
-		}
-	}
+      // Shape which defines the surface
+      val shape = dg.shape
+    }
+  }
 }

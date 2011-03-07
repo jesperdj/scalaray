@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,23 +23,23 @@ import org.jesperdj.scalaray.vecmath._
 
 // Light source (pbrt 12.1)
 abstract class LightSource {
-	// Indicates whether the light is described by a delta distribution
-	val isDeltaLight: Boolean
+  // Indicates whether the light is described by a delta distribution
+  val isDeltaLight: Boolean
 
-	// Number of samples to take from this light source
-	val numberOfSamples: Int
+  // Number of samples to take from this light source
+  val numberOfSamples: Int
 
-	// Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
-	// Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-	def sampleRadiance(point: Point, u1: Float, u2: Float): (Spectrum, Ray, Float)
+  // Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
+  // Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
+  def sampleRadiance(point: Point, u1: Float, u2: Float): (Spectrum, Ray, Float)
 
-	// Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
-	// that sampleRadiance(point: Point, u1: Float, u2: Float) uses to sample points (pbrt 14.6.1)
-	def pdf(point: Point, wi: Vector): Float
+  // Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
+  // that sampleRadiance(point: Point, u1: Float, u2: Float) uses to sample points (pbrt 14.6.1)
+  def pdf(point: Point, wi: Vector): Float
 
-	// Total emitted power of this light source onto the scene
-	def totalPower(scene: Scene): Spectrum
+  // Total emitted power of this light source onto the scene
+  def totalPower(scene: Scene): Spectrum
 
-	// Emitted radiance along a ray that does not intersect with geometry in the scene (for infinite area lights) (pbrt 12.5)
-	def emittedRadiance(ray: Ray): Spectrum = Spectrum.Black
+  // Emitted radiance along a ray that does not intersect with geometry in the scene (for infinite area lights) (pbrt 12.5)
+  def emittedRadiance(ray: Ray): Spectrum = Spectrum.Black
 }

@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,30 +19,30 @@ package org.jesperdj.scalaray.raster
 
 // Blocked array (pbrt A.2.5)
 private final class BlockedArray[T : ClassManifest] (val sizeX: Int, val sizeY: Int, logBlockSize: Int = 4) {
-	// Size of the side of a block
-	private val blockSize = 1 << logBlockSize
-	private val blockSizeSquared = blockSize * blockSize
+  // Size of the side of a block
+  private val blockSize = 1 << logBlockSize
+  private val blockSizeSquared = blockSize * blockSize
 
-	// Round up to a multiple of the block size
-	private def roundUp(n: Int) = (n + blockSize - 1) & ~(blockSize - 1)
+  // Round up to a multiple of the block size
+  private def roundUp(n: Int) = (n + blockSize - 1) & ~(blockSize - 1)
 
-	// Number of blocks in horizontal direction
-	private val blockCountX = roundUp(sizeX) >> logBlockSize
+  // Number of blocks in horizontal direction
+  private val blockCountX = roundUp(sizeX) >> logBlockSize
 
-	// Array to contain the data
-	private val data = new Array[T](roundUp(sizeX) * roundUp(sizeY))
+  // Array to contain the data
+  private val data = new Array[T](roundUp(sizeX) * roundUp(sizeY))
 
-	private def block(n: Int) = n >> logBlockSize
-	private def offset(n: Int) = n & (blockSize - 1)
+  private def block(n: Int) = n >> logBlockSize
+  private def offset(n: Int) = n & (blockSize - 1)
 
-	// Compute the index of an (x, y) position into the data
-	private def index(x: Int, y: Int) = blockSizeSquared * (blockCountX * block(y) + block(x)) + blockSize * offset(y) + offset(x)
+  // Compute the index of an (x, y) position into the data
+  private def index(x: Int, y: Int) = blockSizeSquared * (blockCountX * block(y) + block(x)) + blockSize * offset(y) + offset(x)
 
-	// Access an element by (x, y) position
-	def apply(x: Int, y: Int) = data(index(x, y))
+  // Access an element by (x, y) position
+  def apply(x: Int, y: Int) = data(index(x, y))
 
-	// Update an element by (x, y) position
-	def update(x: Int, y: Int, value: T): Unit = data(index(x, y)) = value
+  // Update an element by (x, y) position
+  def update(x: Int, y: Int, value: T): Unit = data(index(x, y)) = value
 
-	override def toString = "BlockedArray(sizeX=%d, sizeY=%d, logBlockSize=%d)" format (sizeX, sizeY, logBlockSize)
+  override def toString = "BlockedArray(sizeX=%d, sizeY=%d, logBlockSize=%d)" format (sizeX, sizeY, logBlockSize)
 }

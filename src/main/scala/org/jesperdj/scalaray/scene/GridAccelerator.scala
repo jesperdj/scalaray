@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,20 +24,20 @@ import org.jesperdj.scalaray.vecmath._
 
 // Grid accelerator
 final class GridAccelerator (primitives: Traversable[Primitive]) extends Primitive with Accelerator {
-	// Bounding box that contains the primitive
-	val boundingBox: BoundingBox = BoundingBox.Empty // TODO: Implement boundingBox
+  // Bounding box that contains the primitive
+  val boundingBox: BoundingBox = BoundingBox.Empty // TODO: Implement boundingBox
 
-	// Bounding box when primitive is transformed
-	override def boundingBox(transform: Transform): BoundingBox =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement boundingBox
+  // Bounding box when primitive is transformed
+  override def boundingBox(transform: Transform): BoundingBox =
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement boundingBox
 
-	// Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
-	def intersect(ray: Ray): Option[(Intersection, Float)] =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement intersect
+  // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
+  def intersect(ray: Ray): Option[(Intersection, Float)] =
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement intersect
 
-	// Check if a ray intersects this primitive
-	override def checkIntersect(ray: Ray): Boolean =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement checkIntersect
+  // Check if a ray intersects this primitive
+  override def checkIntersect(ray: Ray): Boolean =
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement checkIntersect
 
-	override def toString = "GridAccelerator"
+  override def toString = "GridAccelerator"
 }

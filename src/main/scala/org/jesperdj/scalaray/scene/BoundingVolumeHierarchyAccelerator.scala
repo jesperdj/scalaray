@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,58 +24,58 @@ import org.jesperdj.scalaray.vecmath._
 
 // Bounding volume hierarchy accelerator (pbrt 4.4)
 final class BoundingVolumeHierarchyAccelerator (
-	primitives: Traversable[Primitive],
-	split: (Traversable[Primitive]) => (Traversable[Primitive], Traversable[Primitive]) = BoundingVolumeHierarchyAccelerator.splitSurfaceAreaHeuristic,
-	maxPrimitivesPerNode: Int = 2) extends Primitive with Accelerator {
-	require(maxPrimitivesPerNode >= 2, "maxPrimitivesPerNode must be >= 2")
+  primitives: Traversable[Primitive],
+  split: (Traversable[Primitive]) => (Traversable[Primitive], Traversable[Primitive]) = BoundingVolumeHierarchyAccelerator.splitSurfaceAreaHeuristic,
+  maxPrimitivesPerNode: Int = 2) extends Primitive with Accelerator {
+  require(maxPrimitivesPerNode >= 2, "maxPrimitivesPerNode must be >= 2")
 
-	private val root: Primitive = {
-		// Recursive function to build the tree
-		def build(ps: Traversable[Primitive]): Primitive = {
-			if (ps.size == 1) ps.head
-			else if (ps.size <= maxPrimitivesPerNode) new CompositePrimitive(ps)
-			else { val (left, right) = split(ps); new CompositePrimitive(build(left), build(right)) }
-		}
+  private val root: Primitive = {
+    // Recursive function to build the tree
+    def build(ps: Traversable[Primitive]): Primitive = {
+      if (ps.size == 1) ps.head
+      else if (ps.size <= maxPrimitivesPerNode) new CompositePrimitive(ps)
+      else { val (left, right) = split(ps); new CompositePrimitive(build(left), build(right)) }
+    }
 
-		build(primitives)
-	}
+    build(primitives)
+  }
 
-	// Bounding box that contains the primitive
-	val boundingBox: BoundingBox = root.boundingBox
+  // Bounding box that contains the primitive
+  val boundingBox: BoundingBox = root.boundingBox
 
-	// Bounding box when primitive is transformed
-	override def boundingBox(transform: Transform): BoundingBox = root.boundingBox(transform)
+  // Bounding box when primitive is transformed
+  override def boundingBox(transform: Transform): BoundingBox = root.boundingBox(transform)
 
-	// Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
-	def intersect(ray: Ray): Option[(Intersection, Float)] = root intersect ray
+  // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
+  def intersect(ray: Ray): Option[(Intersection, Float)] = root intersect ray
 
-	// Check if a ray intersects this primitive
-	override def checkIntersect(ray: Ray): Boolean = root checkIntersect ray
+  // Check if a ray intersects this primitive
+  override def checkIntersect(ray: Ray): Boolean = root checkIntersect ray
 
-	override def toString = "BoundingVolumeHierarchyAccelerator(root=%s)" format (root)
+  override def toString = "BoundingVolumeHierarchyAccelerator(root=%s)" format (root)
 }
 
 object BoundingVolumeHierarchyAccelerator {
-	// TODO: There are bugs in this, it might return empty collections, that should never happen
-	def splitMiddle(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) = {
-		// Compute bounding box of centroids and extents of that bounding box
-		val cb = (BoundingBox.Empty /: ps) { (bb, p) => bb union p.boundingBox.centroid }
-		val (ex, ey, ez) = (cb.max.x - cb.min.x, cb.max.y - cb.min.y, cb.max.z - cb.min.z)
+  // TODO: There are bugs in this, it might return empty collections, that should never happen
+  def splitMiddle(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) = {
+    // Compute bounding box of centroids and extents of that bounding box
+    val cb = (BoundingBox.Empty /: ps) { (bb, p) => bb union p.boundingBox.centroid }
+    val (ex, ey, ez) = (cb.max.x - cb.min.x, cb.max.y - cb.min.y, cb.max.z - cb.min.z)
 
-		// Predicates for partitioning
-		def predX(p: Primitive) = p.boundingBox.centroid.x < cb.centroid.x
-		def predY(p: Primitive) = p.boundingBox.centroid.y < cb.centroid.y
-		def predZ(p: Primitive) = p.boundingBox.centroid.z < cb.centroid.z
+    // Predicates for partitioning
+    def predX(p: Primitive) = p.boundingBox.centroid.x < cb.centroid.x
+    def predY(p: Primitive) = p.boundingBox.centroid.y < cb.centroid.y
+    def predZ(p: Primitive) = p.boundingBox.centroid.z < cb.centroid.z
 
-		// Select predicate for the largest extent axis
-		val pred: (Primitive) => Boolean = if (ex > ey && ex > ez) predX else if (ey > ex && ey > ez) predY else predZ
+    // Select predicate for the largest extent axis
+    val pred: (Primitive) => Boolean = if (ex > ey && ex > ez) predX else if (ey > ex && ey > ez) predY else predZ
 
-		ps partition pred
-	}
+    ps partition pred
+  }
 
-	def splitEqualCounts(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement splitEqualCounts
+  def splitEqualCounts(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) =
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement splitEqualCounts
 
-	def splitSurfaceAreaHeuristic(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) =
-		throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement splitSurfaceAreaHeuristic
+  def splitSurfaceAreaHeuristic(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) =
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement splitSurfaceAreaHeuristic
 }

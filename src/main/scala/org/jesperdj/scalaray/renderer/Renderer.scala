@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,12 @@ import org.jesperdj.scalaray.vecmath.RayDifferential
 
 // Renderer (pbrt 1.3.3)
 abstract class Renderer {
-	// Render the scene
-	def render(): Unit
+  // Render the scene
+  def render(): Unit
 
-	// Compute the incident radiance along the given ray
-	def radiance(ray: RayDifferential, sample: Sample): Spectrum
+  // Compute the incident radiance along the given ray
+  def radiance(ray: RayDifferential, sample: Sample): Spectrum
 
-	// Compute the fraction of light that is attenuated by volumetric scattering along the ray
-	def transmittance(ray: RayDifferential, sample: Sample): Spectrum
+  // Compute the fraction of light that is attenuated by volumetric scattering along the ray
+  def transmittance(ray: RayDifferential, sample: Sample): Spectrum
 }

@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,18 +24,18 @@ import org.jesperdj.scalaray.vecmath._
 
 // Point light source (pbrt 12.2)
 final class PointLightSource (position: Point, intensity: Spectrum) extends DeltaLightSource {
-	// Create a point light source using a light-to-world transform
-	def this(lightToWorld: Transform, intensity: Spectrum) = this(lightToWorld * Point.Origin, intensity)
+  // Create a point light source using a light-to-world transform
+  def this(lightToWorld: Transform, intensity: Spectrum) = this(lightToWorld * Point.Origin, intensity)
 
-	// Radiance of this light source at the given point
-	// Returns the radiance and a ray from the light source to the given point
-	def radiance(point: Point): (Spectrum, Ray) = {
-		val rd = point - position
-		(intensity / rd.lengthSquared, Ray(position, rd, 0.0f, 1.0f))
-	}
+  // Radiance of this light source at the given point
+  // Returns the radiance and a ray from the light source to the given point
+  def radiance(point: Point): (Spectrum, Ray) = {
+    val rd = point - position
+    (intensity / rd.lengthSquared, Ray(position, rd, 0.0f, 1.0f))
+  }
 
-	// Total emitted power of this light source onto the scene
-	def totalPower(scene: Scene): Spectrum = intensity * (4.0f * π)
+  // Total emitted power of this light source onto the scene
+  def totalPower(scene: Scene): Spectrum = intensity * (4.0f * π)
 
-	override def toString = "PointLightSource(position=%s, intensity=%s)" format (position, intensity)
+  override def toString = "PointLightSource(position=%s, intensity=%s)" format (position, intensity)
 }

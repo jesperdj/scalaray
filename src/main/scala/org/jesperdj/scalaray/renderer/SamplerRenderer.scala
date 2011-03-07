@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,59 +27,59 @@ import org.jesperdj.scalaray.vecmath.RayDifferential
 
 // Sampler renderer (pbrt 1.3.3)
 final class SamplerRenderer (scene: Scene, samplerFactory: SamplerFactory, camera: Camera, raster: Raster,
-							 surfaceIntegrator: SurfaceIntegrator, volumeIntegrator: VolumeIntegrator) extends Renderer {
-	// Render the scene
-	def render(): Unit = {
-		import java.util.concurrent._
-		import java.util.concurrent.atomic.AtomicInteger
+               surfaceIntegrator: SurfaceIntegrator, volumeIntegrator: VolumeIntegrator) extends Renderer {
+  // Render the scene
+  def render(): Unit = {
+    import java.util.concurrent._
+    import java.util.concurrent.atomic.AtomicInteger
 
-		var runningTasks = new AtomicInteger
+    var runningTasks = new AtomicInteger
 
-		final class Task (sampler: Sampler) extends Runnable {
-			def run() {
-				val scale: Float = 1.0f / math.sqrt(sampler.samplesPerPixel).toFloat
-				sampler.samples foreach { sample => raster.addSample(sample, radiance(camera.generateRayDifferential(sample, scale), sample)) }
-				runningTasks.decrementAndGet
-			}
-		}
+    final class Task (sampler: Sampler) extends Runnable {
+      def run() {
+        val scale: Float = 1.0f / math.sqrt(sampler.samplesPerPixel).toFloat
+        sampler.samples foreach { sample => raster.addSample(sample, radiance(camera.generateRayDifferential(sample, scale), sample)) }
+        runningTasks.decrementAndGet
+      }
+    }
 
-		val processors = Runtime.getRuntime().availableProcessors()
-		println("Number of processors: " + processors)
+    val processors = Runtime.getRuntime().availableProcessors()
+    println("Number of processors: " + processors)
 
-		// Create executor service and submit tasks
-		val executorService = Executors.newFixedThreadPool(processors)
-		val samplers = samplerFactory.createSamplers(math.max(32 * processors, raster.rectangle.width * raster.rectangle.height / 256))
-		samplers.foreach { s => runningTasks.incrementAndGet; executorService.submit(new Task(s)) }
+    // Create executor service and submit tasks
+    val executorService = Executors.newFixedThreadPool(processors)
+    val samplers = samplerFactory.createSamplers(math.max(32 * processors, raster.rectangle.width * raster.rectangle.height / 256))
+    samplers.foreach { s => runningTasks.incrementAndGet; executorService.submit(new Task(s)) }
 
-		val numSamplers = samplers.size
+    val numSamplers = samplers.size
 
-		// Wait until all tasks have finished
-		executorService.shutdown()
-		while (!executorService.isTerminated()) {
-			executorService.awaitTermination(10, TimeUnit.SECONDS)
-			println("%d/%d tasks done (%d%%)" format
-					(numSamplers - runningTasks.intValue, numSamplers, 100 - ((100 * runningTasks.get) / numSamplers)))
-		}
+    // Wait until all tasks have finished
+    executorService.shutdown()
+    while (!executorService.isTerminated()) {
+      executorService.awaitTermination(10, TimeUnit.SECONDS)
+      println("%d/%d tasks done (%d%%)" format
+          (numSamplers - runningTasks.intValue, numSamplers, 100 - ((100 * runningTasks.get) / numSamplers)))
+    }
 
-	}
+  }
 
-	// Compute the incident radiance along the given ray (pbrt 1.3.4)
-	def radiance(ray: RayDifferential, sample: Sample): Spectrum = {
-		val li = scene intersect ray match {
-			// If the ray intersects geometry in the scene, get the reflected radiance from the surface integrator
-			case Some(intersection) => surfaceIntegrator.radiance(this, ray, intersection, sample)
+  // Compute the incident radiance along the given ray (pbrt 1.3.4)
+  def radiance(ray: RayDifferential, sample: Sample): Spectrum = {
+    val li = scene intersect ray match {
+      // If the ray intersects geometry in the scene, get the reflected radiance from the surface integrator
+      case Some(intersection) => surfaceIntegrator.radiance(this, ray, intersection, sample)
 
-			// TODO: If the ray does not intersect any geometry, accumulate the contributions of infinite area light sources along the ray
-			case _ => Spectrum.Black
-		}
+      // TODO: If the ray does not intersect any geometry, accumulate the contributions of infinite area light sources along the ray
+      case _ => Spectrum.Black
+    }
 
-		val (lvi, t) = volumeIntegrator.radiance(this, ray, sample)
+    val (lvi, t) = volumeIntegrator.radiance(this, ray, sample)
 
-		t * li + lvi
-	}
+    t * li + lvi
+  }
 
-	// Compute the fraction of light that is attenuated by volumetric scattering along the ray (pbrt 1.3.4)
-	def transmittance(ray: RayDifferential, sample: Sample): Spectrum = volumeIntegrator.transmittance(this, ray, sample)
+  // Compute the fraction of light that is attenuated by volumetric scattering along the ray (pbrt 1.3.4)
+  def transmittance(ray: RayDifferential, sample: Sample): Spectrum = volumeIntegrator.transmittance(this, ray, sample)
 
-	override def toString = "SamplerRenderer"
+  override def toString = "SamplerRenderer"
 }

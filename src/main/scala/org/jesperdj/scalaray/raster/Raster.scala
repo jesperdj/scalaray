@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,5 +24,5 @@ import org.jesperdj.scalaray.spectrum.Spectrum
 
 // Raster (replaces pbrt's Film)
 abstract class Raster (val rectangle: Rectangle) {
-	def addSample(sample: CameraSample, spectrum: Spectrum): Unit
+  def addSample(sample: CameraSample, spectrum: Spectrum): Unit
 }

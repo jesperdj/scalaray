@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,46 +19,46 @@ package org.jesperdj.scalaray.spectrum
 
 // Spectrum
 sealed class Spectrum (private val red: Float, private val green: Float, private val blue: Float) {
-	// Add two spectra
-	def +(s: Spectrum): Spectrum = new Spectrum(red + s.red, green + s.green, blue + s.blue)
+  // Add two spectra
+  def +(s: Spectrum): Spectrum = new Spectrum(red + s.red, green + s.green, blue + s.blue)
 
-	// Multiply two spectra
-	def *(s: Spectrum): Spectrum = new Spectrum(red * s.red, green * s.green, blue * s.blue)
+  // Multiply two spectra
+  def *(s: Spectrum): Spectrum = new Spectrum(red * s.red, green * s.green, blue * s.blue)
 
-	// Scale this spectrum
-	def *(f: Float): Spectrum = new Spectrum(red * f, green * f, blue * f)
-	def /(f: Float): Spectrum = new Spectrum(red / f, green / f, blue / f)
+  // Scale this spectrum
+  def *(f: Float): Spectrum = new Spectrum(red * f, green * f, blue * f)
+  def /(f: Float): Spectrum = new Spectrum(red / f, green / f, blue / f)
 
-	// Add another spectrum to this spectrum with a weight
-	def +*(s: Spectrum, w: Float): Spectrum = new Spectrum(red + s.red * w, green + s.green * w, blue + s.blue * w)
+  // Add another spectrum to this spectrum with a weight
+  def +*(s: Spectrum, w: Float): Spectrum = new Spectrum(red + s.red * w, green + s.green * w, blue + s.blue * w)
 
-	def isBlack = red == 0.0f && green == 0.0f && blue == 0.0f
+  def isBlack = red == 0.0f && green == 0.0f && blue == 0.0f
 
-	def toRGB = (red, green, blue)
+  def toRGB = (red, green, blue)
 
-	override def toString = "Spectrum(red=%g, green=%g, blue=%g)" format (red, green, blue)
+  override def toString = "Spectrum(red=%g, green=%g, blue=%g)" format (red, green, blue)
 }
 
 object Spectrum {
-	// Spectrum constants
-	val Black: Spectrum = new Spectrum(0.0f, 0.0f, 0.0f) {
-		override def +(s: Spectrum) = s
-		override def *(s: Spectrum) = this
-		override def *(f: Float) = this
-		override def /(f: Float) = this
-		override def +*(s: Spectrum, w: Float) = s * w
-		override def isBlack = true
+  // Spectrum constants
+  val Black: Spectrum = new Spectrum(0.0f, 0.0f, 0.0f) {
+    override def +(s: Spectrum) = s
+    override def *(s: Spectrum) = this
+    override def *(f: Float) = this
+    override def /(f: Float) = this
+    override def +*(s: Spectrum, w: Float) = s * w
+    override def isBlack = true
 
-		override def toString = "Spectrum.Black"
-	}
+    override def toString = "Spectrum.Black"
+  }
 
-	val Unit: Spectrum = new Spectrum(1.0f, 1.0f, 1.0f) {
-		override def *(s: Spectrum) = s
-		override def isBlack = false
+  val Unit: Spectrum = new Spectrum(1.0f, 1.0f, 1.0f) {
+    override def *(s: Spectrum) = s
+    override def isBlack = false
 
-		override def toString = "Spectrum.Unit"
-	}
+    override def toString = "Spectrum.Unit"
+  }
 
-	// Create a new spectrum
-	def apply(red: Float, green: Float, blue: Float) = new Spectrum(red, green, blue)
+  // Create a new spectrum
+  def apply(red: Float, green: Float, blue: Float) = new Spectrum(red, green, blue)
 }

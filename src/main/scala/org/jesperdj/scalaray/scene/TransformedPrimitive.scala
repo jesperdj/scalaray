@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,21 +22,21 @@ import org.jesperdj.scalaray.vecmath._
 
 // Transformed primitive: wraps a primitive with a transform
 final class TransformedPrimitive (primitive: Primitive, transform: Transform) extends Primitive {
-	private val inverse: Transform = transform.inverse
+  private val inverse: Transform = transform.inverse
 
-	// Bounding box that contains the primitive
-	val boundingBox: BoundingBox = primitive.boundingBox(transform)
+  // Bounding box that contains the primitive
+  val boundingBox: BoundingBox = primitive.boundingBox(transform)
 
-	// Bounding box when primitive is transformed
-	override def boundingBox(tr: Transform): BoundingBox = primitive.boundingBox(tr * transform)
+  // Bounding box when primitive is transformed
+  override def boundingBox(tr: Transform): BoundingBox = primitive.boundingBox(tr * transform)
 
-	// Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
-	def intersect(ray: Ray): Option[(Intersection, Float)] = primitive intersect (inverse * ray) map {
-		case (its, distance) => (transform * its, distance)
-	}
+  // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
+  def intersect(ray: Ray): Option[(Intersection, Float)] = primitive intersect (inverse * ray) map {
+    case (its, distance) => (transform * its, distance)
+  }
 
-	// Check if a ray intersects this primitive
-	override def checkIntersect(ray: Ray): Boolean = primitive checkIntersect (inverse * ray)
+  // Check if a ray intersects this primitive
+  override def checkIntersect(ray: Ray): Boolean = primitive checkIntersect (inverse * ray)
 
-	override def toString = "TransformedPrimitive(primitive=%s, transform=%s)" format (primitive, transform)
+  override def toString = "TransformedPrimitive(primitive=%s, transform=%s)" format (primitive, transform)
 }

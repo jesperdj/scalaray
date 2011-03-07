@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,5 +19,5 @@ package org.jesperdj.scalaray.vecmath
 
 // Animated transform (pbrt 2.9.3)
 final class AnimatedTransform {
-	// TODO: Implement AnimatedTransform
+  // TODO: Implement AnimatedTransform
 }

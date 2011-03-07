@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,5 +22,5 @@ import org.jesperdj.scalaray.util._
 
 // Scale texture (pbrt 10.3.2)
 final class ScaleTexture[@specialized(Float) T1 <% Multipliable[T2, T2], @specialized(Float) T2] (tex1: Texture[T1], tex2: Texture[T2]) extends Texture[T2] {
-	def apply(dg: DifferentialGeometry): T2 = tex1(dg) * tex2(dg)
+  def apply(dg: DifferentialGeometry): T2 = tex1(dg) * tex2(dg)
 }

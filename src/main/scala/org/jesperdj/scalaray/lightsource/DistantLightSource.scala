@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,18 +24,18 @@ import org.jesperdj.scalaray.vecmath._
 
 // Distant light source (pbrt 12.3)
 final class DistantLightSource (direction: Vector, radiance: Spectrum) extends DeltaLightSource {
-	// Create a distant light source using a light-to-world transform
-	def this(lightToWorld: Transform, radiance: Spectrum) = this(lightToWorld * Vector.ZAxis, radiance)
+  // Create a distant light source using a light-to-world transform
+  def this(lightToWorld: Transform, radiance: Spectrum) = this(lightToWorld * Vector.ZAxis, radiance)
 
-	// Radiance of this light source at the given point
-	// Returns the radiance and a ray from the light source to the given point
-	def radiance(point: Point): (Spectrum, Ray) = (radiance, Ray(point, direction, Float.NegativeInfinity, 0.0f))
+  // Radiance of this light source at the given point
+  // Returns the radiance and a ray from the light source to the given point
+  def radiance(point: Point): (Spectrum, Ray) = (radiance, Ray(point, direction, Float.NegativeInfinity, 0.0f))
 
-	// Total emitted power of this light source onto the scene
-	def totalPower(scene: Scene): Spectrum = {
-		val (center, radius) = scene.boundingSphere
-		radiance * (π * radius * radius)
-	}
+  // Total emitted power of this light source onto the scene
+  def totalPower(scene: Scene): Spectrum = {
+    val (center, radius) = scene.boundingSphere
+    radiance * (π * radius * radius)
+  }
 
-	override def toString = "DistantLightSource(direction=%s, radiance=%s)" format (direction, radiance)
+  override def toString = "DistantLightSource(direction=%s, radiance=%s)" format (direction, radiance)
 }

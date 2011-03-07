@@ -1,6 +1,6 @@
 /*
- * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 package object scene {
-	// Implicit conversion for transforming an intersection
-	implicit def implicitTransformIntersection(transform: Transform) = new MultipliableSame[Intersection] {
-		def *(its: Intersection): Intersection = new Intersection(transform * its.dg, its.primitive, transform * its.objectToWorld)
-	}
+  // Implicit conversion for transforming an intersection
+  implicit def implicitTransformIntersection(transform: Transform) = new MultipliableSame[Intersection] {
+    def *(its: Intersection): Intersection = new Intersection(transform * its.dg, its.primitive, transform * its.objectToWorld)
+  }
 }
