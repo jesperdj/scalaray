@@ -1,6 +1,6 @@
 /*
  * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala 2.8
- * Copyright (C) 2009, 2010  Jesper de Jong
+ * Copyright (C) 2009, 2010, 2011  Jesper de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.jesperdj.scalaray.vecmath
+
+import org.jesperdj.scalaray.util._
 
 // Quaternion (pbrt 2.9.1)
 final class Quaternion (val v: Vector, val w: Float) {
@@ -110,4 +112,15 @@ object Quaternion {
 			}
 		}
 	}
+
+  // Interpolate between two quaternions using spherical linear interpolation (pbrt 2.9.2)
+  def interpolate(t: Float, q1: Quaternion, q2: Quaternion): Quaternion = {
+    val cosTheta = q1 * q2
+    if (cosTheta > 0.9995f) ((1.0f - t) * q1 + t * q2).normalize else {
+      val theta = math.acos(clamp(cosTheta, -1.0f, 1.0f)).toFloat
+      val thetap = theta * t
+      val qperp = (q2 - q1 * cosTheta).normalize
+      q1 * math.cos(thetap).toFloat + qperp * math.sin(thetap).toFloat
+    }
+  }
 }
