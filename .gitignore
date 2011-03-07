@@ -1,4 +1,6 @@
 .idea/
 scalaray.iml
+scalaray.ipr
+scalaray.iws
 target/
 output*.png
