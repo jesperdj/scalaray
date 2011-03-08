@@ -18,7 +18,7 @@
 package org.jesperdj.scalaray.vecmath
 
 // Point (pbrt 2.3)
-final class Point (val x: Float, val y: Float, val z: Float) {
+final class Point (val x: Double, val y: Double, val z: Double) {
   // Create a point from a vector
   def this(v: Vector) = this(v.x, v.y, v.z)
 
@@ -41,11 +41,11 @@ final class Point (val x: Float, val y: Float, val z: Float) {
   def -(p: Point) = new Vector(x - p.x, y - p.y, z - p.z)
 
   // Multiply or divide a point by a weight
-  def *(f: Float) = new Point(x * f, y * f, z * f)
-  def /(f: Float) = new Point(x / f, y / f, z / f)
+  def *(f: Double) = new Point(x * f, y * f, z * f)
+  def /(f: Double) = new Point(x / f, y / f, z / f)
 
   // Distance between two points
-  def distance(p: Point) = (this - p).length
+  def distance(p: Point) = math.sqrt(distanceSquared(p))
   def distanceSquared(p: Point) = (this - p).lengthSquared
 
   override def toString = "Point(%g, %g, %g)" format (x, y, z)
@@ -53,16 +53,19 @@ final class Point (val x: Float, val y: Float, val z: Float) {
 
 object Point {
   // Point constants
-  val Origin = new Point(0.0f, 0.0f, 0.0f)
-  val PositiveInfinity = new Point(Float.PositiveInfinity, Float.PositiveInfinity, Float.PositiveInfinity)
-  val NegativeInfinity = new Point(Float.NegativeInfinity, Float.NegativeInfinity, Float.NegativeInfinity)
+  val Origin = new Point(0.0, 0.0, 0.0)
+  val PositiveInfinity = new Point(Double.PositiveInfinity, Double.PositiveInfinity, Double.PositiveInfinity)
+  val NegativeInfinity = new Point(Double.NegativeInfinity, Double.NegativeInfinity, Double.NegativeInfinity)
 
   // Create a point
-  def apply(x: Float, y: Float, z: Float) = new Point(x, y, z)
+  def apply(x: Double, y: Double, z: Double) = new Point(x, y, z)
 
   // Create a point from a vector
   def apply(v: Vector) = new Point(v)
 
   // Create a point from a normal
   def apply(n: Normal) = new Point(n)
+
+  // Extractor method for pattern matching
+  def unapply(p: Point) = Some(p.x, p.y, p.z)
 }

@@ -21,7 +21,7 @@ package org.jesperdj.scalaray.vecmath
 // have to be transformed differently: by multiplying them with the transpose of the inverse (see pbrt 2.8.3).
 
 // Normal (pbrt 2.4)
-final class Normal (val x: Float, val y: Float, val z: Float) {
+final class Normal (val x: Double, val y: Double, val z: Double) {
   // Create a normal from a vector
   def this(v: Vector) = this(v.x, v.y, v.z)
 
@@ -35,8 +35,8 @@ final class Normal (val x: Float, val y: Float, val z: Float) {
   def -(n: Normal) = new Normal(x - n.x, y - n.y, z - n.z)
 
   // Scale a normal
-  def *(f: Float) = new Normal(x * f, y * f, z * f)
-  def /(f: Float) = new Normal(x / f, y / f, z / f)
+  def *(f: Double) = new Normal(x * f, y * f, z * f)
+  def /(f: Double) = new Normal(x / f, y / f, z / f)
 
   // Unary minus
   def unary_- = new Normal(-x, -y, -z)
@@ -51,7 +51,7 @@ final class Normal (val x: Float, val y: Float, val z: Float) {
   def **(v: Vector) = new Vector(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x)
 
   // Length
-  def length = math.sqrt(this * this).toFloat
+  def length = math.sqrt(lengthSquared)
   def lengthSquared = this * this
 
   // Normalize
@@ -62,17 +62,20 @@ final class Normal (val x: Float, val y: Float, val z: Float) {
 
 object Normal {
   // Normal constants
-  val XAxis = new Normal(1.0f, 0.0f, 0.0f)
-  val YAxis = new Normal(0.0f, 1.0f, 0.0f)
-  val ZAxis = new Normal(0.0f, 0.0f, 1.0f)
-  val Zero = new Normal(0.0f, 0.0f, 0.0f)
+  val XAxis = new Normal(1.0, 0.0, 0.0)
+  val YAxis = new Normal(0.0, 1.0, 0.0)
+  val ZAxis = new Normal(0.0, 0.0, 1.0)
+  val Zero = new Normal(0.0, 0.0, 0.0)
 
   // Create a normal
-  def apply(x: Float, y: Float, z: Float) = new Normal(x, y, z)
+  def apply(x: Double, y: Double, z: Double) = new Normal(x, y, z)
 
   // Create a normal from a vector
   def apply(v: Vector) = new Normal(v)
 
   // Create a normal from a point
   def apply(p: Point) = new Normal(p)
+
+  // Extractor method for pattern matching
+  def unapply(n: Normal) = Some(n.x, n.y, n.z)
 }

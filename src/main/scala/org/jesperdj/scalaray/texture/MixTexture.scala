@@ -21,6 +21,6 @@ import org.jesperdj.scalaray.shape.DifferentialGeometry
 import org.jesperdj.scalaray.util._
 
 // Mix texture (pbrt 10.3.3)
-final class MixTexture[@specialized(Float) T <% Interpolatable[T]] (tex1: Texture[T], tex2: Texture[T], amount: Texture[Float]) extends Texture[T] {
+final class MixTexture[@specialized(Double) T <% Interpolatable[T]] (tex1: Texture[T], tex2: Texture[T], amount: Texture[Double]) extends Texture[T] {
   def apply(dg: DifferentialGeometry): T = interpolate(amount(dg), tex1(dg), tex2(dg))
 }

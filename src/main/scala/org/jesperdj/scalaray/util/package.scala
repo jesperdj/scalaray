@@ -20,16 +20,16 @@ package org.jesperdj.scalaray
 import scala.collection.immutable.IndexedSeq
 
 package object util {
-  val π = math.Pi.toFloat
+  val π = math.Pi
 
   // Clamp a value between a low and high bound
-  @inline def clamp[@specialized(Int, Float) N : Ordering](value: N, low: N, high: N): N = {
+  @inline def clamp[@specialized(Int, Double) N : Ordering](value: N, low: N, high: N): N = {
     import Ordered._
     if (value < low) low else if (value > high) high else value
   }
 
   // Get the minimum and maximum of two values as a pair
-  @inline def minmax[@specialized(Int, Float) N : Ordering](a: N, b: N): (N, N) = {
+  @inline def minmax[@specialized(Int, Double) N : Ordering](a: N, b: N): (N, N) = {
     import Ordered._
     if (a <= b) (a, b) else (b, a)
   }
@@ -43,27 +43,27 @@ package object util {
   trait AddableSame[T] extends Addable[T, T]
 
   // Operations that a type must have to be used in interpolate()
-  trait Interpolatable[T] extends Multipliable[Float, T] with AddableSame[T]
+  trait Interpolatable[T] extends Multipliable[Double, T] with AddableSame[T]
 
   // Linearly interpolate a value
-  @inline def interpolate[@specialized(Float) T <% Interpolatable[T]](t: Float, a: T, b: T): T = a * (1.0f - t) + b * t
+  @inline def interpolate[@specialized(Double) T <% Interpolatable[T]](t: Double, a: T, b: T): T = a * (1.0 - t) + b * t
 
-  // Implicit conversion to enable Float to be used in interpolate()
-  implicit def floatToInterpolatable(f1: Float) = new Interpolatable[Float] {
-    def *(t: Float): Float = f1 * t
-    def +(f2: Float): Float = f1 + f2
+  // Implicit conversion to enable Double to be used in interpolate()
+  implicit def doubleToInterpolatable(f1: Double) = new Interpolatable[Double] {
+    def *(t: Double): Double = f1 * t
+    def +(f2: Double): Double = f1 + f2
   }
 
-  // Create an immutable IndexedSeq that wraps an Array. Note that Scala already contains a method wrapFloatArray(), but this returns a mutable WrappedArray.
-  // Also, this version is @specialized on Float to avoid unnecessary boxing and unboxing.
-  def arrayToIndexedSeq[@specialized(Float) T](array: Array[T]): IndexedSeq[T] = new IndexedSeq[T] {
+  // Create an immutable IndexedSeq that wraps an Array. Note that Scala already contains a method wrapDoubleArray(), but this returns a mutable WrappedArray.
+  // Also, this version is @specialized on Double to avoid unnecessary boxing and unboxing.
+  def arrayToIndexedSeq[@specialized(Double) T](array: Array[T]): IndexedSeq[T] = new IndexedSeq[T] {
     def apply(idx: Int): T = array(idx)
     def length: Int = array.length
   }
 
   // Randomly permutate an array - Fisher-Yates shuffle (see: http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
   // This method can also take a custom swap method, which is useful for example for Latin hypercube sampling
-  def shuffle[@specialized(Float) T](array: Array[T], swap: (T, T) => (T, T) = { (a: T, b: T) => (b, a) }): Array[T] = {
+  def shuffle[@specialized(Double) T](array: Array[T], swap: (T, T) => (T, T) = { (a: T, b: T) => (b, a) }): Array[T] = {
     val random = new scala.util.Random
 
     for (n <- array.length - 1 to 0 by -1) {

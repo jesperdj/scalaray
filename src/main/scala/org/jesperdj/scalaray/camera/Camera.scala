@@ -30,7 +30,7 @@ abstract class Camera {
   def generateRay(sample: CameraSample): Ray
 
   // Generate a camera ray with differentials
-  def generateRayDifferential(sample: CameraSample, scale: Float = 1.0f): RayDifferential = {
+  def generateRayDifferential(sample: CameraSample, scale: Double = 1.0): RayDifferential = {
     val ray = generateRay(sample)
 
     val rx = generateRay(new CameraSample(sample.imageX + 1, sample.imageY, sample.lensU, sample.lensV, sample.time))

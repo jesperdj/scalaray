@@ -18,4 +18,4 @@
 package org.jesperdj.scalaray.filter
 
 // Two-dimensional reconstruction filter (pbrt 7.6.1)
-abstract class Filter (val extentX: Float, val extentY: Float) extends ((Float, Float) => Float)
+abstract class Filter (val extentX: Double, val extentY: Double) extends ((Double, Double) => Double)

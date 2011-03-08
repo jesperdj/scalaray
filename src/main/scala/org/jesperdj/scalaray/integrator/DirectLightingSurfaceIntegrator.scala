@@ -52,7 +52,7 @@ final class DirectLightingSurfaceIntegrator private (
 
     // TODO: This does not work if the light source is on the wrong side of the surface. Solve the self-intersection problem differently.
     // Point for shadow ray calculations just above surface to avoid self-intersection
-    val shadowPoint = dg.point + dg.normal * 1e-6f
+    val shadowPoint = dg.point + dg.normal * 1e-6
 
     // Get radiance of direct light from light sources on the intersection point
     val direct = uniformSampleAllLights(shadowPoint, dg.normal, wo, intersection.bsdf, sample)
@@ -84,7 +84,7 @@ final class DirectLightingSurfaceIntegrator private (
 
   // Compute direct light from a delta light source on the intersection point
   private def estimateDirect(deltaLight: LightSource, point: Point, normal: Normal, wo: Vector, bsdf: BSDF): Spectrum = {
-    val (radiance, ray, _) = deltaLight.sampleRadiance(point, 0.0f, 0.0f)
+    val (radiance, ray, _) = deltaLight.sampleRadiance(point, 0.0, 0.0)
     if (radiance.isBlack) return Spectrum.Black
 
     val wi = -ray.direction.normalize
@@ -101,15 +101,15 @@ final class DirectLightingSurfaceIntegrator private (
 
   // Sample direct light from an area light source on the intersection point
   private def estimateDirect(areaLight: LightSource, point: Point, normal: Normal, wo: Vector, bsdf: BSDF,
-                 lightSamples: IndexedSeq[FloatPair],
-                 bsdfSamples: IndexedSeq[FloatPair], bsdfComponentSamples: IndexedSeq[Float]): Spectrum = {
+                 lightSamples: IndexedSeq[(Double, Double)],
+                 bsdfSamples: IndexedSeq[(Double, Double)], bsdfComponentSamples: IndexedSeq[Double]): Spectrum = {
     // Sample light source
     var lightContrib = Spectrum.Black
     for (i <- 0 until lightSamples.size) {
       val ls = lightSamples(i)
 
       val (radiance, ray, lightPdf) = areaLight.sampleRadiance(point, ls._1, ls._2)
-      if (lightPdf > 0.0f && !radiance.isBlack) {
+      if (lightPdf > 0.0 && !radiance.isBlack) {
         val wi = -ray.direction.normalize
 
         // Evaluate BSDF; trace shadow ray
@@ -127,9 +127,9 @@ final class DirectLightingSurfaceIntegrator private (
       val bss = bsdfSamples(i); val bcs = bsdfComponentSamples(i)
 
       val (reflectance, wi, bsdfPdf, _) = bsdf.sample(wo, bss._1, bss._2, bcs)
-      if (bsdfPdf > 0.0f && !reflectance.isBlack) {
+      if (bsdfPdf > 0.0 && !reflectance.isBlack) {
         val lightPdf = areaLight.pdf(point, wi)
-        if (lightPdf > 0.0f) {
+        if (lightPdf > 0.0) {
           // Evaluate radiance from area light source
           val radiance = scene.intersect(Ray(point, wi)) match {
             case Some(Intersection(dg, prim, _)) if (prim.areaLightSource.isDefined && prim.areaLightSource.get == areaLight) =>
@@ -156,11 +156,11 @@ final class DirectLightingSurfaceIntegrator private (
   }
 
   // Balance heuristic weighing function for multiple importance sampling (pbrt 14.4.1)
-  private def balanceHeuristic(nf: Int, fPdf: Float, ng: Int, gPdf: Float): Float =
+  private def balanceHeuristic(nf: Int, fPdf: Double, ng: Int, gPdf: Double): Double =
     (nf * fPdf) / (nf * fPdf + ng * gPdf)
 
   // Power heuristic weighing function for multiple importance sampling (pbrt 14.4.1)
-  private def powerHeuristic(nf: Int, fPdf: Float, ng: Int, gPdf: Float): Float = {
+  private def powerHeuristic(nf: Int, fPdf: Double, ng: Int, gPdf: Double): Double = {
     val f = nf * fPdf; val g = ng * gPdf
     (f * f) / (f * f + g * g)
   }

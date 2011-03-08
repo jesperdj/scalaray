@@ -31,11 +31,11 @@ abstract class LightSource {
 
   // Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
   // Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-  def sampleRadiance(point: Point, u1: Float, u2: Float): (Spectrum, Ray, Float)
+  def sampleRadiance(point: Point, u1: Double, u2: Double): (Spectrum, Ray, Double)
 
   // Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
-  // that sampleRadiance(point: Point, u1: Float, u2: Float) uses to sample points (pbrt 14.6.1)
-  def pdf(point: Point, wi: Vector): Float
+  // that sampleRadiance(point: Point, u1: Double, u2: Double) uses to sample points (pbrt 14.6.1)
+  def pdf(point: Point, wi: Vector): Double
 
   // Total emitted power of this light source onto the scene
   def totalPower(scene: Scene): Spectrum

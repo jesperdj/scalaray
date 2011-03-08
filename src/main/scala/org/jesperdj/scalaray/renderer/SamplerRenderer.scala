@@ -37,7 +37,7 @@ final class SamplerRenderer (scene: Scene, samplerFactory: SamplerFactory, camer
 
     final class Task (sampler: Sampler) extends Runnable {
       def run() {
-        val scale: Float = 1.0f / math.sqrt(sampler.samplesPerPixel).toFloat
+        val scale: Double = 1.0 / math.sqrt(sampler.samplesPerPixel)
         sampler.samples foreach { sample => raster.addSample(sample, radiance(camera.generateRayDifferential(sample, scale), sample)) }
         runningTasks.decrementAndGet
       }

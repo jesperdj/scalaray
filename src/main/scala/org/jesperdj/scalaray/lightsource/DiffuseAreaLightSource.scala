@@ -31,10 +31,10 @@ final class DiffuseAreaLightSource (shape: Shape, lightToWorld: Transform, emitt
 
   // Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
   // Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-  def sampleRadiance(point: Point, u1: Float, u2: Float): (Spectrum, Ray, Float) = {
+  def sampleRadiance(point: Point, u1: Double, u2: Double): (Spectrum, Ray, Double) = {
     // Sample a point on the light source with respect to the given point
     val (sp, sn, pdf) = shape.sampleSurface(worldToLight * point, u1, u2)
-    if (pdf == 0.0f) return (Spectrum.Black, Ray(Point.Origin, Vector.ZAxis, 0.0f, 0.0f), 0.0f)
+    if (pdf == 0.0) return (Spectrum.Black, Ray(Point.Origin, Vector.ZAxis, 0.0, 0.0), 0.0)
 
     // Transform point and normal to world coordinates
     val p = lightToWorld * sp
@@ -44,18 +44,18 @@ final class DiffuseAreaLightSource (shape: Shape, lightToWorld: Transform, emitt
     val rd = point - p
 
     // Return the radiance only if the light shines from the right side of the surface of the light source
-    (emittedRadiance(p, n, rd), new Ray(p, rd, 1e-3f, 1.0f), pdf)
+    (emittedRadiance(p, n, rd), new Ray(p, rd, 1e-3, 1.0), pdf)
   }
 
   // Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
-  // that sampleRadiance(point: Point, u1: Float, u2: Float) uses to sample points (pbrt 14.6.1)
-  def pdf(point: Point, wi: Vector): Float = shape.pdf(worldToLight * point, worldToLight * wi)
+  // that sampleRadiance(point: Point, u1: Double, u2: Double) uses to sample points (pbrt 14.6.1)
+  def pdf(point: Point, wi: Vector): Double = shape.pdf(worldToLight * point, worldToLight * wi)
 
   // Total emitted power of this light source onto the scene
   def totalPower(scene: Scene): Spectrum = emitted * (shape.surfaceArea * π)
 
   // Emitted radiance in the given direction from the given point on the surface of the area light with the given normal
-  def emittedRadiance(point: Point, normal: Normal, direction: Vector): Spectrum = if (normal * direction > 0.0f) emitted else Spectrum.Black
+  def emittedRadiance(point: Point, normal: Normal, direction: Vector): Spectrum = if (normal * direction > 0.0) emitted else Spectrum.Black
 
   override def toString = "DiffuseAreaLightSource(shape=%s, lightToWorld=%s, emitted=%s, numberOfSamples=%d)" format
     (shape, lightToWorld, emitted, numberOfSamples)

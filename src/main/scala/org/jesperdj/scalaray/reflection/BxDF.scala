@@ -36,13 +36,13 @@ abstract class BxDF {
   def apply(wo: Vector, wi: Vector): Spectrum
 
   // Sample the BxDF for the given outgoing direction; returns reflectance or transmittance, incoming direction and value of the pdf (pbrt 14.5)
-  def sample(wo: Vector, u1: Float, u2: Float): (Spectrum, Vector, Float) = {
-    val wi = { val p = SampleTransforms.cosineSampleHemisphere(u1, u2); if (wo.z >= 0.0f) Vector(p) else Vector(p.x, p.y, -p.z) }
+  def sample(wo: Vector, u1: Double, u2: Double): (Spectrum, Vector, Double) = {
+    val wi = { val p = SampleTransforms.cosineSampleHemisphere(u1, u2); if (wo.z >= 0.0) Vector(p) else Vector(p.x, p.y, -p.z) }
     (apply(wo, wi), wi, pdf(wo, wi))
   }
 
-  // Get the value of the probability distribition function that matches the sampling method of sample(Vector, Float, Float) (pbrt 14.5)
-  def pdf(wo: Vector, wi: Vector): Float = if (wo.z * wi.z > 0.0f) wi.z.abs / π else 0.0f
+  // Get the value of the probability distribition function that matches the sampling method of sample(Vector, Double, Double) (pbrt 14.5)
+  def pdf(wo: Vector, wi: Vector): Double = if (wo.z * wi.z > 0.0) wi.z.abs / π else 0.0
 
   // Compute hemispherical-directional reflectance (pbrt 8.1.1, 14.5.5)
   def rho(wo: Vector, samples: Traversable[(Double, Double)]): Spectrum =

@@ -31,11 +31,11 @@ final class PointLightSource (position: Point, intensity: Spectrum) extends Delt
   // Returns the radiance and a ray from the light source to the given point
   def radiance(point: Point): (Spectrum, Ray) = {
     val rd = point - position
-    (intensity / rd.lengthSquared, Ray(position, rd, 0.0f, 1.0f))
+    (intensity / rd.lengthSquared, Ray(position, rd, 0.0, 1.0))
   }
 
   // Total emitted power of this light source onto the scene
-  def totalPower(scene: Scene): Spectrum = intensity * (4.0f * π)
+  def totalPower(scene: Scene): Spectrum = intensity * (4.0 * π)
 
   override def toString = "PointLightSource(position=%s, intensity=%s)" format (position, intensity)
 }

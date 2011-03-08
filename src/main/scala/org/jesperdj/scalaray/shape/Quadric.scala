@@ -23,18 +23,18 @@ import org.jesperdj.scalaray.vecmath._
 // Quadric, superclass for quadric shapes
 abstract class Quadric extends Shape {
   // Compute closest intersection between a ray and this shape, returns differential geometry and distance of intersection along ray
-  def intersect(ray: Ray): Option[(DifferentialGeometry, Float)] = {
+  def intersect(ray: Ray): Option[(DifferentialGeometry, Double)] = {
     // Get differential geometry and distance if the intersection point is in the range of the ray
-    def getResult(distance: Float): Option[(DifferentialGeometry, Float)] =
+    def getResult(distance: Double): Option[(DifferentialGeometry, Double)] =
       if (ray.isInRange(distance)) differentialGeometry(ray.point(distance)) map { case dg => (dg, distance) } else None
 
     // Compute quadratic coefficients
     val (a, b, c) = computeCoefficients(ray)
 
     // Solve quadratic equation
-    val d = b * b - 4.0f * a * c
-    if (d < 0.0f) None else {
-      val q = if (b < 0.0f) -0.5f * (b - math.sqrt(d).toFloat) else -0.5f * (b + math.sqrt(d).toFloat)
+    val d = b * b - 4.0 * a * c
+    if (d < 0.0) None else {
+      val q = if (b < 0.0) -0.5 * (b - math.sqrt(d)) else -0.5 * (b + math.sqrt(d))
       val (t0, t1) = minmax(q / a, c / q)
 
       // Return differential geometry and distance for closest valid intersection point
@@ -43,7 +43,7 @@ abstract class Quadric extends Shape {
   }
 
   // Compute quadratic coefficients
-  protected def computeCoefficients(ray: Ray): (Float, Float, Float)
+  protected def computeCoefficients(ray: Ray): (Double, Double, Double)
 
   // Get differential geometry for an intersection point
   protected def differentialGeometry(point: Point): Option[DifferentialGeometry]

@@ -18,8 +18,8 @@
 package org.jesperdj.scalaray.filter
 
 // Triangle filter (pbrt 7.6.1)
-final class TriangleFilter (extentX: Float = 2.0f, extentY: Float = 2.0f) extends Filter(extentX, extentY) {
-  def apply(x: Float, y: Float) = math.max(0.0f, extentX - x.abs) * math.max(0.0f, extentY - y.abs)
+final class TriangleFilter (extentX: Double = 2.0, extentY: Double = 2.0) extends Filter(extentX, extentY) {
+  def apply(x: Double, y: Double) = math.max(0.0, extentX - x.abs) * math.max(0.0, extentY - y.abs)
 
   override def toString = "TriangleFilter(extentX=%g, extentY=%g)" format (extentX, extentY)
 }

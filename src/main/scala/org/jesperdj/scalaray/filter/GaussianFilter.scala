@@ -18,13 +18,13 @@
 package org.jesperdj.scalaray.filter
 
 // Gaussian filter (pbrt 7.6.1)
-final class GaussianFilter (extentX: Float = 2.0f, extentY: Float = 2.0f, alpha: Float = 2.0f) extends Filter(extentX, extentY) {
-  private val expX = math.exp(-alpha * extentX * extentX).toFloat
-  private val expY = math.exp(-alpha * extentY * extentY).toFloat
+final class GaussianFilter (extentX: Double = 2.0, extentY: Double = 2.0, alpha: Double = 2.0) extends Filter(extentX, extentY) {
+  private val expX = math.exp(-alpha * extentX * extentX)
+  private val expY = math.exp(-alpha * extentY * extentY)
 
-  private def gaussian(d: Float, exp: Float) = math.max(0.0f, math.exp(-alpha * d * d).toFloat - exp)
+  private def gaussian(d: Double, exp: Double) = math.max(0.0, math.exp(-alpha * d * d) - exp)
 
-  def apply(x: Float, y: Float) = gaussian(x, expX) * gaussian(y, expY)
+  def apply(x: Double, y: Double) = gaussian(x, expX) * gaussian(y, expY)
 
   override def toString = "GaussianFilter(extentX=%g, extentY=%g, alpha=%g)" format (extentX, extentY, alpha)
 }

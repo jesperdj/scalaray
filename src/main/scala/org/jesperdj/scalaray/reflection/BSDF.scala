@@ -25,7 +25,7 @@ import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 // Bidirectional Scattering Distribution Function (pbrt 9.1)
-final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: Normal, eta: Float = 1.0f) {
+final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: Normal, eta: Double = 1.0) {
   private val nn = dgShading.normal
   private val sn = dgShading.dpdu.normalize
   private val tn = nn ** sn
@@ -42,7 +42,7 @@ final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: 
   // Evaluate components of the BSDF that match the given type for the given pair of directions (pbrt 9.1)
   def apply(woW: Vector, wiW: Vector, bxdfType: BxDFType = BxDFType.All): Spectrum = {
     // Select BRDFs or BTDFs depending on the geometry
-    val flags = if ((wiW * ng) * (woW * ng) > 0.0f) bxdfType & ~BxDFType.Transmission else bxdfType & ~BxDFType.Reflection
+    val flags = if ((wiW * ng) * (woW * ng) > 0.0) bxdfType & ~BxDFType.Transmission else bxdfType & ~BxDFType.Reflection
 
     val wo = worldToLocal(woW); val wi = worldToLocal(wiW)
 
@@ -52,10 +52,10 @@ final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: 
 
   // Sample the BSDF for the given outgoing direction; returns reflectance or transmittance, incoming direction,
   // value of the pdf and type of the selected BxDF component (pbrt 14.5.6)
-  def sample(woW: Vector, u1: Float, u2: Float, u3: Float, bxdfType: BxDFType = BxDFType.All): (Spectrum, Vector, Float, BxDFType) = {
+  def sample(woW: Vector, u1: Double, u2: Double, u3: Double, bxdfType: BxDFType = BxDFType.All): (Spectrum, Vector, Double, BxDFType) = {
     // Get BxDFs that match the given type
     val matchingBxDFs = bxdfs filter (_.matchesType(bxdfType))
-    if (matchingBxDFs.size == 0) return (Spectrum.Black, Vector.Zero, 0.0f, BxDFType.None)
+    if (matchingBxDFs.size == 0) return (Spectrum.Black, Vector.Zero, 0.0, BxDFType.None)
 
     // Get the BxDF to sample
     val bxdf = matchingBxDFs(math.min((u3 * matchingBxDFs.size).floor.toInt, matchingBxDFs.size - 1))
@@ -63,7 +63,7 @@ final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: 
     // Sample the selected BxDF
     val wo = worldToLocal(woW)
     val (spec, wi, pdf) = bxdf.sample(wo, u1, u2)
-    if (pdf == 0.0f) return (Spectrum.Black, Vector.Zero, 0.0f, BxDFType.None)
+    if (pdf == 0.0) return (Spectrum.Black, Vector.Zero, 0.0, BxDFType.None)
     val wiW = localToWorld(wi)
 
     // Compute the overall pdf with all matching BxDFs
@@ -76,7 +76,7 @@ final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: 
     val spectrum = if (bxdf.matchesType(BxDFType.Specular)) spec
     else {
       // Select BRDFs or BTDFs depending on the geometry
-      val flags = if ((wiW * ng) * (woW * ng) > 0.0f) bxdfType & ~BxDFType.Transmission else bxdfType & ~BxDFType.Reflection
+      val flags = if ((wiW * ng) * (woW * ng) > 0.0) bxdfType & ~BxDFType.Transmission else bxdfType & ~BxDFType.Reflection
 
       // Accumulate contributions of BxDFs that match the flags
       (Spectrum.Black /: (bxdfs filter (_.matchesType(flags)))) { (accu, b) => accu + b(wo, wi) }
@@ -85,16 +85,16 @@ final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: 
     (spectrum, wiW, totalPdf, bxdf.bxdfType)
   }
 
-  // Get the value of the probability distribition function that matches the sampling method of sample(Vector, Float, Float, Float, BxDFType) (pbrt 14.5.6)
-  def pdf(woW: Vector, wiW: Vector, bxdfType: BxDFType = BxDFType.All): Float = {
-    if (bxdfs.size == 0) return 0.0f
+  // Get the value of the probability distribition function that matches the sampling method of sample(Vector, Double, Double, Double, BxDFType) (pbrt 14.5.6)
+  def pdf(woW: Vector, wiW: Vector, bxdfType: BxDFType = BxDFType.All): Double = {
+    if (bxdfs.size == 0) return 0.0
 
     val wo = worldToLocal(woW); val wi = worldToLocal(wiW)
 
     val matchingBxDFs = bxdfs filter (_.matchesType(bxdfType))
-    if (matchingBxDFs.size == 0.0) return 0.0f
+    if (matchingBxDFs.size == 0.0) return 0.0
 
     // Compute average of the pdfs of the matching BxDF components
-    ((0.0f /: matchingBxDFs) { (accu, bxdf) => accu + bxdf.pdf(wo, wi) }) / matchingBxDFs.size
+    ((0.0 /: matchingBxDFs) { (accu, bxdf) => accu + bxdf.pdf(wo, wi) }) / matchingBxDFs.size
   }
 }

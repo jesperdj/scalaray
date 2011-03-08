@@ -20,9 +20,9 @@ package org.jesperdj.scalaray.vecmath
 import org.jesperdj.scalaray.util._
 
 // Quaternion (pbrt 2.9.1)
-final class Quaternion (val v: Vector, val w: Float) {
+final class Quaternion (val v: Vector, val w: Double) {
   // Create a quaternion from components
-  def this(x: Float, y: Float, z: Float, w: Float) = this(new Vector(x, y, z), w)
+  def this(x: Double, y: Double, z: Double, w: Double) = this(new Vector(x, y, z), w)
 
   // Add two quaternions
   def +(q: Quaternion) = new Quaternion(v + q.v, w + q.w)
@@ -31,21 +31,21 @@ final class Quaternion (val v: Vector, val w: Float) {
   def -(q: Quaternion) = new Quaternion(v - q.v, w - q.w)
 
   // Scale a quaternion
-  def *(f: Float): Quaternion = new Quaternion(v * f, w * f)
-  def /(f: Float) = new Quaternion(v / f, w / f)
+  def *(f: Double): Quaternion = new Quaternion(v * f, w * f)
+  def /(f: Double) = new Quaternion(v / f, w / f)
 
   // Dot product
-  def *(q: Quaternion): Float = v * q.v + w * q.w
+  def *(q: Quaternion): Double = v * q.v + w * q.w
 
   // Length
-  def length = math.sqrt(this * this).toFloat
+  def length = math.sqrt(lengthSquared)
   def lengthSquared = this * this
 
   // Normalize
   def normalize = this / length
 
   // Rotation angle of this quaternion
-  def angle = 2.0f * math.acos(w).toFloat
+  def angle = 2.0 * math.acos(w)
 
   // Rotation axis of this quaternion
   def axis = v.normalize
@@ -57,10 +57,10 @@ final class Quaternion (val v: Vector, val w: Float) {
     val wx = v.x * w; val wy = v.y * w; val wz = v.z * w
 
     val m = new Matrix(
-      1.0f - 2.0f * (yy + zz), 2.0f * (xy + wz), 2.0f * (xz - wy), 0.0f,
-      2.0f * (xy - wz), 1.0f - 2.0f * (xx + zz), 2.0f * (yz + wx), 0.0f,
-      2.0f * (xz + wy), 2.0f * (yz - wx), 1.0f - 2.0f * (xx + yy), 0.0f,
-      0.0f, 0.0f, 0.0f, 1.0f)
+      1.0 - 2.0 * (yy + zz), 2.0 * (xy + wz), 2.0 * (xz - wy), 0.0,
+      2.0 * (xy - wz), 1.0 - 2.0 * (xx + zz), 2.0 * (yz + wx), 0.0,
+      2.0 * (xz + wy), 2.0 * (yz - wx), 1.0 - 2.0 * (xx + yy), 0.0,
+      0.0, 0.0, 0.0, 1.0)
 
     // Transpose because we are using a left-handed coordinate system
     new Transform(m.transpose, m)
@@ -71,23 +71,23 @@ final class Quaternion (val v: Vector, val w: Float) {
 
 object Quaternion {
   // Quaternion constants
-  val Identity = new Quaternion(Vector.Zero, 1.0f)
-  val Zero = new Quaternion(Vector.Zero, 0.0f)
+  val Identity = new Quaternion(Vector.Zero, 1.0)
+  val Zero = new Quaternion(Vector.Zero, 0.0)
 
   // Create a quaternion
-  def apply(v: Vector, w: Float) = new Quaternion(v, w)
+  def apply(v: Vector, w: Double) = new Quaternion(v, w)
 
   // Create a quaternion from components
-  def apply(x: Float, y: Float, z: Float, w: Float) = new Quaternion(new Vector(x, y, z), w)
+  def apply(x: Double, y: Double, z: Double, w: Double) = new Quaternion(new Vector(x, y, z), w)
 
   // Create a quaternion from a transform
   def apply(t: Transform): Quaternion = {
     val trace = t.mat(0, 0) + t.mat(1, 1) + t.mat(2, 2)
-    if (trace > 0.0f) {
-      val s = 2.0f * math.sqrt(trace + 1.0f).toFloat
+    if (trace > 0.0) {
+      val s = 2.0 * math.sqrt(trace + 1.0)
 
-      if (s == 0.0f) Zero
-      else new Quaternion((t.mat(2, 1) - t.mat(1, 2)) / s, (t.mat(0, 2) - t.mat(2, 0)) / s, (t.mat(1, 0) - t.mat(0, 1)) / s, s / 4.0f)
+      if (s == 0.0) Zero
+      else new Quaternion((t.mat(2, 1) - t.mat(1, 2)) / s, (t.mat(0, 2) - t.mat(2, 0)) / s, (t.mat(1, 0) - t.mat(0, 1)) / s, s / 4.0)
     }
     else {
       // Find index of largest trace component
@@ -99,12 +99,12 @@ object Quaternion {
       val j = nxt(i)
       val k = nxt(j)
 
-      val s = 2.0f * math.sqrt((t.mat(i, i) - (t.mat(j, j) + t.mat(k, k))) + 1.0f).toFloat
+      val s = 2.0 * math.sqrt((t.mat(i, i) - (t.mat(j, j) + t.mat(k, k))) + 1.0)
 
-      if (s == 0.0f) Zero
+      if (s == 0.0) Zero
       else {
-        val q: Array[Float] = new Array(3)
-        q(i) = s / 4.0f
+        val q: Array[Double] = new Array(3)
+        q(i) = s / 4.0
         q(j) = (t.mat(j, i) + t.mat(i, j)) / s
         q(k) = (t.mat(k, i) + t.mat(i, k)) / s
 
@@ -113,14 +113,17 @@ object Quaternion {
     }
   }
 
+  // Extractor method for pattern matching
+  def unapply(q: Quaternion) = Some(q.v, q.w)
+
   // Interpolate between two quaternions using spherical linear interpolation (pbrt 2.9.2)
-  def interpolate(t: Float, q1: Quaternion, q2: Quaternion): Quaternion = {
+  def interpolate(t: Double, q1: Quaternion, q2: Quaternion): Quaternion = {
     val cosTheta = q1 * q2
-    if (cosTheta > 0.9995f) ((1.0f - t) * q1 + t * q2).normalize else {
-      val theta = math.acos(clamp(cosTheta, -1.0f, 1.0f)).toFloat
+    if (cosTheta > 0.9995) ((1.0 - t) * q1 + t * q2).normalize else {
+      val theta = math.acos(clamp(cosTheta, -1.0, 1.0))
       val thetap = theta * t
       val qperp = (q2 - q1 * cosTheta).normalize
-      q1 * math.cos(thetap).toFloat + qperp * math.sin(thetap).toFloat
+      q1 * math.cos(thetap) + qperp * math.sin(thetap)
     }
   }
 }

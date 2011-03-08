@@ -20,6 +20,6 @@ package org.jesperdj.scalaray.texture
 import org.jesperdj.scalaray.shape.DifferentialGeometry
 
 // Constant texture (pbrt 10.3.1)
-final class ConstantTexture[@specialized(Float) T] (value: T) extends Texture[T] {
+final class ConstantTexture[@specialized(Double) T] (value: T) extends Texture[T] {
   def apply(dg: DifferentialGeometry): T = value
 }

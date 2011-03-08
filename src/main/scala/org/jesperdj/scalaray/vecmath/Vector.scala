@@ -18,7 +18,7 @@
 package org.jesperdj.scalaray.vecmath
 
 // Vector (pbrt 2.2)
-final class Vector (val x: Float, val y: Float, val z: Float) {
+final class Vector (val x: Double, val y: Double, val z: Double) {
   // Create a vector from a normal
   def this(n: Normal) = this(n.x, n.y, n.z)
 
@@ -32,8 +32,8 @@ final class Vector (val x: Float, val y: Float, val z: Float) {
   def -(v: Vector) = new Vector(x - v.x, y - v.y, z - v.z)
 
   // Scale a vector
-  def *(f: Float) = new Vector(x * f, y * f, z * f)
-  def /(f: Float) = new Vector(x / f, y / f, z / f)
+  def *(f: Double) = new Vector(x * f, y * f, z * f)
+  def /(f: Double) = new Vector(x / f, y / f, z / f)
 
   // Unary minus
   def unary_- = new Vector(-x, -y, -z)
@@ -51,7 +51,7 @@ final class Vector (val x: Float, val y: Float, val z: Float) {
   def **(n: Normal) = new Vector(y * n.z - z * n.y, z * n.x - x * n.z, x * n.y - y * n.x)
 
   // Length
-  def length = math.sqrt(this * this).toFloat
+  def length = math.sqrt(lengthSquared)
   def lengthSquared = this * this
 
   // Normalize
@@ -62,13 +62,13 @@ final class Vector (val x: Float, val y: Float, val z: Float) {
 
 object Vector {
   // Vector constants
-  val XAxis = new Vector(1.0f, 0.0f, 0.0f)
-  val YAxis = new Vector(0.0f, 1.0f, 0.0f)
-  val ZAxis = new Vector(0.0f, 0.0f, 1.0f)
-  val Zero = new Vector(0.0f, 0.0f, 0.0f)
+  val XAxis = new Vector(1.0, 0.0, 0.0)
+  val YAxis = new Vector(0.0, 1.0, 0.0)
+  val ZAxis = new Vector(0.0, 0.0, 1.0)
+  val Zero = new Vector(0.0, 0.0, 0.0)
 
   // Create a vector
-  def apply(x: Float, y: Float, z: Float) = new Vector(x, y, z)
+  def apply(x: Double, y: Double, z: Double) = new Vector(x, y, z)
 
   // Create a vector from a normal
   def apply(n: Normal) = new Vector(n)
@@ -76,15 +76,18 @@ object Vector {
   // Create a vector from a point
   def apply(p: Point) = new Vector(p)
 
+  // Extractor method for pattern matching
+  def unapply(v: Vector) = Some(v.x, v.y, v.z)
+
   // Coordinate system from a vector (pbrt 2.2.5)
   def coordinateSystem(v1: Vector): (Vector, Vector) = {
     val v2 = if (v1.x.abs > v1.y.abs) {
-      val len = math.sqrt(v1.x * v1.x + v1.z * v1.z).toFloat
-      new Vector(-v1.z / len, 0.0f, v1.x / len)
+      val len = math.sqrt(v1.x * v1.x + v1.z * v1.z)
+      new Vector(-v1.z / len, 0.0, v1.x / len)
     }
     else {
-      val len = math.sqrt(v1.y * v1.y + v1.z * v1.z).toFloat
-      new Vector(0.0f, v1.z / len, -v1.y / len)
+      val len = math.sqrt(v1.y * v1.y + v1.z * v1.z)
+      new Vector(0.0, v1.z / len, -v1.y / len)
     }
 
     (v2, v1 ** v2)

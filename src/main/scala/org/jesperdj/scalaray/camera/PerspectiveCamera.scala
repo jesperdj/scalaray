@@ -21,19 +21,19 @@ import org.jesperdj.scalaray.sampler.CameraSample
 import org.jesperdj.scalaray.vecmath._
 
 // Perspective camera (pbrt 6.2.2) - This is less complicated than the pbrt version
-final class PerspectiveCamera (cameraToWorld: Transform, angleOfView: Float, rasterWidth: Int, rasterHeight: Int) extends Camera {
+final class PerspectiveCamera (cameraToWorld: Transform, angleOfView: Double, rasterWidth: Int, rasterHeight: Int) extends Camera {
   require(!cameraToWorld.hasScale, "PerspectiveCamera only works correctly when cameraToWorld transform has no scale factor")
 
-  private val tx = (rasterWidth - 1) / 2.0f
-  private val ty = (rasterHeight - 1) / 2.0f
+  private val tx = (rasterWidth - 1) / 2.0
+  private val ty = (rasterHeight - 1) / 2.0
 
-  private val s = 2.0f * math.tan(angleOfView / 2.0f).toFloat / rasterWidth
+  private val s = 2.0 * math.tan(angleOfView / 2.0) / rasterWidth
 
   private val cameraOrigin = cameraToWorld * Point.Origin
 
   // Generate a camera ray for a sample (pbrt 6.2.2)
   def generateRay(sample: CameraSample): Ray =
-    new Ray(cameraOrigin, (cameraToWorld * new Vector((sample.imageX - tx) * s, (ty - sample.imageY) * s, 1.0f)).normalize)
+    new Ray(cameraOrigin, (cameraToWorld * new Vector((sample.imageX - tx) * s, (ty - sample.imageY) * s, 1.0)).normalize)
 
   override def toString =
     "PerspectiveCamera(cameraToWorld=%s, angleOfView=%g, rasterWidth=%d, rasterHeight=%d)" format (cameraToWorld, angleOfView, rasterWidth, rasterHeight)

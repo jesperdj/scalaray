@@ -37,8 +37,8 @@ final class PixelRaster (rectangle: Rectangle, filter: Filter) extends Raster(re
 
   def addSample(sample: CameraSample, spectrum: Spectrum): Unit = {
     // Determine the raster extent of the sample
-    val ix = sample.imageX - 0.5f
-    val iy = sample.imageY - 0.5f
+    val ix = sample.imageX - 0.5
+    val iy = sample.imageY - 0.5
 
     val minX = math.max((ix - filter.extentX).ceil.toInt, rectangle.left)
     val maxX = math.min((ix + filter.extentX).floor.toInt, rectangle.right)
@@ -57,7 +57,7 @@ final class PixelRaster (rectangle: Rectangle, filter: Filter) extends Raster(re
     for (y <- rectangle.top to rectangle.bottom; x <- rectangle.left to rectangle.right) {
       val px = x - rectangle.left; val py = y - rectangle.top
       val (red, green, blue) = pixels(px, py).spectrum.toRGB
-      image.setRGB(px, py, (clamp(red, 0.0f, 1.0f) * 255.0f).toInt << 16 | (clamp(green, 0.0f, 1.0f) * 255.0f).toInt << 8 | (clamp(blue, 0.0f, 1.0f) * 255.0f).toInt)
+      image.setRGB(px, py, (clamp(red, 0.0, 1.0) * 255.0).toInt << 16 | (clamp(green, 0.0, 1.0) * 255.0).toInt << 8 | (clamp(blue, 0.0, 1.0) * 255.0).toInt)
     }
 
     image
@@ -70,13 +70,13 @@ object PixelRaster {
   // Pixel (mutable)
   private final class Pixel {
     private var value = Spectrum.Black
-    private var weight = 0.0f
+    private var weight = 0.0
 
     // Add a spectrum with the specified weight to this pixel
-    def add(s: Spectrum, w: Float): Unit = synchronized { value +*= (s, w); weight += w }
+    def add(s: Spectrum, w: Double): Unit = synchronized { value +*= (s, w); weight += w }
 
     // Get the spectrum of this pixel
-    def spectrum: Spectrum = if (weight == 0.0f) Spectrum.Black else value / weight
+    def spectrum: Spectrum = if (weight == 0.0) Spectrum.Black else value / weight
 
     override def toString = "Pixel(value=%s, weight=%g)" format (value, weight)
   }

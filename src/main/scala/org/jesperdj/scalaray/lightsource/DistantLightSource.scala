@@ -29,7 +29,7 @@ final class DistantLightSource (direction: Vector, radiance: Spectrum) extends D
 
   // Radiance of this light source at the given point
   // Returns the radiance and a ray from the light source to the given point
-  def radiance(point: Point): (Spectrum, Ray) = (radiance, Ray(point, direction, Float.NegativeInfinity, 0.0f))
+  def radiance(point: Point): (Spectrum, Ray) = (radiance, Ray(point, direction, Double.NegativeInfinity, 0.0))
 
   // Total emitted power of this light source onto the scene
   def totalPower(scene: Scene): Spectrum = {

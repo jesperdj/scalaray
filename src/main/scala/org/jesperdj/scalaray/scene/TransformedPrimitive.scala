@@ -31,7 +31,7 @@ final class TransformedPrimitive (primitive: Primitive, transform: Transform) ex
   override def boundingBox(tr: Transform): BoundingBox = primitive.boundingBox(tr * transform)
 
   // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
-  def intersect(ray: Ray): Option[(Intersection, Float)] = primitive intersect (inverse * ray) map {
+  def intersect(ray: Ray): Option[(Intersection, Double)] = primitive intersect (inverse * ray) map {
     case (its, distance) => (transform * its, distance)
   }
 

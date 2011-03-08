@@ -28,8 +28,8 @@ abstract class DifferentialGeometry {
   val normal: Normal
 
   // Surface parameter coordinates
-  val u: Float
-  val v: Float
+  val u: Double
+  val v: Double
 
   // Partial derivatives of the surface position
   val dpdu: Vector

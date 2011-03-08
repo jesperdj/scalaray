@@ -32,7 +32,7 @@ final class KdTreeAccelerator (primitives: Traversable[Primitive]) extends Primi
     throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement boundingBox
   
   // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
-  def intersect(ray: Ray): Option[(Intersection, Float)] =
+  def intersect(ray: Ray): Option[(Intersection, Double)] =
     throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement intersect
 
   // Check if a ray intersects this primitive

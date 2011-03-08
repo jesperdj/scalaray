@@ -39,8 +39,8 @@ package object shape {
       lazy val normal: Normal = (t * dg.normal).normalize
 
       // Surface parameter coordinates
-      val u: Float = dg.u
-      val v: Float = dg.v
+      val u: Double = dg.u
+      val v: Double = dg.v
 
       // Partial derivatives of the surface position
       lazy val dpdu: Vector = t * dg.dpdu

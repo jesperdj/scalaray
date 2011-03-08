@@ -28,8 +28,8 @@ sealed class BoundingBox (points: Traversable[Point]) {
 
   // Minimum and maximum corners
   val (min, max) = {
-    var (minX, minY, minZ) = (Float.PositiveInfinity, Float.PositiveInfinity, Float.PositiveInfinity)
-    var (maxX, maxY, maxZ) = (Float.NegativeInfinity, Float.NegativeInfinity, Float.NegativeInfinity)
+    var (minX, minY, minZ) = (Double.PositiveInfinity, Double.PositiveInfinity, Double.PositiveInfinity)
+    var (maxX, maxY, maxZ) = (Double.NegativeInfinity, Double.NegativeInfinity, Double.NegativeInfinity)
 
     for (p <- points) {
       if (p.x < minX) minX = p.x; if (p.y < minY) minY = p.y; if (p.z < minZ) minZ = p.z
@@ -40,10 +40,10 @@ sealed class BoundingBox (points: Traversable[Point]) {
   }
 
   // Centroid of the bounding box
-  val centroid = min + (max - min) * 0.5f
+  val centroid = min + ((max - min) / 2.0)
 
   // Sphere that contains this bounding box; returns center point and radius
-  def boundingSphere: (Point, Float) = (centroid, if (inside(centroid)) centroid.distance(max) else 0.0f)
+  def boundingSphere: (Point, Double) = (centroid, if (inside(centroid)) centroid.distance(max) else 0.0)
 
   // The eight corners of the bounding box
   def corners: Traversable[Point] = Traversable(
@@ -69,7 +69,7 @@ sealed class BoundingBox (points: Traversable[Point]) {
     (max.z >= bb.min.z) && (min.z <= bb.max.z)
 
   // Compute intersection between a ray and this bounding box; returns an Option with the range of the ray that's inside the box (pbrt 4.2.1)
-  def intersect(ray: Ray): Option[(Float, Float)] = {
+  def intersect(ray: Ray): Option[(Double, Double)] = {
     var minT = ray.minDistance
     var maxT = ray.maxDistance
 
@@ -101,7 +101,7 @@ sealed class BoundingBox (points: Traversable[Point]) {
   }
 
   // Surface area
-  val surfaceArea = { val d = max - min; 2.0f * (d.x * d.y + d.x * d.z + d.y * d.z) }
+  val surfaceArea = { val d = max - min; 2.0 * (d.x * d.y + d.x * d.z + d.y * d.z) }
 
   // Volume
   val volume = { val d = max - min; d.x * d.y * d.z }
@@ -120,9 +120,9 @@ object BoundingBox {
     override def union(bb: BoundingBox) = bb
     override def inside(p: Point) = false
     override def overlaps(bb: BoundingBox) = false
-    override def intersect(ray: Ray): Option[(Float, Float)] = None
-    override val surfaceArea = 0.0f
-    override val volume = 0.0f
+    override def intersect(ray: Ray): Option[(Double, Double)] = None
+    override val surfaceArea = 0.0
+    override val volume = 0.0
 
     override def toString = "BoundingBox.Empty"
   }

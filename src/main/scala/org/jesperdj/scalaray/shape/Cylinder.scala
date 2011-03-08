@@ -21,18 +21,18 @@ import org.jesperdj.scalaray.util._
 import org.jesperdj.scalaray.vecmath._
 
 // Cylinder (pbrt 3.3)
-final class Cylinder (radius: Float = 1.0f, minZ: Float = -1.0f, maxZ: Float = 1.0f, maxPhi: Float = 2.0f * π) extends Quadric {
-  require(radius > 0.0f, "radius must be > 0")
+final class Cylinder (radius: Double = 1.0, minZ: Double = -1.0, maxZ: Double = 1.0, maxPhi: Double = 2.0 * π) extends Quadric {
+  require(radius > 0.0, "radius must be > 0")
   require(minZ < maxZ, "minZ must be < maxZ")
-  require(maxPhi >= 0.0f && maxPhi <= 2.0f * π, "maxPhi must be >= 0 and <= 2π")
+  require(maxPhi >= 0.0 && maxPhi <= 2.0 * π, "maxPhi must be >= 0 and <= 2π")
 
   // Bounding box that contains the shape (pbrt 3.3.2)
   val boundingBox: BoundingBox = BoundingBox(Point(-radius, -radius, minZ), Point(radius, radius, maxZ))
 
   // Compute quadratic coefficients (pbrt 3.3.3)
-  protected def computeCoefficients(ray: Ray): (Float, Float, Float) =
+  protected def computeCoefficients(ray: Ray): (Double, Double, Double) =
     (ray.direction.x * ray.direction.x + ray.direction.y * ray.direction.y,
-     2.0f * (ray.direction.x * ray.origin.x + ray.direction.y * ray.origin.y),
+     2.0 * (ray.direction.x * ray.origin.x + ray.direction.y * ray.origin.y),
      ray.origin.x * ray.origin.x + ray.origin.y * ray.origin.y - radius * radius)
 
   // Get differential geometry for an intersection point (pbrt 3.3.4)
@@ -41,7 +41,7 @@ final class Cylinder (radius: Float = 1.0f, minZ: Float = -1.0f, maxZ: Float = 1
     if (p.z < minZ || p.z > maxZ) return None
 
     // Check against max φ
-    val phi = { val f = math.atan2(p.y, p.x).toFloat; if (f >= 0.0f) f else f + 2.0f * π }
+    val phi = { val f = math.atan2(p.y, p.x); if (f >= 0.0) f else f + 2.0 * π }
     if (phi > maxPhi) return None
 
     // Initialize differential geometry
@@ -50,19 +50,19 @@ final class Cylinder (radius: Float = 1.0f, minZ: Float = -1.0f, maxZ: Float = 1
       val point: Point = p
 
       // Surface normal (better method than what's used in pbrt)
-      lazy val normal: Normal = Normal(p.x, p.y, 0.0f).normalize
+      lazy val normal: Normal = Normal(p.x, p.y, 0.0).normalize
 
       // Surface parameter coordinates (pbrt 3.3.4)
-      lazy val u: Float = phi / maxPhi
-      lazy val v: Float = (p.z - minZ) / (maxZ - minZ)
+      lazy val u: Double = phi / maxPhi
+      lazy val v: Double = (p.z - minZ) / (maxZ - minZ)
 
       // Partial derivatives of the surface position
-      lazy val dpdu: Vector = Vector(-maxPhi * p.y, maxPhi * p.x, 0.0f)
-      lazy val dpdv: Vector = Vector(0.0f, 0.0f, maxZ - minZ)
+      lazy val dpdu: Vector = Vector(-maxPhi * p.y, maxPhi * p.x, 0.0)
+      lazy val dpdv: Vector = Vector(0.0, 0.0, maxZ - minZ)
 
       // Partial derivatives of the surface normal
       lazy val (dndu, dndv): (Normal, Normal) = {
-        val d2Pduu = Vector(p.x, p.y, 0.0f) * (-maxPhi * maxPhi)
+        val d2Pduu = Vector(p.x, p.y, 0.0) * (-maxPhi * maxPhi)
         val d2Pduv = Vector.Zero
         val d2Pdvv = Vector.Zero
 
@@ -85,14 +85,14 @@ final class Cylinder (radius: Float = 1.0f, minZ: Float = -1.0f, maxZ: Float = 1
   }
 
   // Surface area (pbrt 3.3.5)
-  val surfaceArea: Float = maxPhi * radius * (maxZ - minZ)
+  val surfaceArea: Double = maxPhi * radius * (maxZ - minZ)
 
   // Sample a point on the surface using the random variables u1, u2 (pbrt 14.6.3)
   // Returns a point on the surface, the surface normal at that point and the probability density for this sample
-  def sampleSurface(u1: Float, u2: Float): (Point, Normal, Float) = {
+  def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double) = {
     val phi = u2 * maxPhi
-    val (x, y) = (math.cos(phi).toFloat, math.sin(phi).toFloat)
-    (Point(x * radius, y * radius, interpolate(u1, minZ, maxZ)), Normal(x, y, 0.0f), 1.0f / surfaceArea)
+    val (x, y) = (math.cos(phi), math.sin(phi))
+    (Point(x * radius, y * radius, interpolate(u1, minZ, maxZ)), Normal(x, y, 0.0), 1.0 / surfaceArea)
   }
 
   override def toString = "Cylinder(radius=%g, minZ=%g, maxZ=%g, maxPhi=%g)" format (radius, minZ, maxZ, maxPhi)

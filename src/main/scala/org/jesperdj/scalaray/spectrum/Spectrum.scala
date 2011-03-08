@@ -18,7 +18,7 @@
 package org.jesperdj.scalaray.spectrum
 
 // Spectrum
-sealed class Spectrum (private val red: Float, private val green: Float, private val blue: Float) {
+sealed class Spectrum (private val red: Double, private val green: Double, private val blue: Double) {
   // Add two spectra
   def +(s: Spectrum): Spectrum = new Spectrum(red + s.red, green + s.green, blue + s.blue)
 
@@ -26,13 +26,13 @@ sealed class Spectrum (private val red: Float, private val green: Float, private
   def *(s: Spectrum): Spectrum = new Spectrum(red * s.red, green * s.green, blue * s.blue)
 
   // Scale this spectrum
-  def *(f: Float): Spectrum = new Spectrum(red * f, green * f, blue * f)
-  def /(f: Float): Spectrum = new Spectrum(red / f, green / f, blue / f)
+  def *(f: Double): Spectrum = new Spectrum(red * f, green * f, blue * f)
+  def /(f: Double): Spectrum = new Spectrum(red / f, green / f, blue / f)
 
   // Add another spectrum to this spectrum with a weight
-  def +*(s: Spectrum, w: Float): Spectrum = new Spectrum(red + s.red * w, green + s.green * w, blue + s.blue * w)
+  def +*(s: Spectrum, w: Double): Spectrum = new Spectrum(red + s.red * w, green + s.green * w, blue + s.blue * w)
 
-  def isBlack = red == 0.0f && green == 0.0f && blue == 0.0f
+  def isBlack = red == 0.0 && green == 0.0 && blue == 0.0
 
   def toRGB = (red, green, blue)
 
@@ -41,18 +41,18 @@ sealed class Spectrum (private val red: Float, private val green: Float, private
 
 object Spectrum {
   // Spectrum constants
-  val Black: Spectrum = new Spectrum(0.0f, 0.0f, 0.0f) {
+  val Black: Spectrum = new Spectrum(0.0, 0.0, 0.0) {
     override def +(s: Spectrum) = s
     override def *(s: Spectrum) = this
-    override def *(f: Float) = this
-    override def /(f: Float) = this
-    override def +*(s: Spectrum, w: Float) = s * w
+    override def *(f: Double) = this
+    override def /(f: Double) = this
+    override def +*(s: Spectrum, w: Double) = s * w
     override def isBlack = true
 
     override def toString = "Spectrum.Black"
   }
 
-  val Unit: Spectrum = new Spectrum(1.0f, 1.0f, 1.0f) {
+  val Unit: Spectrum = new Spectrum(1.0, 1.0, 1.0) {
     override def *(s: Spectrum) = s
     override def isBlack = false
 
@@ -60,5 +60,5 @@ object Spectrum {
   }
 
   // Create a new spectrum
-  def apply(red: Float, green: Float, blue: Float) = new Spectrum(red, green, blue)
+  def apply(red: Double, green: Double, blue: Double) = new Spectrum(red, green, blue)
 }
