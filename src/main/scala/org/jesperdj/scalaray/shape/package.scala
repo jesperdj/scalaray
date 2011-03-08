@@ -17,7 +17,7 @@
  */
 package org.jesperdj.scalaray
 
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
 
 package object shape {

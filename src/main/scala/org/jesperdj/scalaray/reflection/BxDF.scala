@@ -21,7 +21,7 @@ import scala.collection.immutable.Traversable
 
 import org.jesperdj.scalaray.sampler.SampleTransforms
 import org.jesperdj.scalaray.spectrum._
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
 
 // Bidirectional Reflectance or Transmittance Distribution Function (pbrt 8.1)

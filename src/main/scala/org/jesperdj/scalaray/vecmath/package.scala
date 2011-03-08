@@ -17,7 +17,7 @@
  */
 package org.jesperdj.scalaray
 
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 
 package object vecmath {
   // Implicit conversion for scaling vectors by multiplying a numeric type with a vector

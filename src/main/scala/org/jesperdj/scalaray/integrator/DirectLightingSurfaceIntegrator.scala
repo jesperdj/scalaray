@@ -26,7 +26,7 @@ import org.jesperdj.scalaray.renderer.Renderer
 import org.jesperdj.scalaray.sampler.{ Sample, SampleSpec, SampleSpec1D, SampleSpec2D }
 import org.jesperdj.scalaray.scene.{ Intersection, Scene }
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
 
 // TODO: This needs to be refactored, can be substantially simplified now that the light source interface has been refactored.

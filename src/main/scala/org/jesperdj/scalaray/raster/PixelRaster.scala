@@ -22,7 +22,7 @@ import java.awt.image.BufferedImage
 import org.jesperdj.scalaray.filter.Filter
 import org.jesperdj.scalaray.sampler.CameraSample
 import org.jesperdj.scalaray.spectrum._
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 
 // Pixel raster
 final class PixelRaster (rectangle: Rectangle, filter: Filter) extends Raster(rectangle) {

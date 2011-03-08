@@ -36,7 +36,7 @@ import org.jesperdj.scalaray.scene._
 import org.jesperdj.scalaray.shape._
 import org.jesperdj.scalaray.spectrum._
 import org.jesperdj.scalaray.texture._
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
 
 object Main {

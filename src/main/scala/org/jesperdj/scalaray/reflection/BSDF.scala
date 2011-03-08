@@ -21,7 +21,7 @@ import scala.collection.immutable.IndexedSeq
 
 import org.jesperdj.scalaray.shape.DifferentialGeometry
 import org.jesperdj.scalaray.spectrum._
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
 
 // Bidirectional Scattering Distribution Function (pbrt 9.1)

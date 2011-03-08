@@ -20,7 +20,7 @@ package org.jesperdj.scalaray.sampler
 import scala.collection.immutable.{ IndexedSeq, Traversable }
 
 import org.jesperdj.scalaray.raster.Rectangle
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 
 // Stratified sampler (pbrt 7.3)
 final class StratifiedSampler (rectangle: Rectangle, samplesPerPixelX: Int, samplesPerPixelY: Int, sampleSpecs: Traversable[SampleSpec])

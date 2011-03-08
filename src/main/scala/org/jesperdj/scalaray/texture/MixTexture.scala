@@ -18,7 +18,7 @@
 package org.jesperdj.scalaray.texture
 
 import org.jesperdj.scalaray.shape.DifferentialGeometry
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 
 // Mix texture (pbrt 10.3.3)
 final class MixTexture[@specialized(Double) T <% Interpolatable[T]] (tex1: Texture[T], tex2: Texture[T], amount: Texture[Double]) extends Texture[T] {

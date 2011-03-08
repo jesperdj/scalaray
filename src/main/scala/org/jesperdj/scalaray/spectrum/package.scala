@@ -17,7 +17,7 @@
  */
 package org.jesperdj.scalaray
 
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 
 package object spectrum {
   // Implicit conversion for scaling spectra by multiplying a numeric type with a spectrum

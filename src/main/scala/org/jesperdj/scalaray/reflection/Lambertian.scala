@@ -20,7 +20,7 @@ package org.jesperdj.scalaray.reflection
 import scala.collection.immutable.Traversable
 
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
 
 // Lambertian reflection (pbrt 8.3)

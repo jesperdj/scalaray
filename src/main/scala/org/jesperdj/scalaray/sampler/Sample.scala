@@ -19,7 +19,7 @@ package org.jesperdj.scalaray.sampler
 
 import scala.collection.immutable.{ IndexedSeq, Map }
 
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 
 // Camera sample
 sealed class CameraSample (val imageX: Double, val imageY: Double, val lensU: Double, val lensV: Double, val time: Double) {

@@ -18,7 +18,7 @@
 package org.jesperdj.scalaray.texture
 
 import org.jesperdj.scalaray.shape.DifferentialGeometry
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 
 // Scale texture (pbrt 10.3.2)
 final class ScaleTexture[@specialized(Double) T1 <% Multipliable[T2, T2], @specialized(Double) T2] (tex1: Texture[T1], tex2: Texture[T2]) extends Texture[T2] {

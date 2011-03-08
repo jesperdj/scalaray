@@ -18,7 +18,7 @@
 package org.jesperdj.scalaray.shape
 
 import org.jesperdj.scalaray.sampler.SampleTransforms
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
 
 // Disk (pbrt 3.4)

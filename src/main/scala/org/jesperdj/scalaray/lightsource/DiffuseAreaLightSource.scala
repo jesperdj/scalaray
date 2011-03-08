@@ -20,7 +20,7 @@ package org.jesperdj.scalaray.lightsource
 import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.shape.Shape
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
 
 // Diffuse area light source (pbrt 12.4)

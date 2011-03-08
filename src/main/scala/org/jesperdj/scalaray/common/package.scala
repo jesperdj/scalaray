@@ -19,7 +19,7 @@ package org.jesperdj.scalaray
 
 import scala.collection.immutable.IndexedSeq
 
-package object util {
+package object common {
   val π = math.Pi
 
   // Clamp a value between a low and high bound

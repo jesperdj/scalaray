@@ -17,7 +17,7 @@
  */
 package org.jesperdj.scalaray.filter
 
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 
 // Windowed sinc filter (pbrt 7.6.1)
 final class LanczosSincFilter (extentX: Double = 4.0, extentY: Double = 4.0, tau: Double = 3.0) extends Filter(extentX, extentY) {

@@ -17,7 +17,7 @@
  */
 package org.jesperdj.scalaray.vecmath
 
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 
 // Quaternion (pbrt 2.9.1)
 final class Quaternion (val v: Vector, val w: Double) {

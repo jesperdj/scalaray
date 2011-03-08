@@ -19,7 +19,7 @@ package org.jesperdj.scalaray.lightsource
 
 import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.util._
+import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
 
 // Point light source (pbrt 12.2)
