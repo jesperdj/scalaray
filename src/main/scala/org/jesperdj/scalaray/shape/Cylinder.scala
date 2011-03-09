@@ -61,16 +61,20 @@ final class Cylinder (radius: Double = 1.0, minZ: Double = -1.0, maxZ: Double = 
       lazy val dpdv: Vector = Vector(0.0, 0.0, maxZ - minZ)
 
       // Partial derivatives of the surface normal
-      lazy val (dndu, dndv): (Normal, Normal) = {
+      lazy val (dndu, dndv) = {
         val d2Pduu = Vector(p.x, p.y, 0.0) * (-maxPhi * maxPhi)
         val d2Pduv = Vector.Zero
         val d2Pdvv = Vector.Zero
 
         // TODO: This can be simplified because d2Pduv and d2Pdvv are Vector.Zero for a cylinder
 
-        val E = dpdu * dpdu; val F = dpdu * dpdv; val G = dpdv * dpdv
+        val E = dpdu * dpdu
+        val F = dpdu * dpdv
+        val G = dpdv * dpdv
         val N = (dpdu ** dpdv).normalize
-        val e = N * d2Pduu; val f = N * d2Pduv; val g = N * d2Pdvv
+        val e = N * d2Pduu
+        val f = N * d2Pduv
+        val g = N * d2Pdvv
 
         val EGF2 = (E * G - F * F)
         val dndu = Normal(dpdu * ((f * F - e * G) / EGF2) + dpdv * ((e * F - f * E) / EGF2))
@@ -91,7 +95,8 @@ final class Cylinder (radius: Double = 1.0, minZ: Double = -1.0, maxZ: Double = 
   // Returns a point on the surface, the surface normal at that point and the probability density for this sample
   def sampleSurface(u1: Double, u2: Double): (Point, Normal, Double) = {
     val phi = u2 * maxPhi
-    val (x, y) = (math.cos(phi), math.sin(phi))
+    val x = math.cos(phi)
+    val y = math.sin(phi)
     (Point(x * radius, y * radius, interpolate(u1, minZ, maxZ)), Normal(x, y, 0.0), 1.0 / surfaceArea)
   }
 

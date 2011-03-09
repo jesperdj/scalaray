@@ -23,7 +23,7 @@ import org.jesperdj.scalaray.vecmath._
 package object shape {
   // Implicit conversion for transforming a bounding box (pbrt 2.8.5)
   implicit def implicitTransformBoundingBox(t: Transform) = new MultipliableSame[BoundingBox] {
-    def *(bb: BoundingBox) = new BoundingBox(bb.corners map (t * _ ))
+    def *(bb: BoundingBox) = new BoundingBox(bb.corners map { t * _ })
   }
 
   // Implicit conversion for transforming a DifferentialGeometry

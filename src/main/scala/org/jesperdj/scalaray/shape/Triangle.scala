@@ -25,7 +25,7 @@ final class Vertex (val point: Point, val normal: Normal, val u: Double, val v: 
   override def toString = "Vertex(point=%s, normal=%s, u=%g, v=%g)" format (point, normal, u, v)
 }
 
-// Triangle
+// Triangle (pbrt 3.6)
 final class Triangle (v0: Vertex, v1: Vertex, v2: Vertex) extends Shape {
   // Edge vectors
   private val e1: Vector = v1.point - v0.point
@@ -69,13 +69,13 @@ final class Triangle (v0: Vertex, v1: Vertex, v2: Vertex) extends Shape {
       val normal: Normal = Triangle.this.normal
 
       // Surface parameter coordinates; interpolate from vertices
-      lazy val (u, v): (Double, Double) = {
+      lazy val (u, v) = {
         val b0 = 1.0 - b1 - b2
         (b0 * v0.u + b1 * v1.u + b2 * v2.u, b0 * v0.v + b1 * v1.v + b2 * v2.v)
       }
 
       // Partial derivatives of the surface position
-      lazy val (dpdu, dpdv): (Vector, Vector) = {
+      lazy val (dpdu, dpdv) = {
         val du1 = v0.u - v2.u
         val du2 = v1.u - v2.u
         val dv1 = v0.v - v2.v

@@ -115,6 +115,7 @@ object BoundingBox {
 //    override val min = Point.PositiveInfinity  NOTE: Uncommenting this causes a NullPointerException because of an initialization order problem
 //    override val max = Point.NegativeInfinity
     override val centroid = Point.Origin
+    override val boundingSphere: (Point, Double) = (Point.Origin, 0.0)
     override val corners: Traversable[Point] = Traversable.empty
     override def union(p: Point) = new BoundingBox(p)
     override def union(bb: BoundingBox) = bb
@@ -132,4 +133,7 @@ object BoundingBox {
 
   // Create a bounding box from points (using varargs)
   def apply(points: Point*) = new BoundingBox(points: _*)
+
+  // Extractor method
+  def unapply(bb: BoundingBox) = Some(bb.min, bb.max)
 }

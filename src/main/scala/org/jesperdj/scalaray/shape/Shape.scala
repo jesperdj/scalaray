@@ -26,7 +26,7 @@ import org.jesperdj.scalaray.vecmath._
 // It is not necessary and only complicates the architecture.
 
 // Shape, describes geometry of a surface (pbrt 3.1)
-abstract class Shape extends HasBoundingBox {
+trait Shape extends HasBoundingBox {
   // Compute closest intersection between a ray and this shape, returns differential geometry and distance of intersection along ray (pbrt 3.1.3)
   def intersect(ray: Ray): Option[(DifferentialGeometry, Double)]
 
@@ -36,7 +36,7 @@ abstract class Shape extends HasBoundingBox {
   // Get shading geometry (pbrt 3.1.5)
   def shadingGeometry(dg: DifferentialGeometry, objectToWorld: Transform): DifferentialGeometry = dg
 
-  // Surface area
+  // Surface area (pbrt 3.1.6)
   def surfaceArea: Double
 
   // Sample a point on the surface using the random variables u1, u2 (pbrt 14.6.3)

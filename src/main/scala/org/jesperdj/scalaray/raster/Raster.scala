@@ -1,5 +1,3 @@
-package org.jesperdj.scalaray.raster
-
 /*
  * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
  * Copyright (C) 2009, 2010, 2011  Jesper de Jong
@@ -17,6 +15,9 @@ package org.jesperdj.scalaray.raster
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.jesperdj.scalaray.raster
+
+// Raster: Mutable two-dimensional container
 final class Raster[T : ClassManifest] (rectangle: Rectangle) {
   private val data = new Array[T](rectangle.width * rectangle.height)
 

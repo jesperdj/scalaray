@@ -19,8 +19,8 @@ package org.jesperdj.scalaray.shape
 
 import org.jesperdj.scalaray.vecmath._
 
-// Differential geometry, describes the geometry at a point on a surface (pbrt 2.9)
-abstract class DifferentialGeometry {
+// Differential geometry, describes the geometry at a point on a surface (pbrt 2.10)
+trait DifferentialGeometry {
   // Point on the surface
   val point: Point
 

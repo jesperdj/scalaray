@@ -65,7 +65,7 @@ final class Sphere (radius: Double = 1.0, minZ: Double = Double.NegativeInfinity
       lazy val v: Double = (theta - minTheta) / diffTheta
 
       // Partial derivatives of the surface position and normal
-      lazy val (dpdu, dpdv, dndu, dndv): (Vector, Vector, Normal, Normal) = {
+      lazy val (dpdu, dpdv, dndu, dndv) = {
         val radiusZ = math.sqrt(p.x * p.x + p.y * p.y)
         val (cosPhi, sinPhi) = if (radiusZ > 0.0) (p.x / radiusZ, p.y / radiusZ) else (0.0, 1.0)
 
@@ -76,9 +76,13 @@ final class Sphere (radius: Double = 1.0, minZ: Double = Double.NegativeInfinity
         val d2Pduv = Vector(-sinPhi, cosPhi, 0.0) * (diffTheta * maxPhi * p.z)
         val d2Pdvv = Vector(p) * (-diffTheta * diffTheta)
 
-        val E = dpdu * dpdu; val F = dpdu * dpdv; val G = dpdv * dpdv
+        val E = dpdu * dpdu
+        val F = dpdu * dpdv
+        val G = dpdv * dpdv
         val N = (dpdu ** dpdv).normalize
-        val e = N * d2Pduu; val f = N * d2Pduv; val g = N * d2Pdvv
+        val e = N * d2Pduu
+        val f = N * d2Pduv
+        val g = N * d2Pdvv
 
         val EGF2 = (E * G - F * F)
         val dndu = Normal(dpdu * ((f * F - e * G) / EGF2) + dpdv * ((e * F - f * E) / EGF2))
