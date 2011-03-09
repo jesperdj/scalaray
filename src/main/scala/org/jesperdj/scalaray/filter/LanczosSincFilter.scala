@@ -19,12 +19,14 @@ package org.jesperdj.scalaray.filter
 
 import org.jesperdj.scalaray.common._
 
-// Windowed sinc filter (pbrt 7.6.1)
-final class LanczosSincFilter (extentX: Double = 4.0, extentY: Double = 4.0, tau: Double = 3.0) extends Filter(extentX, extentY) {
+// Windowed sinc filter (pbrt 7.7.1)
+final class LanczosSincFilter (val extentX: Double = 4.0, val extentY: Double = 4.0, tau: Double = 3.0) extends Filter {
   private def lanczosSinc(v: Double) = {
     val x = v.abs
-    if (x < 1e-6) 1.0 else if (x > 1.0) 0.0 else {
-      val w = π * x; val wt = w * tau; (math.sin(wt) / wt) * (math.sin(w) / w)
+    if (x < 1e-5) 1.0 else if (x > 1.0) 0.0 else {
+      val w = π * x
+      val wt = w * tau
+      (math.sin(wt) / wt) * (math.sin(w) / w)
     }
   }
 

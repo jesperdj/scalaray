@@ -15,16 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray.filter
+package org.jesperdj.scalaray.common
 
-// Gaussian filter (pbrt 7.7.1)
-final class GaussianFilter (val extentX: Double = 2.0, val extentY: Double = 2.0, alpha: Double = 2.0) extends Filter {
-  private val expX = math.exp(-alpha * extentX * extentX)
-  private val expY = math.exp(-alpha * extentY * extentY)
+import scala.collection.immutable.List
+import scala.collection.mutable.ListBuffer
 
-  private def gaussian(d: Double, exp: Double) = math.max(0.0, math.exp(-alpha * d * d) - exp)
+trait Accumulator[-T] {
+  def +=(value: T): Unit
+}
 
-  def apply(x: Double, y: Double) = gaussian(x, expX) * gaussian(y, expY)
+trait Builder[+T] {
+  def build(): T
+}
 
-  override def toString = "GaussianFilter(extentX=%g, extentY=%g, alpha=%g)" format (extentX, extentY, alpha)
+// TODO: What about co- and contravariance in ListBuilder? See Daniel Spiewak's answer on this StackOverflow question:
+// http://stackoverflow.com/questions/663254/scala-covariance-contravariance-question
+
+class ListBuilder[T] extends Accumulator[T] with Builder[List[T]] {
+  private val buffer: ListBuffer[T] = ListBuffer.empty
+  def +=(value: T): Unit = buffer += value
+  def build: List[T] = buffer.toList
 }

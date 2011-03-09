@@ -20,15 +20,19 @@ package org.jesperdj.scalaray.integrator
 import scala.collection.immutable.Traversable
 
 import org.jesperdj.scalaray.renderer.Renderer
-import org.jesperdj.scalaray.sampler.{ Sample, SampleSpec }
+import org.jesperdj.scalaray.sampler.{ Sample, SamplePatternSpec }
 import org.jesperdj.scalaray.scene.Intersection
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath.RayDifferential
 
+// TODO: Refactor this. Integrators should not have a val sampleSpecs.
+// Instead, an Accumulator[SamplePatternSpec] should be passed to the constructor of integrators that need this. The constructor of the integrator
+// should add SamplePatternSpec instances to this accumulator if it needs additional sample patterns.
+
 // Integrator (pbrt 15)
 sealed abstract class Integrator {
   // Sample specifications for the sample patterns that this integrator needs
-  val sampleSpecs: Traversable[SampleSpec]
+  val sampleSpecs: Traversable[SamplePatternSpec]
 }
 
 // Surface integrator (pbrt 15)

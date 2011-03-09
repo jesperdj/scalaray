@@ -61,9 +61,9 @@ final class Triangle (v0: Vertex, v1: Vertex, v2: Vertex) extends Shape {
     if (!ray.isInRange(distance)) return None
 
     // Initialize differential geometry
-    Some(new DifferentialGeometry {
+    Some((new DifferentialGeometry {
       // Intersection point
-      lazy val point: Point = ray.point(distance)
+      lazy val point: Point = ray(distance)
 
       // Surface normal
       val normal: Normal = Triangle.this.normal
@@ -96,7 +96,7 @@ final class Triangle (v0: Vertex, v1: Vertex, v2: Vertex) extends Shape {
 
       // Shape which is intersected
       val shape: Shape = Triangle.this
-    }, distance)
+    }, distance))
   }
 
   // Surface area

@@ -76,6 +76,6 @@ object Normal {
   // Create a normal from a point
   def apply(p: Point) = new Normal(p)
 
-  // Extractor method for pattern matching
+  // Extractor method
   def unapply(n: Normal) = Some(n.x, n.y, n.z)
 }

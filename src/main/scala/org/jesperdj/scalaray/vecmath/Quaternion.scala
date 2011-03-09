@@ -86,8 +86,7 @@ object Quaternion {
     if (trace > 0.0) {
       val s = 2.0 * math.sqrt(trace + 1.0)
 
-      if (s == 0.0) Zero
-      else new Quaternion((t.mat(2, 1) - t.mat(1, 2)) / s, (t.mat(0, 2) - t.mat(2, 0)) / s, (t.mat(1, 0) - t.mat(0, 1)) / s, s / 4.0)
+      if (s == 0.0) Zero else new Quaternion((t.mat(2, 1) - t.mat(1, 2)) / s, (t.mat(0, 2) - t.mat(2, 0)) / s, (t.mat(1, 0) - t.mat(0, 1)) / s, s / 4.0)
     }
     else {
       // Find index of largest trace component
@@ -101,8 +100,7 @@ object Quaternion {
 
       val s = 2.0 * math.sqrt((t.mat(i, i) - (t.mat(j, j) + t.mat(k, k))) + 1.0)
 
-      if (s == 0.0) Zero
-      else {
+      if (s == 0.0) Zero else {
         val q: Array[Double] = new Array(3)
         q(i) = s / 4.0
         q(j) = (t.mat(j, i) + t.mat(i, j)) / s
@@ -113,10 +111,12 @@ object Quaternion {
     }
   }
 
-  // Extractor method for pattern matching
+  // Extractor method
   def unapply(q: Quaternion) = Some(q.v, q.w)
 
   // Interpolate between two quaternions using spherical linear interpolation (pbrt 2.9.2)
+  // NOTE: It would have been nice if we could put this in the package object, but that leads to this problem:
+  // http://www.scala-notes.org/2010/07/strange-limitation-when-importing-from-different-scopes/
   def interpolate(t: Double, q1: Quaternion, q2: Quaternion): Quaternion = {
     val cosTheta = q1 * q2
     if (cosTheta > 0.9995) ((1.0 - t) * q1 + t * q2).normalize else {

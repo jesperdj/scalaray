@@ -15,16 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray.filter
+package org.jesperdj.scalaray.sampler
 
-// Gaussian filter (pbrt 7.7.1)
-final class GaussianFilter (val extentX: Double = 2.0, val extentY: Double = 2.0, alpha: Double = 2.0) extends Filter {
-  private val expX = math.exp(-alpha * extentX * extentX)
-  private val expY = math.exp(-alpha * extentY * extentY)
+// Sample pattern specification
+sealed trait SamplePatternSpec {
+  // Unique identifier
+  val id: Int = SamplePatternSpec.generator.getAndIncrement()
 
-  private def gaussian(d: Double, exp: Double) = math.max(0.0, math.exp(-alpha * d * d) - exp)
-
-  def apply(x: Double, y: Double) = gaussian(x, expX) * gaussian(y, expY)
-
-  override def toString = "GaussianFilter(extentX=%g, extentY=%g, alpha=%g)" format (extentX, extentY, alpha)
+  // Number of samples in the specified sample pattern
+  val count: Int
 }
+
+object SamplePatternSpec {
+  private val generator = new java.util.concurrent.atomic.AtomicInteger
+}
+
+// Sample pattern specification for 1D and 2D sample patterns
+final class SamplePatternSpec1D (val count: Int) extends SamplePatternSpec
+final class SamplePatternSpec2D (val count: Int) extends SamplePatternSpec

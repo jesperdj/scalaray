@@ -21,28 +21,28 @@ import org.jesperdj.scalaray.common._
 
 package object vecmath {
   // Implicit conversion for scaling vectors by multiplying a numeric type with a vector
-  implicit def implicitScaleVector[@specialized(Int, Double) N <% Double](f: N) = new MultipliableSame[Vector] {
-    def *(v: Vector) = v * f
+  implicit def implicitScaleVector[@specialized(Int, Double) T <% Double](f: T) = new MultipliableSame[Vector] {
+    @inline def *(v: Vector) = v * f
   }
 
   // Implicit conversion for scaling normals by multiplying a numeric type with a normal
-  implicit def implicitScaleNormal[@specialized(Int, Double) N <% Double](f: N) = new MultipliableSame[Normal] {
-    def *(n: Normal) = n * f
+  implicit def implicitScaleNormal[@specialized(Int, Double) T <% Double](f: T) = new MultipliableSame[Normal] {
+    @inline def *(n: Normal) = n * f
   }
 
   // Implicit conversion for multiplying a point by a weight
-  implicit def implicitScalePoint[@specialized(Int, Double) N <% Double](f: N) = new MultipliableSame[Point] {
-    def *(p: Point) = p * f
+  implicit def implicitScalePoint[@specialized(Int, Double) T <% Double](f: T) = new MultipliableSame[Point] {
+    @inline def *(p: Point) = p * f
   }
 
   // Implicit conversion for scaling quaternions by multiplying a numeric type with a quaternion
-  implicit def implicitScaleQuaternion[@specialized(Int, Double) N <% Double](f: N) = new MultipliableSame[Quaternion] {
-    def *(q: Quaternion) = q * f
+  implicit def implicitScaleQuaternion[@specialized(Int, Double) T <% Double](f: T) = new MultipliableSame[Quaternion] {
+    @inline def *(q: Quaternion) = q * f
   }
 
   // Implicit conversion to enable Vector to be used in interpolate()
-  implicit def vectorToInterpolatable(v1: Vector) = new Interpolatable[Vector] {
-    def *(t: Double): Vector = v1 * t
-    def +(v2: Vector): Vector = v1 + v2
+  implicit def vectorToInterpolatable(v: Vector) = new Interpolatable[Vector] {
+    @inline def *(f: Double): Vector = v * f
+    @inline def +(w: Vector): Vector = v + w
   }
 }

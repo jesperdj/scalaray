@@ -41,7 +41,7 @@ final class Disk (radius: Double = 1.0, innerRadius: Double = 0.0, maxPhi: Doubl
     if (!ray.isInRange(distance)) return None
 
     // Compute intersection point, check if it is inside the disk radii
-    val p = ray.point(distance)
+    val p = ray(distance)
     val distanceSquared = p.x * p.x + p.y * p.y
     if (distanceSquared > radius * radius || distanceSquared < innerRadius * innerRadius) return None
 

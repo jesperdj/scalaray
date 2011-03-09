@@ -17,6 +17,8 @@
  */
 package org.jesperdj.scalaray.common
 
+// TODO: Delete this
+
 // Trait that can be mixed in to give instances a unique identifier
 trait UniqueId {
   // Unique identifier

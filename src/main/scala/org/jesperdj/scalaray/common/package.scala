@@ -22,36 +22,38 @@ import scala.collection.immutable.IndexedSeq
 package object common {
   val π = math.Pi
 
-  // Clamp a value between a low and high bound
-  @inline def clamp[@specialized(Int, Double) N : Ordering](value: N, low: N, high: N): N = {
+  // Trait for types that can be multiplied with a T, resulting in an R
+  trait Multipliable[-T, +R] {
+    def *(value: T): R
+  }
+
+  // Trait for types to which a T can be added, resulting in an R
+  trait Addable[-T, +R] {
+    def +(value: T): R
+  }
+
+  trait MultipliableSame[T] extends Multipliable[T, T]
+
+  trait AddableSame[T] extends Addable[T, T]
+
+  trait Interpolatable[T] extends Multipliable[Double, T] with AddableSame[T]
+
+  implicit def doubleToInterpolatable(n: Double) = new Interpolatable[Double] {
+    @inline def *(value: Double): Double = n * value
+    @inline def +(value: Double): Double = n + value
+  }
+
+  // Linearly interpolate between two values
+  @inline def interpolate[@specialized(Double) T <% Interpolatable[T]](t: Double, a: T, b: T): T = a * (1.0 - t) + b * t
+
+  @inline def clamp[@specialized(Int, Double) T : Ordering](value: T, low: T, high: T): T = {
     import Ordered._
     if (value < low) low else if (value > high) high else value
   }
 
-  // Get the minimum and maximum of two values as a pair
-  @inline def minmax[@specialized(Int, Double) N : Ordering](a: N, b: N): (N, N) = {
+  @inline def minmax[@specialized(Int, Double) T : Ordering](a: T, b: T): (T, T) = {
     import Ordered._
     if (a <= b) (a, b) else (b, a)
-  }
-
-  // Traits for types that can be multiplied with a T or to which a T can be added, resulting in an R
-  trait Multipliable[-T, +R] { def *(value: T): R }
-  trait Addable[-T, +R] { def +(value: T): R }
-
-  // Traits for types that can be multiplied with a T or to which a T can be added, resulting in the same type T
-  trait MultipliableSame[T] extends Multipliable[T, T]
-  trait AddableSame[T] extends Addable[T, T]
-
-  // Operations that a type must have to be used in interpolate()
-  trait Interpolatable[T] extends Multipliable[Double, T] with AddableSame[T]
-
-  // Linearly interpolate a value
-  @inline def interpolate[@specialized(Double) T <% Interpolatable[T]](t: Double, a: T, b: T): T = a * (1.0 - t) + b * t
-
-  // Implicit conversion to enable Double to be used in interpolate()
-  implicit def doubleToInterpolatable(f1: Double) = new Interpolatable[Double] {
-    def *(t: Double): Double = f1 * t
-    def +(f2: Double): Double = f1 + f2
   }
 
   // Create an immutable IndexedSeq that wraps an Array. Note that Scala already contains a method wrapDoubleArray(), but this returns a mutable WrappedArray.

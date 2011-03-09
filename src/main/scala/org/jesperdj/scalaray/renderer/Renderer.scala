@@ -21,6 +21,14 @@ import org.jesperdj.scalaray.sampler.Sample
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath.RayDifferential
 
+// TODO: Refactor this. Separate rendering (which includes producing an image) from ray tracing.
+// Renderer should be the thing that gets a sampler, a camera and that outputs a PixelBuffer. It runs a job for each sample batch.
+// In each job, the camera is called to create a ray for each sample. Th RayTracer is used to compute the radiance for this ray.
+// The radiance is added to the PixelBuffer.
+// RayTracer should be the thing that gets the scene and integrators and that can trace rays and compute radiance and transmittance.
+// RayTracer does not know anything about the sampler, camera and PixelBuffer.
+// Integrators that do recursive ray tracing can get a reference to the RayTracer - NOT to the Renderer, as it is now.
+
 // Renderer (pbrt 1.3.3)
 abstract class Renderer {
   // Render the scene

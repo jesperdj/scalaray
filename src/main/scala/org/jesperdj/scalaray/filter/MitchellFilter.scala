@@ -17,13 +17,14 @@
  */
 package org.jesperdj.scalaray.filter
 
-// Mitchell filter (pbrt 7.6.1)
-final class MitchellFilter (extentX: Double = 2.0, extentY: Double = 2.0, b: Double = 1.0 / 3.0, c: Double = 1.0 / 3.0) extends Filter(extentX, extentY) {
+// Mitchell filter (pbrt 7.7.1)
+final class MitchellFilter (val extentX: Double = 2.0, val extentY: Double = 2.0, b: Double = 1.0 / 3.0, c: Double = 1.0 / 3.0) extends Filter {
   private val (p10, p11, p12, p13) = (1.0 - b / 3.0, 0.0, -3.0 + 2.0 * b + c, 2.0 - 1.5 * b - c)
   private val (p20, p21, p22, p23) = (4.0 / 3.0 * b + 4.0 * c, -2.0 * b - 8.0 * c, b + 5.0 * c, -b / 6.0 - c)
 
   private def mitchell(v: Double) = {
-    val x = 2.0 * v.abs; if (x <= 1.0) p10 + p11 * x + p12 * x * x + p13 * x * x * x else p20 + p21 * x + p22 * x * x + p23 * x * x * x
+    val x = 2.0 * v.abs
+    if (x <= 1.0) p10 + p11 * x + p12 * x * x + p13 * x * x * x else p20 + p21 * x + p22 * x * x + p23 * x * x * x
   }
 
   def apply(x: Double, y: Double) = mitchell(x / extentX) * mitchell(y / extentY)

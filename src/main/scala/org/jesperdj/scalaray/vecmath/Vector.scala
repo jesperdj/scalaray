@@ -76,7 +76,7 @@ object Vector {
   // Create a vector from a point
   def apply(p: Point) = new Vector(p)
 
-  // Extractor method for pattern matching
+  // Extractor method
   def unapply(v: Vector) = Some(v.x, v.y, v.z)
 
   // Coordinate system from a vector (pbrt 2.2.5)

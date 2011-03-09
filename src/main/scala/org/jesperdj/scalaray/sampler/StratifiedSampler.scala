@@ -17,81 +17,117 @@
  */
 package org.jesperdj.scalaray.sampler
 
-import scala.collection.immutable.{ IndexedSeq, Traversable }
+import scala.collection.immutable.Traversable
 
 import org.jesperdj.scalaray.raster.Rectangle
-import org.jesperdj.scalaray.common._
 
 // Stratified sampler (pbrt 7.3)
-final class StratifiedSampler (rectangle: Rectangle, samplesPerPixelX: Int, samplesPerPixelY: Int, sampleSpecs: Traversable[SampleSpec])
-  extends PixelSampler(rectangle, samplesPerPixelX * samplesPerPixelY) {
+final class StratifiedSampler (rectangle: Rectangle, pixelsPerBatch: Int, samplesPerPixelX: Int, samplesPerPixelY: Int,
+                               jitter: Boolean, samplePatternSpecs: Traversable[SamplePatternSpec]) extends Sampler {
+  // Number of samples per pixel
+  private val samplesPerPixel = samplesPerPixelX * samplesPerPixelY
 
-  // Generate samples for one pixel
-  protected def generateSamples(x: Int, y: Int): Traversable[Sample] = {
-    import scala.collection.mutable.{ Map => MutableMap }
+  // Number of samples per batch
+  private val samplesPerBatch = samplesPerPixel * pixelsPerBatch
 
-    // Generate image, lens and time samples
-    val imageSamples = StratifiedSampler.generateSamples2D(samplesPerPixelX, samplesPerPixelY)
-    val lensSamples = StratifiedSampler.generateSamples2D(samplesPerPixelX, samplesPerPixelY)
-    val timeSamples = StratifiedSampler.generateSamples1D(samplesPerPixel)
+  // Batches produced by this sampler
+  val batches = new Traversable[SampleBatch] {
+    // Apply a function to each batch
+    def foreach[U](f: SampleBatch => U): Unit = for (i <- 0 until size) f(new SampleBatchImpl(i))
 
-    for (i <- 0 until samplesPerPixel) yield {
-      // Generate 1D and 2D sample patterns for the current sample
-      val samples1D = MutableMap[Int, IndexedSeq[Double]]()
-      val samples2D = MutableMap[Int, IndexedSeq[(Double, Double)]]()
+    // Number of batches
+    override val size = ((rectangle.width * rectangle.height) / pixelsPerBatch.toFloat).ceil.toInt
+  }
 
-      sampleSpecs foreach {
-        _ match {
-          case spec: SampleSpec1D => samples1D += spec.id -> StratifiedSampler.generateSamples1D(spec.count)
-          case spec: SampleSpec2D => samples2D += spec.id -> StratifiedSampler.generateSamples2D(spec.count)
+  // Implementation of SampleBatch
+  private class SampleBatchImpl (val batchIndex: Int) extends SampleBatch {
+    // Samples in this batch
+    val samples = new Traversable[Sample] {
+      // Apply a function to each sample
+      def foreach[U](f: Sample => U): Unit = {
+        // Index of the first pixel in this batch
+        val pixelIndex = batchIndex * pixelsPerBatch
+
+        // Indices of the current pixel
+        var py = rectangle.top + pixelIndex / rectangle.width
+        var px = rectangle.left + pixelIndex % rectangle.width
+
+        // Generate samples for each pixel
+        0 until pixelsThisBatch foreach { _ =>
+          // Generate image, lens and time samples for this pixel
+          val imageSamples = StratifiedSampler.generateSamplePattern2D(samplesPerPixelX, samplesPerPixelY, jitter)
+          val lensSamples = StratifiedSampler.generateSamplePattern2D(samplesPerPixelX, samplesPerPixelY, jitter)
+          val timeSamples = StratifiedSampler.generateSamplePattern1D(samplesPerPixel, jitter)
+
+          for (i <- 0 until samplesPerPixel) {
+            import scala.collection.mutable.{ Map => MutableMap }
+
+            // Generate 1D and 2D sample patterns for the current sample
+            val samplePatterns1D = MutableMap[Int, SamplePattern1D]()
+            val samplePatterns2D = MutableMap[Int, SamplePattern2D]()
+
+            samplePatternSpecs foreach {
+              _ match {
+                case spec: SamplePatternSpec1D => samplePatterns1D += spec.id -> StratifiedSampler.generateSamplePattern1D(spec.count, jitter)
+                case spec: SamplePatternSpec2D => samplePatterns2D += spec.id -> StratifiedSampler.generateSamplePattern2D(spec.count, jitter)
+              }
+            }
+
+            val imageSample = imageSamples(i)
+            val lensSample = lensSamples(i)
+            val timeSample = timeSamples(i)
+
+            // Create Sample object, shift image samples to pixel position, apply the function to the sample
+            f(new Sample(px + imageSample._1, py + imageSample._2, lensSample._1, lensSample._2, timeSample, samplePatterns1D.toMap, samplePatterns2D.toMap))
+          }
+
+          // Move indices to the next pixel
+          px += 1; if (px > rectangle.right) { px = rectangle.left; py += 1 }
         }
       }
 
-      val is = imageSamples(i)
-      val ls = lensSamples(i)
+      // Number of pixels in this batch
+      private val pixelsThisBatch = if (batchIndex < batches.size - 1) pixelsPerBatch else {
+        // The last batch contains the remaining pixels (can be less than pixelsPerBatch)
+        rectangle.width * rectangle.height - (batches.size - 1) * pixelsPerBatch
+      }
 
-      // Create Sample object, shift image samples to pixel position
-      new Sample(is._1 + x, is._2 + y, ls._1, ls._2, timeSamples(i), samples1D.toMap, samples2D.toMap)
+      // Number of samples in this batch
+      override val size = samplesPerPixel * pixelsThisBatch
     }
   }
 
-  override def toString = "StratifiedSampler(rectangle=%s, samplesPerPixelX=%d, samplesPerPixelY=%d, sampleSpecs=%s)" format
-    (rectangle, samplesPerPixelX, samplesPerPixelY, sampleSpecs)
+  override def toString = "StratifiedSampler"
 }
 
 object StratifiedSampler {
-  // NOTE: scala.util.Random is thread-safe because it uses java.util.Random which is thread-safe
+  import org.jesperdj.scalaray.common._
+
   private val random = new scala.util.Random
 
-  // Generate a set of stratified 1D samples
-  private def generateSamples1D(count: Int): IndexedSeq[Double] = {
+  // Generate a stratified 1D sample pattern
+  private def generateSamplePattern1D(count: Int, jitter: Boolean): SamplePattern1D = {
     val array = new Array[Double](count)
-
-    // Generate stratified 1D samples
-    for (x <- 0 until count) array(x) = (x + random.nextDouble) / count
+    for (x <- 0 until count) array(x) = (x + (if (jitter) random.nextDouble else 0.5)) / count
 
     // Shuffle samples to decorrelate dimensions
     arrayToIndexedSeq(shuffle(array))
   }
 
-  // Generate a set of stratified 2D samples
-  private def generateSamples2D(countX: Int, countY: Int): IndexedSeq[(Double, Double)] = {
+  // Generate a stratified 2D sample pattern
+  private def generateSamplePattern2D(countX: Int, countY: Int, jitter: Boolean): SamplePattern2D = {
     val array = new Array[(Double, Double)](countX * countY)
-
-    // Generate stratified 2D samples
     for (y <- 0 until countY; x <- 0 until countX)
-      array(x + countX * y) = ((x + random.nextDouble) / countX, (y + random.nextDouble) / countY)
+      array(x + countX * y) = ((x + (if (jitter) random.nextDouble else 0.5)) / countX, (y + (if (jitter) random.nextDouble else 0.5)) / countY)
 
     // Shuffle samples to decorrelate dimensions
     arrayToIndexedSeq(shuffle(array))
   }
 
-  // Generate a set of 2D samples using Latin hypercube sampling
-  private def generateSamples2D(count: Int): IndexedSeq[(Double, Double)] = {
+  // Generate a stratified 2D sample pattern using Latin hypercube sampling
+  private def generateSamplePattern2D(count: Int, jitter: Boolean): SamplePattern2D = {
     val array = new Array[(Double, Double)](count)
-
-    // Generate Latin hypercube samples along diagonal
-    for (i <- 0 until count) array(i) = ((i + random.nextDouble) / count, (i + random.nextDouble) / count)
+    for (i <- 0 until count) array(i) = ((i + (if (jitter) random.nextDouble else 0.5)) / count, (i + (if (jitter) random.nextDouble else 0.5)) / count)
 
     // Swap functions to swap the X or Y components of two samples
     def swapX(a: (Double, Double), b: (Double, Double)): ((Double, Double), (Double, Double)) = ((b._1, a._2), (a._1, b._2))
@@ -100,29 +136,4 @@ object StratifiedSampler {
     // Shuffle along both dimensions independently
     arrayToIndexedSeq(shuffle(shuffle(array, swapX), swapY))
   }
-}
-
-// Stratified sampler factory
-final class StratifiedSamplerFactory (rectangle: Rectangle, samplesPerPixelX: Int, samplesPerPixelY: Int, sampleSpecs: Traversable[SampleSpec]) extends SamplerFactory {
-  // Create a set of related samplers that together cover the full domain to be sampled
-  def createSamplers(count: Int): Traversable[StratifiedSampler] = {
-    import scala.collection.mutable.ListBuffer
-
-    val ratio: Double = rectangle.width / rectangle.height
-    val pixels: Int = (rectangle.height / math.sqrt(count / ratio)).ceil.toInt
-
-    val samplers: ListBuffer[StratifiedSampler] = ListBuffer()
-
-    for (py <- 0 until rectangle.height by pixels; px <- 0 until rectangle.width by pixels) {
-      val rect = Rectangle(px, py, math.min(px + pixels - 1, rectangle.right), math.min(py + pixels - 1, rectangle.bottom))
-      if (rect.width > 0 && rect.height > 0) samplers += new StratifiedSampler(rect, samplesPerPixelX, samplesPerPixelY, sampleSpecs)
-    }
-
-    require(samplers.size > 0, "Could not create samplers")
-
-    samplers.toList
-  }
-
-  override def toString = "StratifiedSamplerFactory(rectangle=%s, samplesPerPixelX=%d, samplesPerPixelY=%d, sampleSpecs=%s)" format
-    (rectangle, samplesPerPixelX, samplesPerPixelY, sampleSpecs)
 }

@@ -17,17 +17,15 @@
  */
 package org.jesperdj.scalaray.sampler
 
-import org.jesperdj.scalaray.common.UniqueId
+import scala.collection.immutable.Traversable
 
-// Sample specification, used to configure a sampler to produce 1D and 2D sample patterns for each sample
-sealed abstract class SampleSpec extends UniqueId
+// Low-discrepancy sampler (pbrt 7.4)
+final class LowDiscrepancySampler extends Sampler {
+  // TODO: Implement low-discrepancy sampler
+  val batches = new Traversable[SampleBatch] {
+    def foreach[U](f: SampleBatch => U): Unit = throw new UnsupportedOperationException("Not yet implemented")
+    override val size = 0
+  }
 
-// Sample specification for a 1D sample pattern
-final class SampleSpec1D (val count: Int) extends SampleSpec {
-  override def toString = "SampleSpec1D(id=%d, count=%d)" format (id, count)
-}
-
-// Sample specification for a 2D sample pattern
-final class SampleSpec2D (val count: Int) extends SampleSpec {
-  override def toString = "SampleSpec2D(id=%d, count=%d)" format (id, count)
+  override def toString = "LowDiscrepancySampler"
 }

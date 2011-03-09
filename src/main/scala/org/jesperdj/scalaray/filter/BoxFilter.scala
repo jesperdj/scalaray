@@ -17,8 +17,8 @@
  */
 package org.jesperdj.scalaray.filter
 
-// Box filter (pbrt 7.6.1)
-final class BoxFilter (extentX: Double = 0.5, extentY: Double = 0.5) extends Filter(extentX, extentY) {
+// Box filter (pbrt 7.7.1)
+final class BoxFilter (val extentX: Double = 0.5, val extentY: Double = 0.5) extends Filter {
   def apply(x: Double, y: Double) = 1.0
 
   override def toString = "BoxFilter(extentX=%g, extentY=%g)" format (extentX, extentY)

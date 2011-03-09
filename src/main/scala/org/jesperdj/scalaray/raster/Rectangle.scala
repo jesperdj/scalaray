@@ -26,5 +26,12 @@ final class Rectangle (val left: Int, val top: Int, val right: Int, val bottom: 
 }
 
 object Rectangle {
+  // Create a rectangle
   def apply(left: Int, top: Int, right: Int, bottom: Int) = new Rectangle(left, top, right, bottom)
+
+  // Create a rectangle with a width and height, with (left, top) = (0, 0)
+  def apply(width: Int, height: Int) = new Rectangle(0, 0, width - 1, height - 1)
+
+  // Extractor method
+  def unapply(rectangle: Rectangle) = Some(rectangle.left, rectangle.top, rectangle.right, rectangle.bottom)
 }

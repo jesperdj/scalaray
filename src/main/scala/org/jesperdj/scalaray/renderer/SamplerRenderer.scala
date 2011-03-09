@@ -19,26 +19,29 @@ package org.jesperdj.scalaray.renderer
 
 import org.jesperdj.scalaray.camera.Camera
 import org.jesperdj.scalaray.integrator.{ SurfaceIntegrator, VolumeIntegrator }
-import org.jesperdj.scalaray.raster.Raster
-import org.jesperdj.scalaray.sampler.{ Sample, Sampler, SamplerFactory }
+import org.jesperdj.scalaray.sampler._
 import org.jesperdj.scalaray.scene._
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath.RayDifferential
 
+// TODO: Rewrite this using actors (see mandelactors)
+// TODO: Ugly that we have to pass the number of samples per pixel to this thing
+
 // Sampler renderer (pbrt 1.3.3)
-final class SamplerRenderer (scene: Scene, samplerFactory: SamplerFactory, camera: Camera, raster: Raster,
-               surfaceIntegrator: SurfaceIntegrator, volumeIntegrator: VolumeIntegrator) extends Renderer {
+final class SamplerRenderer (scene: Scene, sampler: Sampler, samplesPerPixel: Int, camera: Camera, pixelBuffer: PixelBuffer,
+                             surfaceIntegrator: SurfaceIntegrator, volumeIntegrator: VolumeIntegrator) extends Renderer {
   // Render the scene
   def render(): Unit = {
     import java.util.concurrent._
     import java.util.concurrent.atomic.AtomicInteger
 
-    var runningTasks = new AtomicInteger
+    val runningTasks = new AtomicInteger
 
-    final class Task (sampler: Sampler) extends Runnable {
+    val scale = 1.0 / math.sqrt(samplesPerPixel)
+
+    final class Task (batch: SampleBatch) extends Runnable {
       def run() {
-        val scale: Double = 1.0 / math.sqrt(sampler.samplesPerPixel)
-        sampler.samples foreach { sample => raster.addSample(sample, radiance(camera.generateRayDifferential(sample, scale), sample)) }
+        batch.samples foreach { sample => pixelBuffer += (sample, radiance(camera.generateRayDifferential(sample, scale), sample)) }
         runningTasks.decrementAndGet
       }
     }
@@ -48,19 +51,17 @@ final class SamplerRenderer (scene: Scene, samplerFactory: SamplerFactory, camer
 
     // Create executor service and submit tasks
     val executorService = Executors.newFixedThreadPool(processors)
-    val samplers = samplerFactory.createSamplers(math.max(32 * processors, raster.rectangle.width * raster.rectangle.height / 256))
-    samplers.foreach { s => runningTasks.incrementAndGet; executorService.submit(new Task(s)) }
+    sampler.batches.foreach { batch => runningTasks.incrementAndGet; executorService.submit(new Task(batch)) }
 
-    val numSamplers = samplers.size
+    val numTasks = sampler.batches.size
 
     // Wait until all tasks have finished
     executorService.shutdown()
     while (!executorService.isTerminated()) {
-      executorService.awaitTermination(10, TimeUnit.SECONDS)
+      executorService.awaitTermination(5, TimeUnit.SECONDS)
       println("%d/%d tasks done (%d%%)" format
-          (numSamplers - runningTasks.intValue, numSamplers, 100 - ((100 * runningTasks.get) / numSamplers)))
+          (numTasks - runningTasks.intValue, numTasks, 100 - ((100 * runningTasks.get) / numTasks)))
     }
-
   }
 
   // Compute the incident radiance along the given ray (pbrt 1.3.4)

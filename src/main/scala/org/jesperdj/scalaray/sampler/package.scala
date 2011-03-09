@@ -15,18 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray.common
+package org.jesperdj.scalaray
 
-class Timer (val name: String) {
-  private var totalTime: Long = 0L
-  private var startTime: Long = 0L
+package object sampler {
+  import scala.collection.immutable.IndexedSeq
 
-  def start() { startTime = System.nanoTime }
-  def stop() { totalTime += System.nanoTime - startTime }
-
-  def time[T](block: => T): T = { start; val result: T = block; stop; result }
-
-  def total = totalTime
-
-  override def toString = "%s: %g seconds" format (name, totalTime / 1e9)
+  // Type aliases for 1D and 2D sample patterns
+  type SamplePattern1D = IndexedSeq[Double]
+  type SamplePattern2D = IndexedSeq[(Double, Double)]
 }

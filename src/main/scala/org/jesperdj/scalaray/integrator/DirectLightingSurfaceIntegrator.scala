@@ -23,7 +23,7 @@ import scala.collection.mutable.ListBuffer
 import org.jesperdj.scalaray.lightsource._
 import org.jesperdj.scalaray.reflection.BSDF
 import org.jesperdj.scalaray.renderer.Renderer
-import org.jesperdj.scalaray.sampler.{ Sample, SampleSpec, SampleSpec1D, SampleSpec2D }
+import org.jesperdj.scalaray.sampler._
 import org.jesperdj.scalaray.scene.{ Intersection, Scene }
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.common._
@@ -39,7 +39,7 @@ private final class SampleIDs (val lightSampleID: Int, val bsdfSampleID: Int, va
 
 // Direct lighting surface integrator (pbrt 15.1)
 final class DirectLightingSurfaceIntegrator private (
-  scene: Scene, val sampleSpecs: Traversable[SampleSpec],
+  scene: Scene, val sampleSpecs: Traversable[SamplePatternSpec],
   deltaLights: Traversable[LightSource], areaLights: Traversable[(LightSource, SampleIDs)]) extends SurfaceIntegrator {
 
   // Compute the incident radiance along the given ray
@@ -72,9 +72,9 @@ final class DirectLightingSurfaceIntegrator private (
     // Accumulate contributions of area light sources
     val areaLightRadiance = (Spectrum.Black /: areaLights) { case (accu, (areaLight, sampleIDs)) =>
       accu + estimateDirect(areaLight, point, normal, wo, bsdf,
-                  sample.samples2D(sampleIDs.lightSampleID),
-                  sample.samples2D(sampleIDs.bsdfSampleID),
-                  sample.samples1D(sampleIDs.bsdfComponentSampleID))
+                  sample.samplePatterns2D(sampleIDs.lightSampleID),
+                  sample.samplePatterns2D(sampleIDs.bsdfSampleID),
+                  sample.samplePatterns1D(sampleIDs.bsdfComponentSampleID))
     }
 
     deltaLightRadiance + areaLightRadiance
@@ -170,7 +170,7 @@ final class DirectLightingSurfaceIntegrator private (
 
 object DirectLightingSurfaceIntegrator {
   def apply(scene: Scene): DirectLightingSurfaceIntegrator = {
-    val sampleSpecs = ListBuffer[SampleSpec]()
+    val sampleSpecs = ListBuffer[SamplePatternSpec]()
     val deltaLights = ListBuffer[LightSource]()
     val areaLights = ListBuffer[(LightSource, SampleIDs)]()
 
@@ -179,10 +179,10 @@ object DirectLightingSurfaceIntegrator {
         deltaLights += lightSource
       }
       else {
-        val lightSampleSpec = new SampleSpec2D(lightSource.numberOfSamples); sampleSpecs += lightSampleSpec
-        val bsdfSampleSpec = new SampleSpec2D(lightSource.numberOfSamples); sampleSpecs += bsdfSampleSpec
-        val bsdfComponentSampleSpec = new SampleSpec1D(lightSource.numberOfSamples); sampleSpecs += bsdfComponentSampleSpec
-        areaLights += ((lightSource, new SampleIDs(lightSampleSpec.id, bsdfSampleSpec.id, bsdfComponentSampleSpec.id)))
+        val lightSamplePatternSpec = new SamplePatternSpec2D(lightSource.numberOfSamples); sampleSpecs += lightSamplePatternSpec
+        val bsdfSamplePatternSpec = new SamplePatternSpec2D(lightSource.numberOfSamples); sampleSpecs += bsdfSamplePatternSpec
+        val bsdfComponentSamplePatternSpec = new SamplePatternSpec1D(lightSource.numberOfSamples); sampleSpecs += bsdfComponentSamplePatternSpec
+        areaLights += ((lightSource, new SampleIDs(lightSamplePatternSpec.id, bsdfSamplePatternSpec.id, bsdfComponentSamplePatternSpec.id)))
       }
     }
 

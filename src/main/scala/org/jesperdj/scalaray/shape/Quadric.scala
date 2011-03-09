@@ -26,7 +26,7 @@ abstract class Quadric extends Shape {
   def intersect(ray: Ray): Option[(DifferentialGeometry, Double)] = {
     // Get differential geometry and distance if the intersection point is in the range of the ray
     def getResult(distance: Double): Option[(DifferentialGeometry, Double)] =
-      if (ray.isInRange(distance)) differentialGeometry(ray.point(distance)) map { case dg => (dg, distance) } else None
+      if (ray.isInRange(distance)) differentialGeometry(ray(distance)) map { case dg => (dg, distance) } else None
 
     // Compute quadratic coefficients
     val (a, b, c) = computeCoefficients(ray)

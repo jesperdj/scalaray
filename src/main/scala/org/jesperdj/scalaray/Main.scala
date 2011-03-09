@@ -39,6 +39,20 @@ import org.jesperdj.scalaray.texture._
 import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
 
+class Timer (val name: String) {
+  private var totalTime: Long = 0L
+  private var startTime: Long = 0L
+
+  def start() { startTime = System.nanoTime }
+  def stop() { totalTime += System.nanoTime - startTime }
+
+  def time[T](block: => T): T = { start; val result: T = block; stop; result }
+
+  def total = totalTime
+
+  override def toString = "%s: %g seconds" format (name, totalTime / 1e9)
+}
+
 object Main {
   def main(args: Array[String]) {
     println("ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala")
@@ -53,18 +67,18 @@ object Main {
     val camera: Camera = new PerspectiveCamera(Transform.translate(0.0, 0.75f, 0.0), π / 4.0, rect.width, rect.height)
 
     val filter: Filter = new BoxFilter
-    val raster = new PixelRaster(rect, filter)
+    val pixelBuffer = new PixelBuffer(rect, filter)
 
     val surfaceIntegrator: SurfaceIntegrator = DirectLightingSurfaceIntegrator(scene)
     val volumeIntegrator: VolumeIntegrator = VacuumVolumeIntegrator
 
-    val samplerFactory: SamplerFactory = new StratifiedSamplerFactory(rect, 2, 2, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
+    val sampler: Sampler = new StratifiedSampler(rect, 65536, 2, 2, true, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
 
-    val renderer: Renderer = new SamplerRenderer(scene, samplerFactory, camera, raster, surfaceIntegrator, volumeIntegrator)
+    val renderer: Renderer = new SamplerRenderer(scene, sampler, 4, camera, pixelBuffer, surfaceIntegrator, volumeIntegrator)
 
     println("- Surface integrator: " + surfaceIntegrator)
     println("- Volume integrator: " + volumeIntegrator)
-    println("- Sampler factory: " + samplerFactory)
+    println("- Sampler: " + sampler)
     println("- Filter: " + filter)
     println("- Renderer: " + renderer)
     println("- Camera: " + camera)
@@ -75,7 +89,7 @@ object Main {
     timer.time { renderer.render() }
     println(timer.toString)
 
-    ImageIO.write(raster.toImage, "png", new File("output.png"))
+    ImageIO.write(pixelBuffer.toImage, "png", new File("output.png"))
 
     println()
     println("Finished")

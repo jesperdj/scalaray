@@ -1,3 +1,5 @@
+package org.jesperdj.scalaray.raster
+
 /*
  * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
  * Copyright (C) 2009, 2010, 2011  Jesper de Jong
@@ -15,14 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray.raster
+final class Raster[T : ClassManifest] (rectangle: Rectangle) {
+  private val data = new Array[T](rectangle.width * rectangle.height)
 
-import org.jesperdj.scalaray.sampler.CameraSample
-import org.jesperdj.scalaray.spectrum.Spectrum
+  private def index(x: Int, y: Int): Int = (x - rectangle.left) + (y - rectangle.top) * rectangle.width
 
-// NOTE: I didn't want to call this "Film" like in pbrt, because cameras don't work with film anymore.
+  def apply(x: Int, y: Int): T = data(index(x, y))
 
-// Raster (replaces pbrt's Film)
-abstract class Raster (val rectangle: Rectangle) {
-  def addSample(sample: CameraSample, spectrum: Spectrum): Unit
+  def update(x: Int, y: Int, value: T): Unit = data(index(x, y)) = value
 }
