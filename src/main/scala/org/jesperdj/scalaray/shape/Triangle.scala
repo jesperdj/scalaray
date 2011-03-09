@@ -75,7 +75,7 @@ final class Triangle (v0: Vertex, v1: Vertex, v2: Vertex) extends Shape {
       }
 
       // Partial derivatives of the surface position
-      lazy val (dpdu, dpdv) = {
+      lazy val (dpdu: Vector, dpdv: Vector) = {
         val du1 = v0.u - v2.u
         val du2 = v1.u - v2.u
         val dv1 = v0.v - v2.v

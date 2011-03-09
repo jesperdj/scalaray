@@ -65,7 +65,7 @@ final class Sphere (radius: Double = 1.0, minZ: Double = Double.NegativeInfinity
       lazy val v: Double = (theta - minTheta) / diffTheta
 
       // Partial derivatives of the surface position and normal
-      lazy val (dpdu, dpdv, dndu, dndv) = {
+      lazy val (dpdu: Vector, dpdv: Vector, dndu: Normal, dndv: Normal) = {
         val radiusZ = math.sqrt(p.x * p.x + p.y * p.y)
         val (cosPhi, sinPhi) = if (radiusZ > 0.0) (p.x / radiusZ, p.y / radiusZ) else (0.0, 1.0)
 

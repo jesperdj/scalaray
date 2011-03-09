@@ -61,7 +61,7 @@ final class Cylinder (radius: Double = 1.0, minZ: Double = -1.0, maxZ: Double = 
       lazy val dpdv: Vector = Vector(0.0, 0.0, maxZ - minZ)
 
       // Partial derivatives of the surface normal
-      lazy val (dndu, dndv) = {
+      lazy val (dndu: Normal, dndv: Normal) = {
         val d2Pduu = Vector(p.x, p.y, 0.0) * (-maxPhi * maxPhi)
         val d2Pduv = Vector.Zero
         val d2Pdvv = Vector.Zero
