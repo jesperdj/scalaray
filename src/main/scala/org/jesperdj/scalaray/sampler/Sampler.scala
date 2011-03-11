@@ -17,7 +17,8 @@
  */
 package org.jesperdj.scalaray.sampler
 
-import scala.collection.immutable.{ Map, Traversable }
+import scala.collection.Iterator
+import scala.collection.immutable.Map
 
 // Camera sample
 sealed class CameraSample (val imageX: Double, val imageY: Double, val lensU: Double, val lensV: Double, val time: Double)
@@ -28,13 +29,7 @@ final class Sample (imageX: Double, imageY: Double, lensU: Double, lensV: Double
   extends CameraSample(imageX, imageY, lensU, lensV, time)
 
 // A batch of samples
-trait SampleBatch {
-  // Samples in this batch
-  def samples: Traversable[Sample]
-}
+trait SampleBatch extends Iterator[Sample]
 
 // Sampler (pbrt 7.2)
-trait Sampler {
-  // Batches produced by this sampler
-  def batches: Traversable[SampleBatch]
-}
+trait Sampler extends Iterator[SampleBatch]

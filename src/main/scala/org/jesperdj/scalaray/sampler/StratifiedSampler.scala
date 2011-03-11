@@ -27,73 +27,110 @@ final class StratifiedSampler (rectangle: Rectangle, pixelsPerBatch: Int, sample
   // Number of samples per pixel
   private val samplesPerPixel = samplesPerPixelX * samplesPerPixelY
 
-  // Number of samples per batch
-  private val samplesPerBatch = samplesPerPixel * pixelsPerBatch
+  // Number of batches
+  private val numberOfBatches = ((rectangle.width * rectangle.height) / pixelsPerBatch.toFloat).ceil.toInt
 
-  // Batches produced by this sampler
-  val batches = new Traversable[SampleBatch] {
-    // Apply a function to each batch
-    def foreach[U](f: SampleBatch => U): Unit = for (i <- 0 until size) f(new SampleBatchImpl(i))
+  // Index of the next batch to generate
+  private var nextBatchIndex = 0
 
-    // Number of batches
-    override val size = ((rectangle.width * rectangle.height) / pixelsPerBatch.toFloat).ceil.toInt
+  // Check if there is a next batch
+  def hasNext = nextBatchIndex < numberOfBatches
+
+  // Generate the next batch
+  def next: SampleBatch = {
+    if (!hasNext) throw new NoSuchElementException("next on empty iterator")
+
+    val batch = new SampleBatchImpl(nextBatchIndex)
+    nextBatchIndex += 1
+    batch
   }
 
   // Implementation of SampleBatch
   private class SampleBatchImpl (val batchIndex: Int) extends SampleBatch {
-    // Samples in this batch
-    val samples = new Traversable[Sample] {
-      // Apply a function to each sample
-      def foreach[U](f: Sample => U): Unit = {
-        // Index of the first pixel in this batch
-        val pixelIndex = batchIndex * pixelsPerBatch
+    // Number of pixels left to generate samples for
+    private var pixelsLeft = if (batchIndex < numberOfBatches - 1) pixelsPerBatch else {
+      // The last batch contains the remaining pixels (can be less than pixelsPerBatch)
+      rectangle.width * rectangle.height - (numberOfBatches - 1) * pixelsPerBatch
+    }
 
-        // Indices of the current pixel
-        var py = rectangle.top + pixelIndex / rectangle.width
-        var px = rectangle.left + pixelIndex % rectangle.width
+    // Indices of the current pixel
+    private var (pixelIndexX, pixelIndexY) = {
+      val pixelIndex = batchIndex * pixelsPerBatch
+      (rectangle.left + pixelIndex % rectangle.width, rectangle.top + pixelIndex / rectangle.width)
+    }
 
-        // Generate samples for each pixel
-        0 until pixelsThisBatch foreach { _ =>
-          // Generate image, lens and time samples for this pixel
-          val imageSamples = StratifiedSampler.generateSamplePattern2D(samplesPerPixelX, samplesPerPixelY, jitter)
-          val lensSamples = StratifiedSampler.generateSamplePattern2D(samplesPerPixelX, samplesPerPixelY, jitter)
-          val timeSamples = StratifiedSampler.generateSamplePattern1D(samplesPerPixel, jitter)
+    // Samples for the current pixel
+    private var pixelSamples: Array[Sample] = generatePixelSamples(pixelIndexX, pixelIndexY)
 
-          for (i <- 0 until samplesPerPixel) {
-            import scala.collection.mutable.{ Map => MutableMap }
+    // Index of the next sample
+    private var sampleIndex = 0
 
-            // Generate 1D and 2D sample patterns for the current sample
-            val samplePatterns1D = MutableMap[Int, SamplePattern1D]()
-            val samplePatterns2D = MutableMap[Int, SamplePattern2D]()
+    private var moreSamples = true
 
-            samplePatternSpecs foreach {
-              _ match {
-                case spec: SamplePatternSpec1D => samplePatterns1D += spec.id -> StratifiedSampler.generateSamplePattern1D(spec.count, jitter)
-                case spec: SamplePatternSpec2D => samplePatterns2D += spec.id -> StratifiedSampler.generateSamplePattern2D(spec.count, jitter)
-              }
-            }
+    // Check if there is a next sample
+    def hasNext = moreSamples
 
-            val imageSample = imageSamples(i)
-            val lensSample = lensSamples(i)
-            val timeSample = timeSamples(i)
+    // Generate the next sample
+    def next = {
+      if (!hasNext) throw new NoSuchElementException("next on empty iterator")
 
-            // Create Sample object, shift image samples to pixel position, apply the function to the sample
-            f(new Sample(px + imageSample._1, py + imageSample._2, lensSample._1, lensSample._2, timeSample, samplePatterns1D.toMap, samplePatterns2D.toMap))
-          }
+      val sample = pixelSamples(sampleIndex)
 
-          // Move indices to the next pixel
-          px += 1; if (px > rectangle.right) { px = rectangle.left; py += 1 }
+      // Move indices to the next sample
+      sampleIndex += 1
+      if (sampleIndex >= samplesPerPixel) {
+        sampleIndex = 0; pixelIndexX += 1
+        if (pixelIndexX > rectangle.right) {
+          pixelIndexX = rectangle.left; pixelIndexY += 1
+        }
+
+        if (pixelsLeft > 0) {
+          // Generate samples for the next pixel
+          pixelSamples = generatePixelSamples(pixelIndexX, pixelIndexY)
+        }
+        else {
+          // No more samples in this batch
+          moreSamples = false
         }
       }
 
-      // Number of pixels in this batch
-      private val pixelsThisBatch = if (batchIndex < batches.size - 1) pixelsPerBatch else {
-        // The last batch contains the remaining pixels (can be less than pixelsPerBatch)
-        rectangle.width * rectangle.height - (batches.size - 1) * pixelsPerBatch
+      sample
+    }
+
+    // Generate samples for pixel (px, py)
+    private def generatePixelSamples(px: Int, py: Int): Array[Sample] = {
+      val samples = new Array[Sample](samplesPerPixel)
+
+      // Generate image, lens and time samples for this pixel
+      val imageSamples = StratifiedSampler.generateSamplePattern2D(samplesPerPixelX, samplesPerPixelY, jitter)
+      val lensSamples = StratifiedSampler.generateSamplePattern2D(samplesPerPixelX, samplesPerPixelY, jitter)
+      val timeSamples = StratifiedSampler.generateSamplePattern1D(samplesPerPixel, jitter)
+
+      for (i <- 0 until samplesPerPixel) {
+        import scala.collection.mutable.{ Map => MutableMap }
+
+        // Generate 1D and 2D sample patterns for the current sample
+        val samplePatterns1D = MutableMap[Int, SamplePattern1D]()
+        val samplePatterns2D = MutableMap[Int, SamplePattern2D]()
+
+        samplePatternSpecs foreach {
+          _ match {
+            case spec: SamplePatternSpec1D => samplePatterns1D += spec.id -> StratifiedSampler.generateSamplePattern1D(spec.count, jitter)
+            case spec: SamplePatternSpec2D => samplePatterns2D += spec.id -> StratifiedSampler.generateSamplePattern2D(spec.count, jitter)
+          }
+        }
+
+        val imageSample = imageSamples(i)
+        val lensSample = lensSamples(i)
+        val timeSample = timeSamples(i)
+
+        // Create Sample object, shift image samples to pixel position
+        samples(i) = new Sample(px + imageSample._1, py + imageSample._2, lensSample._1, lensSample._2, timeSample, samplePatterns1D.toMap, samplePatterns2D.toMap)
       }
 
-      // Number of samples in this batch
-      override val size = samplesPerPixel * pixelsThisBatch
+      pixelsLeft -= 1
+
+      samples
     }
   }
 

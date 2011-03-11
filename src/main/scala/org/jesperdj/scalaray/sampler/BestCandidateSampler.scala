@@ -17,15 +17,11 @@
  */
 package org.jesperdj.scalaray.sampler
 
-import scala.collection.immutable.Traversable
-
 // Best-candidate sampler (pbrt 7.5)
 final class BestCandidateSampler extends Sampler {
   // TODO: Implement best-candidate sampler
-  val batches = new Traversable[SampleBatch] {
-    def foreach[U](f: SampleBatch => U): Unit = throw new UnsupportedOperationException("Not yet implemented")
-    override val size = 0
-  }
+  def hasNext: Boolean = throw new UnsupportedOperationException("Not yet implemented")
+  def next: SampleBatch = throw new UnsupportedOperationException("Not yet implemented")
 
   override def toString = "BestCandidateSampler"
 }

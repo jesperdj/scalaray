@@ -41,7 +41,7 @@ final class SamplerRenderer (scene: Scene, sampler: Sampler, samplesPerPixel: In
 
     final class Task (batch: SampleBatch) extends Runnable {
       def run() {
-        batch.samples foreach { sample => pixelBuffer += (sample, radiance(camera.generateRayDifferential(sample, scale), sample)) }
+        batch foreach { sample => pixelBuffer += (sample, radiance(camera.generateRayDifferential(sample, scale), sample)) }
         runningTasks.decrementAndGet
       }
     }
@@ -49,11 +49,11 @@ final class SamplerRenderer (scene: Scene, sampler: Sampler, samplesPerPixel: In
     val processors = Runtime.getRuntime().availableProcessors()
     println("Number of processors: " + processors)
 
+    var numTasks = 0
+
     // Create executor service and submit tasks
     val executorService = Executors.newFixedThreadPool(processors)
-    sampler.batches.foreach { batch => runningTasks.incrementAndGet; executorService.submit(new Task(batch)) }
-
-    val numTasks = sampler.batches.size
+    sampler foreach { batch => runningTasks.incrementAndGet; executorService.submit(new Task(batch)); numTasks += 1 }
 
     // Wait until all tasks have finished
     executorService.shutdown()

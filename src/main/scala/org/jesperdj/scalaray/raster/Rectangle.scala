@@ -19,6 +19,9 @@ package org.jesperdj.scalaray.raster
 
 // Rectangle in raster coordinates
 final class Rectangle (val left: Int, val top: Int, val right: Int, val bottom: Int) {
+  // Create a rectangle with a width and height, with (left, top) = (0, 0)
+  def this(width: Int, height: Int) = this(0, 0, width - 1, height - 1)
+
   val width = right - left + 1
   val height = bottom - top + 1
 

@@ -17,15 +17,11 @@
  */
 package org.jesperdj.scalaray.sampler
 
-import scala.collection.immutable.Traversable
-
 // Low-discrepancy sampler (pbrt 7.4)
 final class LowDiscrepancySampler extends Sampler {
   // TODO: Implement low-discrepancy sampler
-  val batches = new Traversable[SampleBatch] {
-    def foreach[U](f: SampleBatch => U): Unit = throw new UnsupportedOperationException("Not yet implemented")
-    override val size = 0
-  }
+  def hasNext: Boolean = throw new UnsupportedOperationException("Not yet implemented")
+  def next: SampleBatch = throw new UnsupportedOperationException("Not yet implemented")
 
   override def toString = "LowDiscrepancySampler"
 }

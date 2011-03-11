@@ -58,11 +58,14 @@ object Main {
     println("ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala")
     println("Copyright (C) 2009, 2010, 2011  Jesper de Jong")
 
+//    println("Press Enter to start")
+//    new java.util.Scanner(System.in).nextLine()
+
     println()
     println("Setup...")
     val scene = createScene()
 
-    val rect = new Rectangle(0, 0, 799, 599)
+    val rect = new Rectangle(800, 600)
 
     val camera: Camera = new PerspectiveCamera(Transform.translate(0.0, 0.75f, 0.0), π / 4.0, rect.width, rect.height)
 
@@ -72,7 +75,7 @@ object Main {
     val surfaceIntegrator: SurfaceIntegrator = DirectLightingSurfaceIntegrator(scene)
     val volumeIntegrator: VolumeIntegrator = VacuumVolumeIntegrator
 
-    val sampler: Sampler = new StratifiedSampler(rect, 65536, 2, 2, true, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
+    val sampler: Sampler = new StratifiedSampler(rect, 16384, 2, 2, true, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
 
     val renderer: Renderer = new SamplerRenderer(scene, sampler, 4, camera, pixelBuffer, surfaceIntegrator, volumeIntegrator)
 
