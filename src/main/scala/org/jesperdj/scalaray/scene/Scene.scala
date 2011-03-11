@@ -26,16 +26,16 @@ import org.jesperdj.scalaray.vecmath._
 // Scene (pbrt 1.3.2)
 final class Scene (primitive: Primitive, val lightSources: Traversable[LightSource]) {
   // Bounding box of the whole scene
-  def boundingBox: BoundingBox = primitive.boundingBox
+  val boundingBox: BoundingBox = primitive.boundingBox
 
   // Bounding sphere of the whole scene
-  def boundingSphere: (Point, Double) = boundingBox.boundingSphere
+  val boundingSphere: (Point, Double) = boundingBox.boundingSphere
 
   // Compute closest intersection between a ray and primitives in the scene
-  def intersect(ray: Ray): Option[Intersection] = primitive intersect ray map { case (its, _) => its }
+  def intersect(ray: Ray): Option[Intersection] = primitive.intersect(ray) map { case (its, _) => its }
 
   // Check if a ray intersects a primitive in the scene
-  def checkIntersect(ray: Ray): Boolean = primitive checkIntersect ray
+  def checkIntersect(ray: Ray): Boolean = primitive.checkIntersect(ray)
 
   override def toString = "Scene(primitive=%s, lightSources=%s)" format (primitive, lightSources)
 }

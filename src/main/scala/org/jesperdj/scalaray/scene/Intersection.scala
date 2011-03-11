@@ -27,7 +27,7 @@ final class Intersection (val dg: DifferentialGeometry, val primitive: Geometric
   // Get the BSDF at the intersection point
   def bsdf: BSDF = primitive.bsdf(dg, objectToWorld)
 
-  // Get the emitted radiance from the intersection point if the intersection is on an area light (pbrt 13.4)
+  // Get the emitted radiance from the intersection point if the intersection is on an area light (pbrt 12.4)
   def emittedRadiance(direction: Vector): Spectrum = primitive.areaLightSource match {
     case Some(areaLightSource) => areaLightSource.emittedRadiance(dg.point, dg.normal, direction)
     case None => Spectrum.Black
@@ -37,5 +37,7 @@ final class Intersection (val dg: DifferentialGeometry, val primitive: Geometric
 }
 
 object Intersection {
-  def unapply(intersection: Intersection) = Some((intersection.dg, intersection.primitive, intersection.objectToWorld))
+  // Extractor method
+  def unapply(intersection: Intersection): Option[(DifferentialGeometry, GeometricPrimitive, Transform)] =
+    Some(intersection.dg, intersection.primitive, intersection.objectToWorld)
 }

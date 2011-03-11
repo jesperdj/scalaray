@@ -24,7 +24,7 @@ import org.jesperdj.scalaray.vecmath.Ray
 // It is not necessary and only complicates the architecture.
 
 // Primitive (pbrt 4.1)
-abstract class Primitive extends HasBoundingBox {
+trait Primitive extends HasBoundingBox {
   // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray (pbrt 4.1)
   def intersect(ray: Ray): Option[(Intersection, Double)]
 

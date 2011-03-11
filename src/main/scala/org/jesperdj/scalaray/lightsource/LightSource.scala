@@ -22,7 +22,7 @@ import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath._
 
 // Light source (pbrt 12.1)
-abstract class LightSource {
+trait LightSource {
   // Indicates whether the light is described by a delta distribution
   val isDeltaLight: Boolean
 

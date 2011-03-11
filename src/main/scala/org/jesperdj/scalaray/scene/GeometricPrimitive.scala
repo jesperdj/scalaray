@@ -38,12 +38,12 @@ final class GeometricPrimitive private (shape: Shape, material: Material, val ar
   override def boundingBox(transform: Transform): BoundingBox = shape.boundingBox(transform)
 
   // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
-  def intersect(ray: Ray): Option[(Intersection, Double)] = shape intersect ray map {
+  def intersect(ray: Ray): Option[(Intersection, Double)] = shape.intersect(ray) map {
     case (dg, distance) => (new Intersection(dg, this, Transform.Identity), distance)
   }
 
   // Check if a ray intersects this primitive
-  override def checkIntersect(ray: Ray): Boolean = shape checkIntersect ray
+  override def checkIntersect(ray: Ray): Boolean = shape.checkIntersect(ray)
 
   // Get the BSDF for a given differential geometry and object-to-world transform
   def bsdf(dg: DifferentialGeometry, objectToWorld: Transform): BSDF = material.bsdf(dg, shape.shadingGeometry(dg, objectToWorld))

@@ -21,9 +21,9 @@ import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath._
 
 // Area light source (pbrt 12.4)
-abstract class AreaLightSource extends LightSource {
+trait AreaLightSource extends LightSource {
   // Indicates whether the light is described by a delta distribution
-  val isDeltaLight: Boolean = false
+  final val isDeltaLight: Boolean = false
 
   // Emitted radiance in the given direction from the given point on the surface of the area light with the given normal
   def emittedRadiance(point: Point, normal: Normal, direction: Vector): Spectrum

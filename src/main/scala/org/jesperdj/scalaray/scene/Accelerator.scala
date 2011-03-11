@@ -17,5 +17,5 @@
  */
 package org.jesperdj.scalaray.scene
 
-// Marker trait for accelerators
+// Marker trait for accelerators (pbrt 4.2)
 trait Accelerator

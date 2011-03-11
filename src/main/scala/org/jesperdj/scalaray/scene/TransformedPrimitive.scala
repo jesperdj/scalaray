@@ -20,7 +20,7 @@ package org.jesperdj.scalaray.scene
 import org.jesperdj.scalaray.shape.BoundingBox
 import org.jesperdj.scalaray.vecmath._
 
-// Transformed primitive: wraps a primitive with a transform
+// Transformed primitive: wraps a primitive with a transform (pbrt 4.1.2)
 final class TransformedPrimitive (primitive: Primitive, transform: Transform) extends Primitive {
   private val inverse: Transform = transform.inverse
 
@@ -31,12 +31,12 @@ final class TransformedPrimitive (primitive: Primitive, transform: Transform) ex
   override def boundingBox(tr: Transform): BoundingBox = primitive.boundingBox(tr * transform)
 
   // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
-  def intersect(ray: Ray): Option[(Intersection, Double)] = primitive intersect (inverse * ray) map {
+  def intersect(ray: Ray): Option[(Intersection, Double)] = primitive.intersect(inverse * ray) map {
     case (its, distance) => (transform * its, distance)
   }
 
   // Check if a ray intersects this primitive
-  override def checkIntersect(ray: Ray): Boolean = primitive checkIntersect (inverse * ray)
+  override def checkIntersect(ray: Ray): Boolean = primitive.checkIntersect(inverse * ray)
 
   override def toString = "TransformedPrimitive(primitive=%s, transform=%s)" format (primitive, transform)
 }

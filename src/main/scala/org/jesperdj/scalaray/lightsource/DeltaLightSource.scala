@@ -20,12 +20,13 @@ package org.jesperdj.scalaray.lightsource
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath._
 
-abstract class DeltaLightSource extends LightSource {
+// Light source described by a delta distribution
+trait DeltaLightSource extends LightSource {
   // Indicates whether the light is described by a delta distribution
-  val isDeltaLight: Boolean = true
+  final val isDeltaLight: Boolean = true
 
   // Number of samples to take from this light source
-  val numberOfSamples: Int = 1
+  final val numberOfSamples: Int = 1
 
   // Radiance of this light source at the given point
   // Returns the radiance and a ray from the light source to the given point
@@ -33,9 +34,12 @@ abstract class DeltaLightSource extends LightSource {
 
   // Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
   // Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-  def sampleRadiance(point: Point, u1: Double, u2: Double): (Spectrum, Ray, Double) = { val (rad, ray) = radiance(point); (rad, ray, 1.0) }
+  final def sampleRadiance(point: Point, u1: Double, u2: Double): (Spectrum, Ray, Double) = {
+    val (rad, ray) = radiance(point)
+    (rad, ray, 1.0)
+  }
 
   // Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
   // that sampleRadiance(point: Point, u1: Double, u2: Double) uses to sample points (pbrt 14.6.1)
-  def pdf(point: Point, wi: Vector): Double = 0.0
+  final def pdf(point: Point, wi: Vector): Double = 0.0
 }

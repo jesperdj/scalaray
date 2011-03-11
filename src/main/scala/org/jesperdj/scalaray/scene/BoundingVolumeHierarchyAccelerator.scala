@@ -23,18 +23,18 @@ import org.jesperdj.scalaray.shape._
 import org.jesperdj.scalaray.vecmath._
 
 // Bounding volume hierarchy accelerator (pbrt 4.4)
-final class BoundingVolumeHierarchyAccelerator (
-  primitives: Traversable[Primitive],
-  split: (Traversable[Primitive]) => (Traversable[Primitive], Traversable[Primitive]) = BoundingVolumeHierarchyAccelerator.splitSurfaceAreaHeuristic,
-  maxPrimitivesPerNode: Int = 2) extends Primitive with Accelerator {
+final class BoundingVolumeHierarchyAccelerator (primitives: Traversable[Primitive],
+                                                split: Traversable[Primitive] => (Traversable[Primitive], Traversable[Primitive]) = BoundingVolumeHierarchyAccelerator.splitSurfaceAreaHeuristic,
+                                                maxPrimitivesPerNode: Int = 2) extends Primitive with Accelerator {
   require(maxPrimitivesPerNode >= 2, "maxPrimitivesPerNode must be >= 2")
 
   private val root: Primitive = {
-    // Recursive function to build the tree
+    // Recursive method to build the tree
     def build(ps: Traversable[Primitive]): Primitive = {
-      if (ps.size == 1) ps.head
-      else if (ps.size <= maxPrimitivesPerNode) new CompositePrimitive(ps)
-      else { val (left, right) = split(ps); new CompositePrimitive(build(left), build(right)) }
+      if (ps.size == 1) ps.head else if (ps.size <= maxPrimitivesPerNode) new CompositePrimitive(ps) else {
+        val (left, right) = split(ps)
+        new CompositePrimitive(build(left), build(right))
+      }
     }
 
     build(primitives)
@@ -47,10 +47,10 @@ final class BoundingVolumeHierarchyAccelerator (
   override def boundingBox(transform: Transform): BoundingBox = root.boundingBox(transform)
 
   // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
-  def intersect(ray: Ray): Option[(Intersection, Double)] = root intersect ray
+  def intersect(ray: Ray): Option[(Intersection, Double)] = root.intersect(ray)
 
   // Check if a ray intersects this primitive
-  override def checkIntersect(ray: Ray): Boolean = root checkIntersect ray
+  override def checkIntersect(ray: Ray): Boolean = root.checkIntersect(ray)
 
   override def toString = "BoundingVolumeHierarchyAccelerator(root=%s)" format (root)
 }
@@ -59,7 +59,7 @@ object BoundingVolumeHierarchyAccelerator {
   // TODO: There are bugs in this, it might return empty collections, that should never happen
   def splitMiddle(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) = {
     // Compute bounding box of centroids and extents of that bounding box
-    val cb = (BoundingBox.Empty /: ps) { (bb, p) => bb union p.boundingBox.centroid }
+    val cb = ps.foldLeft(BoundingBox.Empty) { (bb, p) => bb union p.boundingBox.centroid }
     val (ex, ey, ez) = (cb.max.x - cb.min.x, cb.max.y - cb.min.y, cb.max.z - cb.min.z)
 
     // Predicates for partitioning

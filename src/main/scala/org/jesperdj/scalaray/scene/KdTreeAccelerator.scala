@@ -22,22 +22,22 @@ import scala.collection.immutable.Traversable
 import org.jesperdj.scalaray.shape.BoundingBox
 import org.jesperdj.scalaray.vecmath._
 
-// kd-tree accelerator
+// kd-tree accelerator (pbrt 4.5)
 final class KdTreeAccelerator (primitives: Traversable[Primitive]) extends Primitive with Accelerator {
   // Bounding box that contains the primitive
-  val boundingBox: BoundingBox = BoundingBox.Empty // TODO: Implement boundingBox
+  val boundingBox: BoundingBox = BoundingBox.Empty // TODO: Implement KdTreeAccelerator.boundingBox
 
   // Bounding box when primitive is transformed
   override def boundingBox(transform: Transform): BoundingBox =
-    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement boundingBox
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement KdTreeAccelerator.boundingBox
   
   // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
   def intersect(ray: Ray): Option[(Intersection, Double)] =
-    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement intersect
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement KdTreeAccelerator.intersect
 
   // Check if a ray intersects this primitive
   override def checkIntersect(ray: Ray): Boolean =
-    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement checkIntersect
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement KdTreeAccelerator.checkIntersect
 
   override def toString = "KdTreeAccelerator"
 }

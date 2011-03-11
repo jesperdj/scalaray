@@ -30,15 +30,15 @@ final class CompositePrimitive (primitives: Traversable[Primitive]) extends Prim
   def this(primitives: Primitive*) = this(Traversable(primitives: _*))
 
   // Bounding box that contains the primitive
-  val boundingBox: BoundingBox = (BoundingBox.Empty /: primitives) { (bb, p) => bb union p.boundingBox }
+  val boundingBox: BoundingBox = primitives.foldLeft(BoundingBox.Empty) { (bb, p) => bb union p.boundingBox }
 
   // Bounding box when primitive is transformed
-  override def boundingBox(transform: Transform): BoundingBox = (BoundingBox.Empty /: primitives) { (bb, p) => bb union p.boundingBox(transform) }
+  override def boundingBox(transform: Transform): BoundingBox = primitives.foldLeft(BoundingBox.Empty) { (bb, p) => bb union p.boundingBox(transform) }
 
   // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
   def intersect(ray: Ray): Option[(Intersection, Double)] = {
     // Check against bounding box
-    val range = boundingBox intersect ray
+    val range = boundingBox.intersect(ray)
     if (range.isEmpty) return None
 
     // Initialize the range of the ray with the range inside the bounding box
@@ -46,8 +46,8 @@ final class CompositePrimitive (primitives: Traversable[Primitive]) extends Prim
     var r = Ray(ray.origin, ray.direction, minDistance, maxDistance)
 
     // Find the closest intersection between the ray and one of the primitives
-    ((None: Option[(Intersection, Double)]) /: primitives) { (result: Option[(Intersection, Double)], prim: Primitive) =>
-      prim intersect r match {
+    primitives.foldLeft(None: Option[(Intersection, Double)]) { (result: Option[(Intersection, Double)], prim: Primitive) =>
+      prim.intersect(r) match {
         case Some((its, distance)) =>
           // Found a closer intersection; update max distance of the ray for subsequent intersection tests
           r = Ray(r.origin, r.direction, r.minDistance, distance)
@@ -59,7 +59,7 @@ final class CompositePrimitive (primitives: Traversable[Primitive]) extends Prim
   }
 
   // Check if a ray intersects this primitive
-  override def checkIntersect(ray: Ray): Boolean = primitives exists (_ checkIntersect ray)
+  override def checkIntersect(ray: Ray): Boolean = primitives exists { _.checkIntersect(ray) }
 
   override def toString = "CompositePrimitive(primitives=%s)" format (primitives)
 }
