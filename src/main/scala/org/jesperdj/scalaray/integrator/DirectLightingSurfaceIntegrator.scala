@@ -17,9 +17,6 @@
  */
 package org.jesperdj.scalaray.integrator
 
-import scala.collection.immutable.Traversable
-import scala.collection.mutable.ListBuffer
-
 import org.jesperdj.scalaray.lightsource._
 import org.jesperdj.scalaray.reflection.BSDF
 import org.jesperdj.scalaray.renderer.Renderer
@@ -32,15 +29,33 @@ import org.jesperdj.scalaray.vecmath._
 // TODO: This needs to be refactored, can be substantially simplified now that the light source interface has been refactored.
 // Has been patched to work with the new light source interface, but needs to be cleaned up thoroughly.
 
-// Identifiers of sample patterns for an area light source
-private final class SampleIDs (val lightSampleID: Int, val bsdfSampleID: Int, val bsdfComponentSampleID: Int) {
-  override def toString = "SampleIDs(lightSampleID=%d, bsdfSampleID=%d, bsdfComponentSampleID=%d)" format (lightSampleID, bsdfSampleID, bsdfComponentSampleID)
-}
-
 // Direct lighting surface integrator (pbrt 15.1)
-final class DirectLightingSurfaceIntegrator private (
-  scene: Scene, val sampleSpecs: Traversable[SamplePatternSpec],
-  deltaLights: Traversable[LightSource], areaLights: Traversable[(LightSource, SampleIDs)]) extends SurfaceIntegrator {
+final class DirectLightingSurfaceIntegrator (scene: Scene, samplePatternSpecs: Accumulator[SamplePatternSpec]) extends SurfaceIntegrator {
+  // Identifiers of sample patterns for an area light source
+  private final class SampleIDs (val lightSampleID: Int, val bsdfSampleID: Int, val bsdfComponentSampleID: Int) {
+    override def toString = "SampleIDs(lightSampleID=%d, bsdfSampleID=%d, bsdfComponentSampleID=%d)" format (lightSampleID, bsdfSampleID, bsdfComponentSampleID)
+  }
+
+  private val (deltaLights, areaLights) = {
+    import scala.collection.mutable.ListBuffer
+
+    val deltaLights = ListBuffer[LightSource]()
+    val areaLights = ListBuffer[(LightSource, SampleIDs)]()
+
+    scene.lightSources foreach { lightSource =>
+      if (lightSource.isDeltaLight) {
+        deltaLights += lightSource
+      }
+      else {
+        val lightSamplePatternSpec = new SamplePatternSpec2D(lightSource.numberOfSamples); samplePatternSpecs += lightSamplePatternSpec
+        val bsdfSamplePatternSpec = new SamplePatternSpec2D(lightSource.numberOfSamples); samplePatternSpecs += bsdfSamplePatternSpec
+        val bsdfComponentSamplePatternSpec = new SamplePatternSpec1D(lightSource.numberOfSamples); samplePatternSpecs += bsdfComponentSamplePatternSpec
+        areaLights += ((lightSource, new SampleIDs(lightSamplePatternSpec.id, bsdfSamplePatternSpec.id, bsdfComponentSamplePatternSpec.id)))
+      }
+    }
+
+    (deltaLights.toList, areaLights.toList)
+  }
 
   // Compute the incident radiance along the given ray
   def radiance(renderer: Renderer, ray: RayDifferential, intersection: Intersection, sample: Sample): Spectrum = {
@@ -165,27 +180,5 @@ final class DirectLightingSurfaceIntegrator private (
     (f * f) / (f * f + g * g)
   }
 
-  override def toString = "DirectLightingSurfaceIntegrator(sampleSpecs=%s, deltaLights=%s, areaLights=%s)" format (sampleSpecs, deltaLights, areaLights)
-}
-
-object DirectLightingSurfaceIntegrator {
-  def apply(scene: Scene): DirectLightingSurfaceIntegrator = {
-    val sampleSpecs = ListBuffer[SamplePatternSpec]()
-    val deltaLights = ListBuffer[LightSource]()
-    val areaLights = ListBuffer[(LightSource, SampleIDs)]()
-
-    scene.lightSources foreach { lightSource =>
-      if (lightSource.isDeltaLight) {
-        deltaLights += lightSource
-      }
-      else {
-        val lightSamplePatternSpec = new SamplePatternSpec2D(lightSource.numberOfSamples); sampleSpecs += lightSamplePatternSpec
-        val bsdfSamplePatternSpec = new SamplePatternSpec2D(lightSource.numberOfSamples); sampleSpecs += bsdfSamplePatternSpec
-        val bsdfComponentSamplePatternSpec = new SamplePatternSpec1D(lightSource.numberOfSamples); sampleSpecs += bsdfComponentSamplePatternSpec
-        areaLights += ((lightSource, new SampleIDs(lightSamplePatternSpec.id, bsdfSamplePatternSpec.id, bsdfComponentSamplePatternSpec.id)))
-      }
-    }
-
-    new DirectLightingSurfaceIntegrator(scene, sampleSpecs.toList, deltaLights.toList, areaLights.toList)
-  }
+  override def toString = "DirectLightingSurfaceIntegrator"
 }

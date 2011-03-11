@@ -50,4 +50,3 @@ ScalaRay is not as complete as the original pbrt. Here is a list of things that 
 - add features that are not in pbrt (iso-surfaces ("blobs"), for example)
 - pbrt has no shadow ray caching; investigate if this is worth implementing
 - subsurface scattering
-- profiling and performance improvement; is the performance of ScalaRay significantly different from pbrt?

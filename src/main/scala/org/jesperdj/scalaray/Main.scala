@@ -72,10 +72,12 @@ object Main {
     val filter: Filter = new BoxFilter
     val pixelBuffer = new PixelBuffer(rect, filter)
 
-    val surfaceIntegrator: SurfaceIntegrator = DirectLightingSurfaceIntegrator(scene)
+    val samplePatternSpecs = new ListBuilder[SamplePatternSpec]
+
+    val surfaceIntegrator: SurfaceIntegrator = new DirectLightingSurfaceIntegrator(scene, samplePatternSpecs)
     val volumeIntegrator: VolumeIntegrator = VacuumVolumeIntegrator
 
-    val sampler: Sampler = new StratifiedSampler(rect, 16384, 2, 2, true, surfaceIntegrator.sampleSpecs ++ volumeIntegrator.sampleSpecs)
+    val sampler: Sampler = new StratifiedSampler(rect, 16384, 2, 2, true, samplePatternSpecs.build())
 
     val renderer: Renderer = new SamplerRenderer(scene, sampler, 4, camera, pixelBuffer, surfaceIntegrator, volumeIntegrator)
 

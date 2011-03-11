@@ -17,6 +17,8 @@
  */
 package org.jesperdj.scalaray.spectrum
 
+// TODO: Is it worth it to have a mutable Spectrum class? (Call it SpectrumBuffer, for example, and include a toSpectrum method in it).
+
 // Spectrum
 sealed class Spectrum (private val red: Double, private val green: Double, private val blue: Double) {
   // Add two spectra

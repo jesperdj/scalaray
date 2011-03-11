@@ -17,10 +17,8 @@
  */
 package org.jesperdj.scalaray.integrator
 
-import scala.collection.immutable.Traversable
-
 import org.jesperdj.scalaray.renderer.Renderer
-import org.jesperdj.scalaray.sampler.{ Sample, SamplePatternSpec }
+import org.jesperdj.scalaray.sampler.Sample
 import org.jesperdj.scalaray.scene.Intersection
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath.RayDifferential
@@ -28,24 +26,22 @@ import org.jesperdj.scalaray.vecmath.RayDifferential
 // TODO: Refactor this. Integrators should not have a val sampleSpecs.
 // Instead, an Accumulator[SamplePatternSpec] should be passed to the constructor of integrators that need this. The constructor of the integrator
 // should add SamplePatternSpec instances to this accumulator if it needs additional sample patterns.
+// Also, Integrators should not know the Renderer, see comments in Renderer.scala
 
 // Integrator (pbrt 15)
-sealed abstract class Integrator {
-  // Sample specifications for the sample patterns that this integrator needs
-  val sampleSpecs: Traversable[SamplePatternSpec]
-}
+sealed trait Integrator
 
 // Surface integrator (pbrt 15)
-abstract class SurfaceIntegrator extends Integrator {
+trait SurfaceIntegrator extends Integrator {
   // Compute the incident radiance along the given ray
   def radiance(renderer: Renderer, ray: RayDifferential, intersection: Intersection, sample: Sample): Spectrum
 }
 
 // Volume integrator (pbrt 16.2)
-abstract class VolumeIntegrator extends Integrator {
-  // TODO
+trait VolumeIntegrator extends Integrator {
+  // TODO: Description
   def radiance(renderer: Renderer, ray: RayDifferential, sample: Sample): (Spectrum, Spectrum)
 
-  // TODO
+  // TODO: Description
   def transmittance(renderer: Renderer, ray: RayDifferential, sample: Sample): Spectrum
 }
