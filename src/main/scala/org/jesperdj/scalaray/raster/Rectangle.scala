@@ -33,7 +33,7 @@ object Rectangle {
   def apply(left: Int, top: Int, right: Int, bottom: Int) = new Rectangle(left, top, right, bottom)
 
   // Create a rectangle with a width and height, with (left, top) = (0, 0)
-  def apply(width: Int, height: Int) = new Rectangle(0, 0, width - 1, height - 1)
+  def apply(width: Int, height: Int) = new Rectangle(width, height)
 
   // Extractor method
   def unapply(rectangle: Rectangle) = Some(rectangle.left, rectangle.top, rectangle.right, rectangle.bottom)

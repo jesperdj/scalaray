@@ -18,7 +18,7 @@
 package org.jesperdj.scalaray.raster
 
 // Raster: Mutable two-dimensional container
-final class Raster[T : ClassManifest] (rectangle: Rectangle) {
+final class Raster[T : ClassManifest] (val rectangle: Rectangle) {
   private val data = new Array[T](rectangle.width * rectangle.height)
 
   private def index(x: Int, y: Int): Int = (x - rectangle.left) + (y - rectangle.top) * rectangle.width

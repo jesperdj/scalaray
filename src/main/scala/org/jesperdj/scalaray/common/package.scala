@@ -59,8 +59,8 @@ package object common {
   // Create an immutable IndexedSeq that wraps an Array. Note that Scala already contains a method wrapDoubleArray(), but this returns a mutable WrappedArray.
   // Also, this version is @specialized on Double to avoid unnecessary boxing and unboxing.
   def arrayToIndexedSeq[@specialized(Double) T](array: Array[T]): IndexedSeq[T] = new IndexedSeq[T] {
-    def apply(idx: Int): T = array(idx)
-    def length: Int = array.length
+    @inline def apply(idx: Int): T = array(idx)
+    @inline def length: Int = array.length
   }
 
   // Randomly permutate an array - Fisher-Yates shuffle (see: http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
