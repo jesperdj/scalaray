@@ -23,10 +23,10 @@ import org.jesperdj.scalaray.scene.Intersection
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath.RayDifferential
 
-// TODO: Refactor this. Integrators should not have a val sampleSpecs.
-// Instead, an Accumulator[SamplePatternSpec] should be passed to the constructor of integrators that need this. The constructor of the integrator
-// should add SamplePatternSpec instances to this accumulator if it needs additional sample patterns.
-// Also, Integrators should not know the Renderer, see comments in Renderer.scala
+// TODO: Refactor this.
+// Integrators should not know the Renderer, see comments in Renderer.scala
+// The Renderer (or RayTracer) should not be passed at all in the radiance() and transmittance() methods. Whether the integrator needs these things is
+// an implementation detail of the integrator, so it should be left to specific implementations to get these as for example constructor parameters.
 
 // Integrator (pbrt 15)
 sealed trait Integrator

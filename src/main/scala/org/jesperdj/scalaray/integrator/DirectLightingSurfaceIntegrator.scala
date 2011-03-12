@@ -121,9 +121,9 @@ final class DirectLightingSurfaceIntegrator (scene: Scene, samplePatternSpecs: A
     // Sample light source
     var lightContrib = Spectrum.Black
     for (i <- 0 until lightSamples.size) {
-      val ls = lightSamples(i)
+      val (lx, ly) = lightSamples(i)
 
-      val (radiance, ray, lightPdf) = areaLight.sampleRadiance(point, ls._1, ls._2)
+      val (radiance, ray, lightPdf) = areaLight.sampleRadiance(point, lx, ly)
       if (lightPdf > 0.0 && !radiance.isBlack) {
         val wi = -ray.direction.normalize
 
@@ -139,9 +139,9 @@ final class DirectLightingSurfaceIntegrator (scene: Scene, samplePatternSpecs: A
     // Sample BSDF
     var bsdfContrib = Spectrum.Black
     for (i <- 0 until bsdfSamples.size) {
-      val bss = bsdfSamples(i); val bcs = bsdfComponentSamples(i)
+      val (bsx, bsy) = bsdfSamples(i); val bcs = bsdfComponentSamples(i)
 
-      val (reflectance, wi, bsdfPdf, _) = bsdf.sample(wo, bss._1, bss._2, bcs)
+      val (reflectance, wi, bsdfPdf, _) = bsdf.sample(wo, bsx, bsy, bcs)
       if (bsdfPdf > 0.0 && !reflectance.isBlack) {
         val lightPdf = areaLight.pdf(point, wi)
         if (lightPdf > 0.0) {
