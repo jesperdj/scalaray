@@ -20,7 +20,6 @@ package org.jesperdj.scalaray
 import java.io.File
 import javax.imageio.ImageIO
 
-import scala.actors.Futures._
 import scala.collection.immutable.{ IndexedSeq, Traversable }
 
 import org.jesperdj.scalaray.camera._
@@ -67,22 +66,21 @@ object Main {
 
     val rect = new Rectangle(800, 600)
 
-    val camera: Camera = new PerspectiveCamera(Transform.translate(0.0, 0.75f, 0.0), π / 4.0, rect.width, rect.height)
-
-    val filter: Filter = new BoxFilter
-    val pixelBuffer = new PixelBuffer(rect, filter)
-
     val samplePatternSpecs = new ListBuilder[SamplePatternSpec]
 
-    val surfaceIntegrator: SurfaceIntegrator = new DirectLightingSurfaceIntegrator(scene, samplePatternSpecs)
-    val volumeIntegrator: VolumeIntegrator = VacuumVolumeIntegrator
+    val surfaceIntegratorBuilder = SimpleSurfaceIntegratorBuilder
+    val volumeIntegratorBuilder = VacuumVolumeIntegratorBuilder
+    val integrator = new Integrator(scene, surfaceIntegratorBuilder, volumeIntegratorBuilder)
 
     val sampler: Sampler = new StratifiedSampler(rect, 16384, 2, 2, true, samplePatternSpecs.build())
+    val filter: Filter = new BoxFilter
 
-    val renderer: Renderer = new SamplerRenderer(scene, sampler, 4, camera, pixelBuffer, surfaceIntegrator, volumeIntegrator)
+    val camera: Camera = new PerspectiveCamera(Transform.translate(0.0, 0.75f, 0.0), π / 4.0, rect.width, rect.height)
 
-    println("- Surface integrator: " + surfaceIntegrator)
-    println("- Volume integrator: " + volumeIntegrator)
+    val renderer: Renderer = new SamplerRenderer(sampler, filter, camera, integrator)
+
+//    println("- Surface integrator: " + surfaceIntegrator)
+//    println("- Volume integrator: " + volumeIntegrator)
     println("- Sampler: " + sampler)
     println("- Filter: " + filter)
     println("- Renderer: " + renderer)
@@ -91,7 +89,7 @@ object Main {
     println()
     println("Rendering...")
     val timer = new Timer("Total rendering time")
-    timer.time { renderer.render() }
+    val pixelBuffer = timer.time { renderer.render() }
     println(timer.toString)
 
     ImageIO.write(pixelBuffer.toImage, "png", new File("output.png"))

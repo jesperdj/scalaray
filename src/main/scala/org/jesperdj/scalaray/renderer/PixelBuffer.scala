@@ -56,7 +56,11 @@ final class PixelBuffer (rectangle: Rectangle, filter: Filter) {
     val maxY = math.min((iy + filter.extentY).floor.toInt, rectangle.bottom)
 
     // Update the relevant pixels
-    for (y <- minY to maxY; x <- minX to maxX) pixels(x, y) +*= (spectrum, filter(x - ix, y - iy))
+    for (y <- minY to maxY; x <- minX to maxX) {
+      val weight = filter(x - ix, y - iy)
+      val pixel = pixels(x, y)
+      pixel.synchronized { pixel +*= (spectrum, weight) }
+    }
   }
 
   // Convert the pixels to an RGB image

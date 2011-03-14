@@ -18,20 +18,24 @@
 package org.jesperdj.scalaray.integrator
 
 import org.jesperdj.scalaray.sampler.Sample
+import org.jesperdj.scalaray.scene.Intersection
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath.RayDifferential
 
-object VacuumVolumeIntegratorBuilder extends VolumeIntegratorBuilder {
-  def build() = VacuumVolumeIntegrator
+import scala.collection.immutable.IndexedSeq
+
+object SimpleSurfaceIntegratorBuilder extends SurfaceIntegratorBuilder {
+  def build() = SimpleSurfaceIntegrator
 }
 
-// Volume integrator that does nothing
-object VacuumVolumeIntegrator extends VolumeIntegrator {
-  // TODO: Description; returns radiance and transmittance
-  def radiance(ray: RayDifferential, sample: Sample, integrator: Integrator): (Spectrum, Spectrum) = (Spectrum.Black, Spectrum.Unit)
+// Simple surface integrator that colors each primitive with a color chosen from a fixed set
+object SimpleSurfaceIntegrator extends SurfaceIntegrator {
+  private val colors: IndexedSeq[Spectrum] = IndexedSeq(Spectrum(1.0, 0.0, 0.0), Spectrum(0.0, 1.0, 0.0),
+    Spectrum(0.0, 0.0, 1.0), Spectrum(0.0, 1.0, 1.0), Spectrum(1.0, 0.0, 1.0), Spectrum(1.0, 1.0, 0.0))
 
-  // Compute the fraction of light that is attenuated by volumetric scattering along the ray
-  def transmittance(ray: RayDifferential, sample: Sample, integrator: Integrator): Spectrum = Spectrum.Unit
+  // Compute the incident radiance along the given ray
+  def radiance(ray: RayDifferential, intersection: Intersection, sample: Sample, integrator: Integrator): Spectrum =
+    colors(intersection.primitive.hashCode % colors.size)
 
-  override def toString = "VacuumVolumeIntegrator"
+  override def toString = "SimpleSurfaceIntegrator"
 }

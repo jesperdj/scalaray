@@ -17,9 +17,12 @@
  */
 package org.jesperdj.scalaray.sampler
 
+import org.jesperdj.scalaray.raster.Rectangle
+
 // Best-candidate sampler (pbrt 7.5)
-final class BestCandidateSampler extends Sampler {
+final class BestCandidateSampler (val rectangle: Rectangle, val samplesPerPixel: Int) extends Sampler {
   // TODO: Implement best-candidate sampler
+  val numberOfBatches = 1
   def hasNext: Boolean = throw new UnsupportedOperationException("Not yet implemented")
   def next: SampleBatch = throw new UnsupportedOperationException("Not yet implemented")
 

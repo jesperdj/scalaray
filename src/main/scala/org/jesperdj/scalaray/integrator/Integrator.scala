@@ -17,31 +17,58 @@
  */
 package org.jesperdj.scalaray.integrator
 
-import org.jesperdj.scalaray.renderer.Renderer
+import org.jesperdj.scalaray.common.Builder
 import org.jesperdj.scalaray.sampler.Sample
-import org.jesperdj.scalaray.scene.Intersection
+import org.jesperdj.scalaray.scene.{ Intersection, Scene }
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath.RayDifferential
 
-// TODO: Refactor this.
-// Integrators should not know the Renderer, see comments in Renderer.scala
-// The Renderer (or RayTracer) should not be passed at all in the radiance() and transmittance() methods. Whether the integrator needs these things is
-// an implementation detail of the integrator, so it should be left to specific implementations to get these as for example constructor parameters.
-
-// Integrator (pbrt 15)
-sealed trait Integrator
-
 // Surface integrator (pbrt 15)
-trait SurfaceIntegrator extends Integrator {
+trait SurfaceIntegrator {
   // Compute the incident radiance along the given ray
-  def radiance(renderer: Renderer, ray: RayDifferential, intersection: Intersection, sample: Sample): Spectrum
+  def radiance(ray: RayDifferential, intersection: Intersection, sample: Sample, integrator: Integrator): Spectrum
 }
 
 // Volume integrator (pbrt 16.2)
-trait VolumeIntegrator extends Integrator {
-  // TODO: Description
-  def radiance(renderer: Renderer, ray: RayDifferential, sample: Sample): (Spectrum, Spectrum)
+trait VolumeIntegrator {
+  // TODO: Description; returns radiance and transmittance
+  def radiance(ray: RayDifferential, sample: Sample, integrator: Integrator): (Spectrum, Spectrum)
 
-  // TODO: Description
-  def transmittance(renderer: Renderer, ray: RayDifferential, sample: Sample): Spectrum
+  // Compute the fraction of light that is attenuated by volumetric scattering along the ray
+  def transmittance(ray: RayDifferential, sample: Sample, integrator: Integrator): Spectrum
+}
+
+trait WithIntegrator {
+  def withIntegrator(integrator: Integrator): this.type = this
+}
+
+trait SurfaceIntegratorBuilder extends Builder[SurfaceIntegrator] with WithIntegrator
+trait VolumeIntegratorBuilder extends Builder[VolumeIntegrator] with WithIntegrator
+
+// NOTE: Integrator in ScalaRay is not the same thing as Integrator in pbrt. Here, the Integrator is the object that
+// combines a SurfaceIntegrator and VolumeIntegrator to compute the incident radiance along a ray. In pbrt, this
+// functionality is implemented in Renderer.
+
+// Integrator; combines a SurfaceIntegrator and VolumeIntegrator
+final class Integrator (scene: Scene, surfaceIntegratorBuilder: SurfaceIntegratorBuilder, volumeIntegratorBuilder: VolumeIntegratorBuilder) {
+  private val surfaceIntegrator = surfaceIntegratorBuilder.withIntegrator(this).build()
+  private val volumeIntegrator = volumeIntegratorBuilder.withIntegrator(this).build()
+
+  // Compute the incident radiance along the given ray
+  def radiance(ray: RayDifferential, sample: Sample): Spectrum = {
+    val li = scene.intersect(ray) match {
+      // If the ray intersects geometry in the scene, get the reflected radiance from the surface integrator
+      case Some(intersection) => surfaceIntegrator.radiance(ray, intersection, sample, this)
+
+      // If the ray does not intersect any geometry, accumulate the contributions of infinite area light sources along the ray
+      case _ => scene.lightSources.foldLeft(Spectrum.Black) { (acc, ls) => acc + ls.emittedRadiance(ray) }
+    }
+
+    val (lvi, t) = volumeIntegrator.radiance(ray, sample, this)
+
+    t * li + lvi
+  }
+
+  // Compute the fraction of light that is attenuated by volumetric scattering along the ray
+  def transmittance(ray: RayDifferential, sample: Sample): Spectrum = volumeIntegrator.transmittance(ray, sample, this)
 }

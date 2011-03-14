@@ -17,9 +17,12 @@
  */
 package org.jesperdj.scalaray.sampler
 
+import org.jesperdj.scalaray.raster.Rectangle
+
 // Low-discrepancy sampler (pbrt 7.4)
-final class LowDiscrepancySampler extends Sampler {
+final class LowDiscrepancySampler (val rectangle: Rectangle, val samplesPerPixel: Int) extends Sampler {
   // TODO: Implement low-discrepancy sampler
+  val numberOfBatches = 1
   def hasNext: Boolean = throw new UnsupportedOperationException("Not yet implemented")
   def next: SampleBatch = throw new UnsupportedOperationException("Not yet implemented")
 

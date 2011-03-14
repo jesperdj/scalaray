@@ -25,7 +25,7 @@ import org.jesperdj.scalaray.vecmath.{ Ray, RayDifferential }
 // The only responsibility of Camera is to generate camera rays.
 
 // Camera (pbrt 6.1)
-abstract class Camera {
+trait Camera {
   // Generate a camera ray for a sample (pbrt 6.1)
   def generateRay(sample: CameraSample): Ray
 

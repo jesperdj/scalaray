@@ -17,6 +17,8 @@
  */
 package org.jesperdj.scalaray.sampler
 
+import org.jesperdj.scalaray.raster.Rectangle
+
 import scala.collection.Iterator
 import scala.collection.immutable.Map
 
@@ -32,4 +34,13 @@ final class Sample (imageX: Double, imageY: Double, lensU: Double, lensV: Double
 trait SampleBatch extends Iterator[Sample]
 
 // Sampler (pbrt 7.2)
-trait Sampler extends Iterator[SampleBatch]
+trait Sampler extends Iterator[SampleBatch] {
+  // Rectangle over which this sampler generates samples
+  val rectangle: Rectangle
+
+  // Number of samples per pixel that this sampler generates
+  val samplesPerPixel: Int
+
+  // Number of batches that this sampler generates
+  val numberOfBatches: Int
+}

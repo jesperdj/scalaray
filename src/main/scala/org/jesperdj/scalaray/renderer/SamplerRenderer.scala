@@ -18,69 +18,49 @@
 package org.jesperdj.scalaray.renderer
 
 import org.jesperdj.scalaray.camera.Camera
-import org.jesperdj.scalaray.integrator.{ SurfaceIntegrator, VolumeIntegrator }
-import org.jesperdj.scalaray.sampler._
-import org.jesperdj.scalaray.scene._
-import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.vecmath.RayDifferential
-
-// TODO: Rewrite this using actors (see mandelactors)
-// TODO: Ugly that we have to pass the number of samples per pixel to this thing
+import org.jesperdj.scalaray.filter.Filter
+import org.jesperdj.scalaray.integrator.Integrator
+import org.jesperdj.scalaray.sampler.{ SampleBatch, Sampler }
 
 // Sampler renderer (pbrt 1.3.3)
-final class SamplerRenderer (scene: Scene, sampler: Sampler, samplesPerPixel: Int, camera: Camera, pixelBuffer: PixelBuffer,
-                             surfaceIntegrator: SurfaceIntegrator, volumeIntegrator: VolumeIntegrator) extends Renderer {
-  // Render the scene
-  def render(): Unit = {
-    import java.util.concurrent._
-    import java.util.concurrent.atomic.AtomicInteger
+final class SamplerRenderer (sampler: Sampler, filter: Filter, camera: Camera, integrator: Integrator) extends Renderer {
+  def render(): PixelBuffer = {
+    import scala.actors.Actor._
+    import java.util.concurrent.{ CountDownLatch, TimeUnit }
 
-    val runningTasks = new AtomicInteger
+    val pixelBuffer = new PixelBuffer(sampler.rectangle, filter)
 
-    val scale = 1.0 / math.sqrt(samplesPerPixel)
+    val scale = 1.0 / math.sqrt(sampler.samplesPerPixel)
 
-    final class Task (batch: SampleBatch) extends Runnable {
-      def run() {
-        batch foreach { sample => pixelBuffer += (sample, radiance(camera.generateRayDifferential(sample, scale), sample)) }
-        runningTasks.decrementAndGet
+    val latch = new CountDownLatch(sampler.numberOfBatches)
+
+    for (batch <- sampler) {
+      // Create an actor to handle this batch
+      val computeActor = actor {
+        react {
+          case batch: SampleBatch =>
+            for (sample <- batch) {
+              val ray = camera.generateRayDifferential(sample, scale)
+              val spectrum = integrator.radiance(ray, sample)
+              pixelBuffer += (sample, spectrum)
+            }
+
+            latch.countDown
+        }
       }
+
+      // Send the batch to the actor
+      computeActor ! batch
     }
 
-    val processors = Runtime.getRuntime().availableProcessors()
-    println("Number of processors: " + processors)
-
-    var numTasks = 0
-
-    // Create executor service and submit tasks
-    val executorService = Executors.newFixedThreadPool(processors)
-    sampler foreach { batch => runningTasks.incrementAndGet; executorService.submit(new Task(batch)); numTasks += 1 }
-
-    // Wait until all tasks have finished
-    executorService.shutdown()
-    while (!executorService.isTerminated()) {
-      executorService.awaitTermination(5, TimeUnit.SECONDS)
-      println("%d/%d tasks done (%d%%)" format
-          (numTasks - runningTasks.intValue, numTasks, 100 - ((100 * runningTasks.get) / numTasks)))
+    // Wait until all the actors have finished
+    while (!latch.await(5, TimeUnit.SECONDS)) {
+      val count = sampler.numberOfBatches - latch.getCount()
+      println("%d/%d batches processed (%d%%)" format (count, sampler.numberOfBatches, (count * 100) / sampler.numberOfBatches))
     }
+
+    pixelBuffer
   }
-
-  // Compute the incident radiance along the given ray (pbrt 1.3.4)
-  def radiance(ray: RayDifferential, sample: Sample): Spectrum = {
-    val li = scene intersect ray match {
-      // If the ray intersects geometry in the scene, get the reflected radiance from the surface integrator
-      case Some(intersection) => surfaceIntegrator.radiance(this, ray, intersection, sample)
-
-      // TODO: If the ray does not intersect any geometry, accumulate the contributions of infinite area light sources along the ray
-      case _ => Spectrum.Black
-    }
-
-    val (lvi, t) = volumeIntegrator.radiance(this, ray, sample)
-
-    t * li + lvi
-  }
-
-  // Compute the fraction of light that is attenuated by volumetric scattering along the ray (pbrt 1.3.4)
-  def transmittance(ray: RayDifferential, sample: Sample): Spectrum = volumeIntegrator.transmittance(this, ray, sample)
 
   override def toString = "SamplerRenderer"
 }

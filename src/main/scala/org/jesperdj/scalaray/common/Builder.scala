@@ -28,9 +28,6 @@ trait Builder[+T] {
   def build(): T
 }
 
-// TODO: What about co- and contravariance in ListBuilder? See Daniel Spiewak's answer on this StackOverflow question:
-// http://stackoverflow.com/questions/663254/scala-covariance-contravariance-question
-
 class ListBuilder[T] extends Accumulator[T] with Builder[List[T]] {
   private val buffer: ListBuffer[T] = ListBuffer.empty
   def +=(value: T): Unit = buffer += value

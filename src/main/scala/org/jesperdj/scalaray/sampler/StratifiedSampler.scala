@@ -22,13 +22,13 @@ import scala.collection.immutable.Traversable
 import org.jesperdj.scalaray.raster.Rectangle
 
 // Stratified sampler (pbrt 7.3)
-final class StratifiedSampler (rectangle: Rectangle, pixelsPerBatch: Int, samplesPerPixelX: Int, samplesPerPixelY: Int,
+final class StratifiedSampler (val rectangle: Rectangle, pixelsPerBatch: Int, samplesPerPixelX: Int, samplesPerPixelY: Int,
                                jitter: Boolean, samplePatternSpecs: Traversable[SamplePatternSpec]) extends Sampler {
   // Number of samples per pixel
-  private val samplesPerPixel = samplesPerPixelX * samplesPerPixelY
+  val samplesPerPixel = samplesPerPixelX * samplesPerPixelY
 
   // Number of batches
-  private val numberOfBatches = ((rectangle.width * rectangle.height) / pixelsPerBatch.toFloat).ceil.toInt
+  val numberOfBatches = ((rectangle.width * rectangle.height) / pixelsPerBatch.toFloat).ceil.toInt
 
   // Index of the next batch to generate
   private var nextBatchIndex = 0
