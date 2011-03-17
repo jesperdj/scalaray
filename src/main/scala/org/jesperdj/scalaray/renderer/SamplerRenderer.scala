@@ -40,7 +40,7 @@ final class SamplerRenderer (sampler: Sampler, filter: Filter, camera: Camera, i
         react {
           case batch: SampleBatch =>
             for (sample <- batch) {
-              val ray = camera.generateRayDifferential(sample, scale)
+              val ray = camera.generateRayDifferential(sample.cameraSample, scale)
               val spectrum = integrator.radiance(ray, sample)
               pixelBuffer += (sample, spectrum)
             }

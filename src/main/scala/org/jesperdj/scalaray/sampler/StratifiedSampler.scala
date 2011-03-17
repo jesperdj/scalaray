@@ -125,7 +125,7 @@ final class StratifiedSampler (val rectangle: Rectangle, pixelsPerBatch: Int, sa
         val t = timeSamples(i)
 
         // Create Sample object, shift image samples to pixel position
-        samples(i) = new Sample(px + ix, py + iy, lu, lv, t, samplePatterns1D.toMap, samplePatterns2D.toMap)
+        samples(i) = Sample(CameraSample(px + ix, py + iy, lu, lv, t), samplePatterns1D.toMap, samplePatterns2D.toMap)
       }
 
       pixelsLeft -= 1

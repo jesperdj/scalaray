@@ -18,16 +18,66 @@
 package org.jesperdj.scalaray.integrator
 
 import org.jesperdj.scalaray.common.Accumulator
-import org.jesperdj.scalaray.sampler.{ Sample, SamplePatternSpec }
-import org.jesperdj.scalaray.scene.{ Intersection, Scene }
+import org.jesperdj.scalaray.lightsource.{ LightSample, LightSampleConverter, LightSource }
+import org.jesperdj.scalaray.sampler.{ Sample, SamplePatternSpec, SamplePatternSpec1D, SamplePatternSpec2D }
+import org.jesperdj.scalaray.scene.Intersection
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.vecmath.RayDifferential
+import org.jesperdj.scalaray.vecmath.{ Normal, Point, RayDifferential, Vector }
+import org.jesperdj.scalaray.reflection.{BsdfSample, BsdfSampleConverter, BSDF}
+
+final class DirectLightingSurfaceIntegratorBuilder extends SurfaceIntegratorBuilder {
+  private var samplePatternSpecs: Option[Accumulator[SamplePatternSpec]] = None
+  private var integrator: Option[Integrator] = None
+
+  def withSamplePatternSpecs(arg: Accumulator[SamplePatternSpec]) = { samplePatternSpecs = Some(arg); this }
+  override def withIntegrator(arg: Integrator) = { integrator = Some(arg); this }
+
+  def build() = {
+    if (samplePatternSpecs.isEmpty) throw new IllegalArgumentException("Setting samplePatternSpecs is required")
+    if (integrator.isEmpty) throw new IllegalArgumentException("Setting integrator is required")
+    new DirectLightingSurfaceIntegrator(samplePatternSpecs.get, integrator.get)
+  }
+}
 
 // Direct lighting surface integrator (pbrt 15.1)
-final class DirectLightingSurfaceIntegrator (scene: Scene, samplePatternSpecs: Accumulator[SamplePatternSpec]) extends SurfaceIntegrator {
+final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[SamplePatternSpec], integrator: Integrator) extends SurfaceIntegrator {
+  // Sample converters for a light source
+  private final class SampleConverters (val lightSource: LightSource) {
+    private val count = lightSource.numberOfSamples // TODO: Could be 1 for different sampling strategy
+    val lightSampleConverter = new LightSampleConverter(count, samplePatternSpecs)
+    val bsdfSampleConverter = new BsdfSampleConverter(count, samplePatternSpecs)
+  }
+
+  private val sampleConverters = integrator.scene.lightSources map { new SampleConverters(_) }
+
   // Compute the incident radiance along the given ray
-  def radiance(ray: RayDifferential, intersection: Intersection, sample: Sample, integrator: Integrator): Spectrum = {
+  def radiance(ray: RayDifferential, intersection: Intersection, sample: Sample): Spectrum = {
     // TODO: Implement DirectLightingSurfaceIntegrator
+    throw new UnsupportedOperationException("Not yet implemented")
+  }
+
+  private def uniformSampleAllLights(point: Point, normal: Normal, wo: Vector, bsdf: BSDF, sample: Sample): Spectrum = {
+    // TODO: Implement uniformSampleAllLights
+    throw new UnsupportedOperationException("Not yet implemented")
+  }
+
+  private def uniformSampleOneLight(point: Point, normal: Normal, wo: Vector, bsdf: BSDF, sample: Sample): Spectrum = {
+    // TODO: Implement uniformSampleOneLight
+    throw new UnsupportedOperationException("Not yet implemented")
+  }
+
+  private def estimateDirect(lightSource: LightSource, point: Point, normal: Normal, wo: Vector, bsdf: BSDF, lightSample: LightSample, bsdfSample: BsdfSample): Spectrum = {
+    // TODO: Implement estimateDirect
+    throw new UnsupportedOperationException("Not yet implemented")
+  }
+
+  private def specularReflect(): Spectrum = {
+    // TODO: Implement specularReflect
+    throw new UnsupportedOperationException("Not yet implemented")
+  }
+
+  private def specularTransmit: Spectrum = {
+    // TODO: Implement specularTransmit
     throw new UnsupportedOperationException("Not yet implemented")
   }
 

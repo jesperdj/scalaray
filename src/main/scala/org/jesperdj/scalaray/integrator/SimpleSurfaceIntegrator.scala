@@ -34,7 +34,7 @@ object SimpleSurfaceIntegrator extends SurfaceIntegrator {
     Spectrum(0.0, 0.0, 1.0), Spectrum(0.0, 1.0, 1.0), Spectrum(1.0, 0.0, 1.0), Spectrum(1.0, 1.0, 0.0))
 
   // Compute the incident radiance along the given ray
-  def radiance(ray: RayDifferential, intersection: Intersection, sample: Sample, integrator: Integrator): Spectrum =
+  def radiance(ray: RayDifferential, intersection: Intersection, sample: Sample): Spectrum =
     colors(intersection.primitive.hashCode % colors.size)
 
   override def toString = "SimpleSurfaceIntegrator"

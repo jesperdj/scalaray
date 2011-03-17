@@ -31,9 +31,9 @@ final class DiffuseAreaLightSource (shape: Shape, lightToWorld: Transform, emitt
 
   // Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
   // Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-  def sampleRadiance(point: Point, u1: Double, u2: Double): (Spectrum, Ray, Double) = {
+  def sampleRadiance(point: Point, sample: LightSample): (Spectrum, Ray, Double) = {
     // Sample a point on the light source with respect to the given point
-    val (sp, sn, pdf) = shape.sampleSurface(worldToLight * point, u1, u2)
+    val (sp, sn, pdf) = shape.sampleSurface(worldToLight * point, sample.u1, sample.u2)
     if (pdf == 0.0) return (Spectrum.Black, Ray(Point.Origin, Vector.ZAxis, 0.0, 0.0), 0.0)
 
     // Transform point and normal to world coordinates

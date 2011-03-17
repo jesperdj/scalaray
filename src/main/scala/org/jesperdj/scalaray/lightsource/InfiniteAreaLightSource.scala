@@ -30,7 +30,7 @@ final class InfiniteAreaLightSource (val numberOfSamples: Int) extends LightSour
 
   // Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
   // Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-  def sampleRadiance(point: Point, u1: Double, u2: Double): (Spectrum, Ray, Double) =
+  def sampleRadiance(point: Point, sample: LightSample): (Spectrum, Ray, Double) =
     throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement InfiniteAreaLightSource.sampleRadiance
 
   // Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution

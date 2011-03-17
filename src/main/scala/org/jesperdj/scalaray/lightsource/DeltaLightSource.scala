@@ -34,7 +34,7 @@ trait DeltaLightSource extends LightSource {
 
   // Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
   // Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-  final def sampleRadiance(point: Point, u1: Double, u2: Double): (Spectrum, Ray, Double) = {
+  final def sampleRadiance(point: Point, sample: LightSample): (Spectrum, Ray, Double) = {
     val (rad, ray) = radiance(point)
     (rad, ray, 1.0)
   }

@@ -17,12 +17,39 @@
  */
 package org.jesperdj.scalaray.reflection
 
-import scala.collection.immutable.IndexedSeq
-
+import org.jesperdj.scalaray.common.Accumulator
+import org.jesperdj.scalaray.sampler.{ Sample, SamplePatternSpec, SamplePatternSpec1D, SamplePatternSpec2D }
 import org.jesperdj.scalaray.shape.DifferentialGeometry
 import org.jesperdj.scalaray.spectrum._
-import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
+
+import scala.collection.immutable.IndexedSeq
+import scala.collection.immutable.Traversable
+
+// BSDF sample (pbrt TODO)
+final case class BsdfSample (component: Double, u1: Double, u2: Double)
+
+// TODO: Description
+final class BsdfSampleConverter (val numberOfSamples: Int, samplePatternSpecs: Accumulator[SamplePatternSpec]) {
+  private val componentSamplePatternId = {
+    val samplePatternSpec = new SamplePatternSpec1D(numberOfSamples)
+    samplePatternSpecs += samplePatternSpec
+    samplePatternSpec.id
+  }
+
+  private val directionSamplePatternId = {
+    val samplePatternSpec = new SamplePatternSpec2D(numberOfSamples)
+    samplePatternSpecs += samplePatternSpec
+    samplePatternSpec.id
+  }
+
+  def bsdfSamples(sample: Sample): Traversable[BsdfSample] =
+    sample.samplePatterns1D(componentSamplePatternId) zip sample.samplePatterns2D(directionSamplePatternId) map {
+      case ((c, (u1, u2))) => new BsdfSample(c, u1, u2)
+    }
+}
+
+// TODO: Rename BSDF to Bsdf etc.
 
 // Bidirectional Scattering Distribution Function (pbrt 9.1)
 final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: Normal, eta: Double = 1.0) {

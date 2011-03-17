@@ -27,11 +27,11 @@ object VacuumVolumeIntegratorBuilder extends VolumeIntegratorBuilder {
 
 // Volume integrator that does nothing
 object VacuumVolumeIntegrator extends VolumeIntegrator {
-  // TODO: Description; returns radiance and transmittance
-  def radiance(ray: RayDifferential, sample: Sample, integrator: Integrator): (Spectrum, Spectrum) = (Spectrum.Black, Spectrum.Unit)
+  // Compute the contribution of volume scattering along the ray; returns radiance and transmittance
+  def radiance(ray: RayDifferential, sample: Sample): (Spectrum, Spectrum) = (Spectrum.Black, Spectrum.Unit)
 
   // Compute the fraction of light that is attenuated by volumetric scattering along the ray
-  def transmittance(ray: RayDifferential, sample: Sample, integrator: Integrator): Spectrum = Spectrum.Unit
+  def transmittance(ray: RayDifferential, sample: Sample): Spectrum = Spectrum.Unit
 
   override def toString = "VacuumVolumeIntegrator"
 }

@@ -22,13 +22,14 @@ import org.jesperdj.scalaray.raster.Rectangle
 import scala.collection.Iterator
 import scala.collection.immutable.Map
 
-// Camera sample
-sealed class CameraSample (val imageX: Double, val imageY: Double, val lensU: Double, val lensV: Double, val time: Double)
+// NOTE: In pbrt, Sample is a subclass of CameraSample, which is, in my opinion, a misuse of inheritance.
+// ScalaRay uses composition instead of inheritance here.
 
-// Sample, a camera sample with 1D and 2D sample patterns for integrators
-final class Sample (imageX: Double, imageY: Double, lensU: Double, lensV: Double, time: Double,
-                    val samplePatterns1D: Map[Int, SamplePattern1D], val samplePatterns2D: Map[Int, SamplePattern2D])
-  extends CameraSample(imageX, imageY, lensU, lensV, time)
+// Camera sample
+final case class CameraSample (imageX: Double, imageY: Double, lensU: Double, lensV: Double, time: Double)
+
+// Sample, consists of a camera sample and 1D and 2D sample patterns for integrators
+final case class Sample (cameraSample: CameraSample, samplePatterns1D: Map[Int, SamplePattern1D], samplePatterns2D: Map[Int, SamplePattern2D])
 
 // A batch of samples
 trait SampleBatch extends Iterator[Sample]

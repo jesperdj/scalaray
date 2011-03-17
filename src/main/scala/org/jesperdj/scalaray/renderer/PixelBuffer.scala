@@ -46,8 +46,8 @@ final class PixelBuffer (rectangle: Rectangle, filter: Filter) {
   // Add the spectrum corresponding to a sample to the buffer
   def +=(sample: Sample, spectrum: Spectrum): Unit = {
     // Convert sample to image coordinates
-    val ix = sample.imageX - 0.5
-    val iy = sample.imageY - 0.5
+    val ix = sample.cameraSample.imageX - 0.5
+    val iy = sample.cameraSample.imageY - 0.5
 
     // Determine the pixels that are to be updated according to the extent of the filter
     val minX = math.max((ix - filter.extentX).ceil.toInt, rectangle.left)
