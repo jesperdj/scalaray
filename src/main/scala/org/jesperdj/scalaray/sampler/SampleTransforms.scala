@@ -46,6 +46,21 @@ object SampleTransforms {
   // Probability distribution function for uniform sampling on the unit sphere (pbrt 13.6.1)
   val uniformSpherePdf: Double = 1.0 / (4.0 * π)
 
+  // Sample a direction from a cone around the z-axis (pbrt 14.6.2)
+  def uniformSampleCone(u1: Double, u2: Double, cosThetaMax: Double): Vector = {
+    val cosTheta = (1.0 - u1) + u1 * cosThetaMax
+    val sinTheta = math.sqrt(1.0 - cosTheta * cosTheta)
+    val phi = 2.0 * π * u2
+    Vector(math.cos(phi) * sinTheta, math.sin(phi) * sinTheta, cosTheta)
+  }
+
+  // Sample a direction from a cone around the z-axis of the coordinate system determined by the given vectors (pbrt 14.6.2)
+  def uniformSampleCone(u1: Double, u2: Double, cosThetaMax: Double, x: Vector, y: Vector, z: Vector): Vector =
+    throw new UnsupportedOperationException("Not yet implemented")
+
+  // Probability distribution function for sampling from a cone (pbrt 14.6.2)
+  def uniformConePdf(cosThetaMax: Double): Double = 1.0 / (2.0 * π * (1.0 - cosThetaMax))
+
   // Sample a point on the unit disk by uniform mapping (pbrt 13.6.2)
   def uniformSampleDisk(u1: Double, u2: Double): (Double, Double) = {
     val r = math.sqrt(u1)
