@@ -43,7 +43,7 @@ final class BsdfSampleConverter (val numberOfSamples: Int, samplePatternSpecs: A
     samplePatternSpec.id
   }
 
-  def bsdfSamples(sample: Sample): Traversable[BsdfSample] =
+  def bsdfSamples(sample: Sample): IndexedSeq[BsdfSample] =
     sample.samplePatterns1D(componentSamplePatternId) zip sample.samplePatterns2D(directionSamplePatternId) map {
       case ((c, (u1, u2))) => new BsdfSample(c, u1, u2)
     }
@@ -79,17 +79,17 @@ final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: 
 
   // Sample the BSDF for the given outgoing direction; returns reflectance or transmittance, incoming direction,
   // value of the pdf and type of the selected BxDF component (pbrt 14.5.6)
-  def sample(woW: Vector, u1: Double, u2: Double, u3: Double, bxdfType: BxDFType = BxDFType.All): (Spectrum, Vector, Double, BxDFType) = {
+  def sample(woW: Vector, sample: BsdfSample, bxdfType: BxDFType = BxDFType.All): (Spectrum, Vector, Double, BxDFType) = {
     // Get BxDFs that match the given type
     val matchingBxDFs = bxdfs filter (_.matchesType(bxdfType))
     if (matchingBxDFs.size == 0) return (Spectrum.Black, Vector.Zero, 0.0, BxDFType.None)
 
     // Get the BxDF to sample
-    val bxdf = matchingBxDFs(math.min((u3 * matchingBxDFs.size).floor.toInt, matchingBxDFs.size - 1))
+    val bxdf = matchingBxDFs(math.min((sample.component * matchingBxDFs.size).floor.toInt, matchingBxDFs.size - 1))
 
     // Sample the selected BxDF
     val wo = worldToLocal(woW)
-    val (spec, wi, pdf) = bxdf.sample(wo, u1, u2)
+    val (spec, wi, pdf) = bxdf.sample(wo, sample.u1, sample.u2)
     if (pdf == 0.0) return (Spectrum.Black, Vector.Zero, 0.0, BxDFType.None)
     val wiW = localToWorld(wi)
 

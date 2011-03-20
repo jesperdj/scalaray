@@ -39,7 +39,9 @@ trait VolumeIntegrator {
 }
 
 trait WithIntegrator {
-  def withIntegrator(integrator: Integrator): this.type = this
+  protected var integrator: Option[Integrator] = None
+
+  def withIntegrator(arg: Integrator): this.type = { integrator = Some(arg); this }
 }
 
 trait SurfaceIntegratorBuilder extends Builder[SurfaceIntegrator] with WithIntegrator

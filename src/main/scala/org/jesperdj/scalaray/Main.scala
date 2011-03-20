@@ -68,7 +68,7 @@ object Main {
 
     val samplePatternSpecs = new ListBuilder[SamplePatternSpec]
 
-    val surfaceIntegratorBuilder = SimpleSurfaceIntegratorBuilder
+    val surfaceIntegratorBuilder = new DirectLightingSurfaceIntegratorBuilder().withSamplePatternSpecs(samplePatternSpecs)
     val volumeIntegratorBuilder = VacuumVolumeIntegratorBuilder
     val integrator = new Integrator(scene, surfaceIntegratorBuilder, volumeIntegratorBuilder)
 

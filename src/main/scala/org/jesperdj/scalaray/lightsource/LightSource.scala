@@ -23,7 +23,7 @@ import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath._
 
-import scala.collection.immutable.Traversable
+import scala.collection.immutable.IndexedSeq
 
 // Light sample (pbrt 14.6.1)
 final case class LightSample (component: Double, u1: Double, u2: Double)
@@ -42,7 +42,7 @@ final class LightSampleConverter (val numberOfSamples: Int, samplePatternSpecs: 
     samplePatternSpec.id
   }
 
-  def lightSamples(sample: Sample): Traversable[LightSample] =
+  def lightSamples(sample: Sample): IndexedSeq[LightSample] =
     sample.samplePatterns1D(componentSamplePatternId) zip sample.samplePatterns2D(positionSamplePatternId) map {
       case ((c, (u1, u2))) => new LightSample(c, u1, u2)
     }

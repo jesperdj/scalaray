@@ -25,7 +25,7 @@ final class BxDFType private (val flags: Int) {
   def unary_~ = new BxDFType(~flags)
 
   // Check if this BxDF type matches the given type
-  def matches(other: BxDFType) = (flags & other.flags) == flags
+  def matches(other: BxDFType) = (flags & other.flags) == flags   // TODO: dubieus
 
   override def equals(other: Any): Boolean = other match {
     case that: BxDFType => (that canEqual this) && (flags == that.flags)
