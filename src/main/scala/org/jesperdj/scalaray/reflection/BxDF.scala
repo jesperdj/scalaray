@@ -17,20 +17,54 @@
  */
 package org.jesperdj.scalaray.reflection
 
-import scala.collection.immutable.Traversable
-
-import org.jesperdj.scalaray.sampler.SampleTransforms
-import org.jesperdj.scalaray.spectrum._
 import org.jesperdj.scalaray.common._
-import org.jesperdj.scalaray.vecmath._
+import org.jesperdj.scalaray.sampler._
+import org.jesperdj.scalaray.spectrum.Spectrum
+import org.jesperdj.scalaray.vecmath.Vector
+
+// BxDF type (pbrt 8.1)
+final class BxDFType private (val bits: Int) {
+  def &(other: BxDFType): BxDFType = new BxDFType(bits & other.bits)
+  def |(other: BxDFType): BxDFType = new BxDFType(bits | other.bits)
+
+  def unary_~ = new BxDFType(~bits)
+
+  // Check if this BxDFType matches the mask
+  def matches(mask: BxDFType): Boolean = (this.bits & mask.bits) == this.bits
+
+  // Indicates whether the BxDF is described by a delta distribution
+  def isDeltaBxDF = (this & BxDFType.Specular) == BxDFType.Specular
+
+  override def equals(other: Any): Boolean = other match {
+    case that: BxDFType => (that canEqual this) && (bits == that.bits)
+    case _ => false
+  }
+
+  def canEqual(other: Any): Boolean = other.isInstanceOf[BxDFType]
+
+  override def hashCode: Int = bits
+}
+
+object BxDFType {
+  val None = new BxDFType(0)
+
+  val Reflection = new BxDFType(1 << 0)
+  val Transmission = new BxDFType(1 << 1)
+
+  val Diffuse = new BxDFType(1 << 2)
+  val Glossy = new BxDFType(1 << 3)
+  val Specular = new BxDFType(1 << 4)
+
+  val AllTypes = Diffuse | Glossy | Specular
+  val AllReflection = Reflection | AllTypes
+  val AllTransmission = Transmission | AllTypes
+  val All = AllReflection | AllTransmission
+}
 
 // Bidirectional Reflectance or Transmittance Distribution Function (pbrt 8.1)
-abstract class BxDF {
+trait BxDF {
   // BxDF type
   val bxdfType: BxDFType
-
-  // Check if the type of this BxDF matches the given flags
-  def matchesType(flags: BxDFType): Boolean = bxdfType.matches(flags)
 
   // Evaluate the BxDF for the given pair of directions
   def apply(wo: Vector, wi: Vector): Spectrum
@@ -41,14 +75,14 @@ abstract class BxDF {
     (apply(wo, wi), wi, pdf(wo, wi))
   }
 
-  // Get the value of the probability distribition function that matches the sampling method of sample(Vector, Double, Double) (pbrt 14.5)
+  // Probability density of the direction wi being sampled with respect to the distribution that sample uses (pbrt 14.5)
   def pdf(wo: Vector, wi: Vector): Double = if (wo.z * wi.z > 0.0) wi.z.abs / π else 0.0
 
   // Compute hemispherical-directional reflectance (pbrt 8.1.1, 14.5.5)
-  def rho(wo: Vector, samples: Traversable[(Double, Double)]): Spectrum =
-    throw new UnsupportedOperationException("Not yet implemented") // TODO
+  def rho(wo: Vector, samples: SamplePattern2D): Spectrum =
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement BxDF.rho
 
   // Compute hemispherical-hemispherical reflectance (pbrt 8.1.1, 14.5.5)
-  def rho(samples1: Traversable[(Double, Double)], samples2: Traversable[(Double, Double)]): Spectrum =
-    throw new UnsupportedOperationException("Not yet implemented") // TODO
+  def rho(samples1: SamplePattern2D, samples2: SamplePattern2D): Spectrum =
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement BxDF.rho
 }

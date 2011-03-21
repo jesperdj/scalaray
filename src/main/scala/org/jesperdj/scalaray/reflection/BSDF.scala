@@ -17,20 +17,19 @@
  */
 package org.jesperdj.scalaray.reflection
 
+import scala.collection.immutable.IndexedSeq
+
 import org.jesperdj.scalaray.common.Accumulator
 import org.jesperdj.scalaray.sampler.{ Sample, SamplePatternSpec, SamplePatternSpec1D, SamplePatternSpec2D }
 import org.jesperdj.scalaray.shape.DifferentialGeometry
-import org.jesperdj.scalaray.spectrum._
-import org.jesperdj.scalaray.vecmath._
+import org.jesperdj.scalaray.spectrum.Spectrum
+import org.jesperdj.scalaray.vecmath.{ Normal, Vector }
 
-import scala.collection.immutable.IndexedSeq
-import scala.collection.immutable.Traversable
+// BSDF sample (pbrt 14.5.6)
+final case class BSDFSample (component: Double, u1: Double, u2: Double)
 
-// BSDF sample (pbrt TODO)
-final case class BsdfSample (component: Double, u1: Double, u2: Double)
-
-// TODO: Description
-final class BsdfSampleConverter (val numberOfSamples: Int, samplePatternSpecs: Accumulator[SamplePatternSpec]) {
+// Converter to transform sample patterns to BSDFSamples
+final class BSDFSampleConverter (val numberOfSamples: Int, samplePatternSpecs: Accumulator[SamplePatternSpec]) {
   private val componentSamplePatternId = {
     val samplePatternSpec = new SamplePatternSpec1D(numberOfSamples)
     samplePatternSpecs += samplePatternSpec
@@ -43,13 +42,13 @@ final class BsdfSampleConverter (val numberOfSamples: Int, samplePatternSpecs: A
     samplePatternSpec.id
   }
 
-  def bsdfSamples(sample: Sample): IndexedSeq[BsdfSample] =
-    sample.samplePatterns1D(componentSamplePatternId) zip sample.samplePatterns2D(directionSamplePatternId) map {
-      case ((c, (u1, u2))) => new BsdfSample(c, u1, u2)
-    }
-}
+  def bsdfSamples(sample: Sample): IndexedSeq[BSDFSample] = {
+    val componentSamples = sample.samplePatterns1D(componentSamplePatternId)
+    val directionSamples = sample.samplePatterns2D(directionSamplePatternId)
 
-// TODO: Rename BSDF to Bsdf etc.
+    componentSamples zip directionSamples map { case ((c, (u1, u2))) => new BSDFSample(c, u1, u2) }
+  }
+}
 
 // Bidirectional Scattering Distribution Function (pbrt 9.1)
 final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: Normal, eta: Double = 1.0) {
@@ -66,62 +65,64 @@ final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: 
     sn.y * v.x + tn.y * v.y + nn.y * v.z,
     sn.z * v.x + tn.z * v.y + nn.z * v.z)
 
-  // Evaluate components of the BSDF that match the given type for the given pair of directions (pbrt 9.1)
-  def apply(woW: Vector, wiW: Vector, bxdfType: BxDFType = BxDFType.All): Spectrum = {
+  // Find BxDFs that match a type mask
+  private def matchBxDFs(typeMask: BxDFType): IndexedSeq[BxDF] = bxdfs filter { _.bxdfType.matches(typeMask) }
+
+  // Evaluate components of the BSDF that match a type mask for the given pair of directions (pbrt 9.1)
+  def apply(woW: Vector, wiW: Vector, typeMask: BxDFType = BxDFType.All): Spectrum = {
+    val wo = worldToLocal(woW)
+    val wi = worldToLocal(wiW)
+
     // Select BRDFs or BTDFs depending on the geometry
-    val flags = if ((wiW * ng) * (woW * ng) > 0.0) bxdfType & ~BxDFType.Transmission else bxdfType & ~BxDFType.Reflection
+    val mask = if ((wiW * ng) * (woW * ng) > 0.0) typeMask & ~BxDFType.Transmission else typeMask & ~BxDFType.Reflection
 
-    val wo = worldToLocal(woW); val wi = worldToLocal(wiW)
-
-    // Accumulate contributions of BxDFs that match the flags
-    (Spectrum.Black /: (bxdfs filter (_.matchesType(flags)))) { (accu, bxdf) => accu + bxdf(wo, wi) }
+    // Accumulate contributions of BxDFs that match the mask
+    matchBxDFs(mask).foldLeft(Spectrum.Black) { (total, bxdf) => total + bxdf(wo, wi) }
   }
 
-  // Sample the BSDF for the given outgoing direction; returns reflectance or transmittance, incoming direction,
-  // value of the pdf and type of the selected BxDF component (pbrt 14.5.6)
-  def sample(woW: Vector, sample: BsdfSample, bxdfType: BxDFType = BxDFType.All): (Spectrum, Vector, Double, BxDFType) = {
-    // Get BxDFs that match the given type
-    val matchingBxDFs = bxdfs filter (_.matchesType(bxdfType))
-    if (matchingBxDFs.size == 0) return (Spectrum.Black, Vector.Zero, 0.0, BxDFType.None)
+  // Sample the BSDF for the given outgoing direction; returns reflectance or transmittance, incoming direction, value of the pdf and
+  // type of the selected BxDF component (pbrt 14.5.6)
+  def sample(woW: Vector, sample: BSDFSample, typeMask: BxDFType = BxDFType.All): (Spectrum, Vector, BxDFType, Double) = {
+    // Get BxDFs that match the mask
+    val matchingBxDFs = matchBxDFs(typeMask)
+    if (matchingBxDFs.size == 0) return (Spectrum.Black, Vector.Zero, BxDFType.None, 0.0)
 
-    // Get the BxDF to sample
+    // Select the BxDF to sample
     val bxdf = matchingBxDFs(math.min((sample.component * matchingBxDFs.size).floor.toInt, matchingBxDFs.size - 1))
 
     // Sample the selected BxDF
     val wo = worldToLocal(woW)
-    val (spec, wi, pdf) = bxdf.sample(wo, sample.u1, sample.u2)
-    if (pdf == 0.0) return (Spectrum.Black, Vector.Zero, 0.0, BxDFType.None)
+    val (sampledSpectrum, wi, sampledPdf) = bxdf.sample(wo, sample.u1, sample.u2)
+    if (sampledPdf == 0.0) return (Spectrum.Black, Vector.Zero, BxDFType.None, 0.0)
     val wiW = localToWorld(wi)
 
     // Compute the overall pdf with all matching BxDFs
-    var totalPdf = pdf
-    if (!bxdf.matchesType(BxDFType.Specular) && matchingBxDFs.size > 1)
-      for (b <- matchingBxDFs if (b != bxdf)) totalPdf += b.pdf(wo, wi)
-    if (matchingBxDFs.size > 1) totalPdf /= matchingBxDFs.size
+    val pdf = (if (bxdf.bxdfType.isDeltaBxDF || matchingBxDFs.size == 1) sampledPdf else
+      (sampledPdf + (matchingBxDFs.view filter { _ != bxdf } map { _.pdf(wo, wi) } sum))) / matchingBxDFs.size
 
     // Compute value of BSDF for sampled direction
-    val spectrum = if (bxdf.matchesType(BxDFType.Specular)) spec
-    else {
+    val spectrum = if (bxdf.bxdfType.isDeltaBxDF) sampledSpectrum else {
       // Select BRDFs or BTDFs depending on the geometry
-      val flags = if ((wiW * ng) * (woW * ng) > 0.0) bxdfType & ~BxDFType.Transmission else bxdfType & ~BxDFType.Reflection
+      val mask = if ((wiW * ng) * (woW * ng) > 0.0) typeMask & ~BxDFType.Transmission else typeMask & ~BxDFType.Reflection
 
-      // Accumulate contributions of BxDFs that match the flags
-      (Spectrum.Black /: (bxdfs filter (_.matchesType(flags)))) { (accu, b) => accu + b(wo, wi) }
+      // Accumulate contributions of BxDFs that match the mask
+      matchBxDFs(mask).foldLeft(Spectrum.Black) { (total, bxdf) => total + bxdf(wo, wi) }
     }
 
-    (spectrum, wiW, totalPdf, bxdf.bxdfType)
+    (spectrum, wiW, bxdf.bxdfType, pdf)
   }
 
-  // Get the value of the probability distribition function that matches the sampling method of sample(Vector, Double, Double, Double, BxDFType) (pbrt 14.5.6)
-  def pdf(woW: Vector, wiW: Vector, bxdfType: BxDFType = BxDFType.All): Double = {
+  // Probability density of the direction wiW being sampled with respect to the distribution that sample uses (pbrt 14.5.6)
+  def pdf(woW: Vector, wiW: Vector, typeMask: BxDFType = BxDFType.All): Double = {
     if (bxdfs.size == 0) return 0.0
 
-    val wo = worldToLocal(woW); val wi = worldToLocal(wiW)
+    val wo = worldToLocal(woW)
+    val wi = worldToLocal(wiW)
 
-    val matchingBxDFs = bxdfs filter (_.matchesType(bxdfType))
-    if (matchingBxDFs.size == 0.0) return 0.0
+    val matchingBxDFs = matchBxDFs(typeMask)
+    if (matchingBxDFs.size == 0) return 0.0
 
     // Compute average of the pdfs of the matching BxDF components
-    ((0.0 /: matchingBxDFs) { (accu, bxdf) => accu + bxdf.pdf(wo, wi) }) / matchingBxDFs.size
+    (matchingBxDFs.view map { _.pdf(wo, wi) } sum) / matchingBxDFs.size
   }
 }

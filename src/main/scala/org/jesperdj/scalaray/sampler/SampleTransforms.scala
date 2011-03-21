@@ -51,7 +51,8 @@ object SampleTransforms {
     val cosTheta = (1.0 - u1) + u1 * cosThetaMax
     val sinTheta = math.sqrt(1.0 - cosTheta * cosTheta)
     val phi = 2.0 * π * u2
-    Vector(math.cos(phi) * sinTheta, math.sin(phi) * sinTheta, cosTheta)
+
+    new Vector(math.cos(phi) * sinTheta, math.sin(phi) * sinTheta, cosTheta)
   }
 
   // Sample a direction from a cone around the z-axis of the coordinate system determined by the given vectors (pbrt 14.6.2)

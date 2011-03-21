@@ -21,20 +21,18 @@ import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath._
 
-// TODO: Why does this not extend AreaLightSource; is there a reason or is it a mistake? (Note that this is the same as in pbrt).
-
 // Infinite area light source (pbrt 12.5)
 final class InfiniteAreaLightSource (val numberOfSamples: Int) extends LightSource {
   // Indicates whether the light is described by a delta distribution
   val isDeltaLight: Boolean = false
 
   // Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
-  // Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-  def sampleRadiance(point: Point, sample: LightSample): (Spectrum, Ray, Double) =
-    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement InfiniteAreaLightSource.sampleRadiance
+  // Returns the radiance, a direction vector from the point to the light source, a ray from the light source to the given point (which can be used to
+  // determine if the light is unoccluded) and the value of the probability density for this sample
+  def sample(point: Point, sample: LightSample): (Spectrum, Vector, Ray, Double) =
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement InfiniteAreaLightSource.sample
 
-  // Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
-  // that sampleRadiance(point: Point, u1: Double, u2: Double) uses to sample points (pbrt 14.6.1)
+  // Probability density of the direction wi being sampled with respect to the distribution that sample uses (pbrt 14.6.1)
   def pdf(point: Point, wi: Vector): Double =
     throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement InfiniteAreaLightSource.pdf
 

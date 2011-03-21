@@ -30,11 +30,12 @@ final class DiffuseAreaLightSource (shape: Shape, lightToWorld: Transform, emitt
   private val worldToLight = lightToWorld.inverse
 
   // Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
-  // Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-  def sampleRadiance(point: Point, sample: LightSample): (Spectrum, Ray, Double) = {
+  // Returns the radiance, a direction vector from the point to the light source, a ray from the light source to the given point (which can be used to
+  // determine if the light is unoccluded) and the value of the probability density for this sample
+  def sample(point: Point, sample: LightSample): (Spectrum, Vector, Ray, Double) = {
     // Sample a point on the light source with respect to the given point
     val (sp, sn, pdf) = shape.sampleSurface(worldToLight * point, sample.u1, sample.u2)
-    if (pdf == 0.0) return (Spectrum.Black, Ray(Point.Origin, Vector.ZAxis, 0.0, 0.0), 0.0)
+    if (pdf == 0.0) return (Spectrum.Black, Vector.Zero, Ray(Point.Origin, Vector.Zero, 0.0, 0.0), 0.0)
 
     // Transform point and normal to world coordinates
     val p = lightToWorld * sp
@@ -43,12 +44,13 @@ final class DiffuseAreaLightSource (shape: Shape, lightToWorld: Transform, emitt
     // Ray direction from point on light source to given point
     val rd = point - p
 
+    // TODO: The 1e-3 is to avoid self-intersections. Is there a better way to do this?
+
     // Return the radiance only if the light shines from the right side of the surface of the light source
-    (emittedRadiance(p, n, rd), new Ray(p, rd, 1e-3, 1.0), pdf)
+    (emittedRadiance(p, n, rd), -rd.normalize, new Ray(p, rd, 1e-3, 1.0), pdf)
   }
 
-  // Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
-  // that sampleRadiance(point: Point, u1: Double, u2: Double) uses to sample points (pbrt 14.6.1)
+  // Probability density of the direction wi being sampled with respect to the distribution that sample uses (pbrt 14.6.1)
   def pdf(point: Point, wi: Vector): Double = shape.pdf(worldToLight * point, worldToLight * wi)
 
   // Total emitted power of this light source onto the scene

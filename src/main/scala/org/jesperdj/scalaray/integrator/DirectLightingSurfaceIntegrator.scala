@@ -18,12 +18,12 @@
 package org.jesperdj.scalaray.integrator
 
 import org.jesperdj.scalaray.common.Accumulator
-import org.jesperdj.scalaray.sampler.{ Sample, SamplePatternSpec, SamplePatternSpec1D, SamplePatternSpec2D }
+import org.jesperdj.scalaray.lightsource.{ AreaLightSource, LightSample, LightSampleConverter, LightSource }
+import org.jesperdj.scalaray.reflection.{ BSDF, BSDFSample, BSDFSampleConverter, BxDFType }
+import org.jesperdj.scalaray.sampler.{ Sample, SamplePatternSpec }
 import org.jesperdj.scalaray.scene.Intersection
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath._
-import org.jesperdj.scalaray.lightsource.{AreaLightSource, LightSample, LightSampleConverter, LightSource}
-import org.jesperdj.scalaray.reflection.{BxDFType, BsdfSample, BsdfSampleConverter, BSDF}
 
 // Builder for DirectLightingSurfaceIntegrator
 final class DirectLightingSurfaceIntegratorBuilder extends SurfaceIntegratorBuilder {
@@ -44,7 +44,7 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
   private final class SampleConverters (val lightSource: LightSource) {
     val count = lightSource.numberOfSamples // TODO: Could be 1 for different sampling strategy
     val lightSampleConverter = new LightSampleConverter(count, samplePatternSpecs)
-    val bsdfSampleConverter = new BsdfSampleConverter(count, samplePatternSpecs)
+    val bsdfSampleConverter = new BSDFSampleConverter(count, samplePatternSpecs)
   }
 
   // Sample converters for all light sources
@@ -91,37 +91,36 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
   }
 
   private def estimateDirect(lightSource: LightSource, point: Point, normal: Normal, wo: Vector, bsdf: BSDF,
-                             lightSample: LightSample, bsdfSample: BsdfSample): Spectrum = {
+                             lightSample: LightSample, bsdfSample: BSDFSample): Spectrum = {
     var result = Spectrum.Black
 
-    // TODO: niet handig dat we steeds BxDFType.All & ~BxDFType.Specular moeten doorgeven of checken of dat bit gezet is
-    // Eigenlijk zou BxDF / BSDF dat soort details moeten verbergen; we moeten alleen weten of het wel of niet een BxDF is met een delta-distributie
+    val notSpecularMask = BxDFType.All & ~BxDFType.Specular
 
     // Sample light source with multiple importance sampling
-    val (radiance, ray, lightPdf) = lightSource.sampleRadiance(point, lightSample)
+    val (radiance, wi, shadowRay, lightPdf) = lightSource.sample(point, lightSample)
     if (lightPdf > 0.0 && !radiance.isBlack) {
-      val wi = -ray.direction.normalize
+      // Evaluate BSDF for the direction selected by the light source
+      val reflectance = bsdf(wo, wi, notSpecularMask)
 
-      // Evaluate BSDF for the chosen direction
-      val reflectance = bsdf(wo, wi, BxDFType.All & ~BxDFType.Specular)
-
-      if (!reflectance.isBlack && !integrator.scene.checkIntersect(ray)) {
+      if (!reflectance.isBlack && !integrator.scene.checkIntersect(shadowRay)) {
         // TODO: take transmittance along ray into account
 
-        val weight = if (lightSource.isDeltaLight) 1.0 else powerHeuristic(1, lightPdf, 1, bsdf.pdf(wo, wi, BxDFType.All & ~BxDFType.Specular))
+        val bsdfPdf = bsdf.pdf(wo, wi, notSpecularMask)
+        val weight = if (lightSource.isDeltaLight) 1.0 else powerHeuristic(1, lightPdf, 1, bsdfPdf)
         result +*= (radiance * reflectance, (wi * normal).abs * weight / lightPdf)
       }
     }
 
     // Sample BSDF with multiple importance sampling
     if (!lightSource.isDeltaLight) {
-      val (reflectance, wi, bsdfPdf, sampledType) = bsdf.sample(wo, bsdfSample, BxDFType.All & ~BxDFType.Specular)
+      val (reflectance, wi, sampledType, bsdfPdf) = bsdf.sample(wo, bsdfSample, notSpecularMask)
 
       if (bsdfPdf > 0.0 && !reflectance.isBlack) {
         val lightPdf = lightSource.pdf(point, wi)
         if (lightPdf > 0.0) {
-          // Evaluate radiance of light source at the point from the chosen direction
-          val radiance = integrator.scene.intersect(Ray(point, wi)) match {
+          // Evaluate radiance of light source at the point from the direction selected by the BSDF
+          val ray = Ray(point, wi)
+          val radiance = integrator.scene.intersect(ray) match {
             case Some(Intersection(dg, prim, _)) if (prim.areaLightSource.isDefined && prim.areaLightSource.get == lightSource) =>
               // Ray intersects with this area light source and point isn't shadowed
               lightSource.asInstanceOf[AreaLightSource].emittedRadiance(dg.point, dg.normal, -wi)
@@ -137,7 +136,7 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
           if (!radiance.isBlack) {
             // TODO: take transmittance along ray into account
 
-            val weight = if ((sampledType & BxDFType.Specular) == BxDFType.Specular) 1.0 else powerHeuristic(1, bsdfPdf, 1, lightPdf)
+            val weight = if (sampledType.isDeltaBxDF) 1.0 else powerHeuristic(1, bsdfPdf, 1, lightPdf)
             result +*= (radiance * reflectance, (wi * normal).abs * weight / bsdfPdf)
           }
         }

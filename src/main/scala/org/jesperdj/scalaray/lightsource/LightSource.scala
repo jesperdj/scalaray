@@ -28,7 +28,7 @@ import scala.collection.immutable.IndexedSeq
 // Light sample (pbrt 14.6.1)
 final case class LightSample (component: Double, u1: Double, u2: Double)
 
-// TODO: Description
+// Converter to transform sample patterns to LightSamples
 final class LightSampleConverter (val numberOfSamples: Int, samplePatternSpecs: Accumulator[SamplePatternSpec]) {
   private val componentSamplePatternId = {
     val samplePatternSpec = new SamplePatternSpec1D(numberOfSamples)
@@ -42,10 +42,12 @@ final class LightSampleConverter (val numberOfSamples: Int, samplePatternSpecs: 
     samplePatternSpec.id
   }
 
-  def lightSamples(sample: Sample): IndexedSeq[LightSample] =
-    sample.samplePatterns1D(componentSamplePatternId) zip sample.samplePatterns2D(positionSamplePatternId) map {
-      case ((c, (u1, u2))) => new LightSample(c, u1, u2)
-    }
+  def lightSamples(sample: Sample): IndexedSeq[LightSample] = {
+    val componentSamples = sample.samplePatterns1D(componentSamplePatternId)
+    val positionSamples = sample.samplePatterns2D(positionSamplePatternId)
+
+    componentSamples zip positionSamples map { case ((c, (u1, u2))) => new LightSample(c, u1, u2) }
+  }
 }
 
 // Light source (pbrt 12.1)
@@ -57,11 +59,11 @@ trait LightSource {
   val numberOfSamples: Int
 
   // Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
-  // Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-  def sampleRadiance(point: Point, sample: LightSample): (Spectrum, Ray, Double)
+  // Returns the radiance, a direction vector from the point to the light source, a ray from the light source to the given point (which can be used to
+  // determine if the light is unoccluded) and the value of the probability density for this sample
+  def sample(point: Point, sample: LightSample): (Spectrum, Vector, Ray, Double)
 
-  // Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
-  // that sampleRadiance(point: Point, u1: Double, u2: Double) uses to sample points (pbrt 14.6.1)
+  // Probability density of the direction wi being sampled with respect to the distribution that sample uses (pbrt 14.6.1)
   def pdf(point: Point, wi: Vector): Double
 
   // Total emitted power of this light source onto the scene

@@ -33,13 +33,13 @@ trait DeltaLightSource extends LightSource {
   def radiance(point: Point): (Spectrum, Ray)
 
   // Sample the incident radiance of this light source at the given point (pbrt 14.6.1)
-  // Returns the radiance, a ray from the light source to the given point and the value of the probability density for this sample
-  final def sampleRadiance(point: Point, sample: LightSample): (Spectrum, Ray, Double) = {
+  // Returns the radiance, a direction vector from the point to the light source, a ray from the light source to the given point (which can be used to
+  // determine if the light is unoccluded) and the value of the probability density for this sample
+  final def sample(point: Point, sample: LightSample): (Spectrum, Vector, Ray, Double) = {
     val (rad, ray) = radiance(point)
-    (rad, ray, 1.0)
+    (rad, -ray.direction.normalize, ray, 1.0)
   }
 
-  // Probability density of the direction wi (from the given point to a point on the light source) being sampled with respect to the distribution
-  // that sampleRadiance(point: Point, u1: Double, u2: Double) uses to sample points (pbrt 14.6.1)
+  // Probability density of the direction wi being sampled with respect to the distribution that sample uses (pbrt 14.6.1)
   final def pdf(point: Point, wi: Vector): Double = 0.0
 }
