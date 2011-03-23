@@ -76,7 +76,7 @@ trait BxDF {
   }
 
   // Probability density of the direction wi being sampled with respect to the distribution that sample uses (pbrt 14.5)
-  def pdf(wo: Vector, wi: Vector): Double = if (wo.z * wi.z > 0.0) wi.z.abs / π else 0.0
+  def pdf(wo: Vector, wi: Vector): Double = if (wo.z * wi.z > 0.0) SampleTransforms.cosineHemispherePdf(wi) else 0.0
 
   // Compute hemispherical-directional reflectance (pbrt 8.1.1, 14.5.5)
   def rho(wo: Vector, samples: SamplePattern2D): Spectrum =

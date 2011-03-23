@@ -113,6 +113,9 @@ object SampleTransforms {
     new Point(x, y, math.sqrt(math.max(0.0, 1.0 - x * x - y * y)))
   }
 
+  // Probability distribution function that matches cosineSampleHemisphere
+  def cosineHemispherePdf(wi: Vector): Double = wi.z.abs / π
+
   // Sample a point on a triangle by uniform mapping (pbrt 13.6.4), returns barycentric coordinates
   def uniformSampleTriangle(u1: Double, u2: Double): (Double, Double) = {
     val su1 = math.sqrt(u1)

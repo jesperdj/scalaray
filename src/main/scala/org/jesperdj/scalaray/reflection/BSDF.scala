@@ -80,8 +80,8 @@ final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: 
     matchBxDFs(mask).foldLeft(Spectrum.Black) { (total, bxdf) => total + bxdf(wo, wi) }
   }
 
-  // Sample the BSDF for the given outgoing direction; returns reflectance or transmittance, incoming direction, value of the pdf and
-  // type of the selected BxDF component (pbrt 14.5.6)
+  // Sample the BSDF for the given outgoing direction; returns reflectance or transmittance, incoming direction, type of the selected BxDF component
+  // and value of the pdf (pbrt 14.5.6)
   def sample(woW: Vector, sample: BSDFSample, typeMask: BxDFType = BxDFType.All): (Spectrum, Vector, BxDFType, Double) = {
     // Get BxDFs that match the mask
     val matchingBxDFs = matchBxDFs(typeMask)
@@ -114,15 +114,13 @@ final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: 
 
   // Probability density of the direction wiW being sampled with respect to the distribution that sample uses (pbrt 14.5.6)
   def pdf(woW: Vector, wiW: Vector, typeMask: BxDFType = BxDFType.All): Double = {
-    if (bxdfs.size == 0) return 0.0
-
-    val wo = worldToLocal(woW)
-    val wi = worldToLocal(wiW)
-
     val matchingBxDFs = matchBxDFs(typeMask)
-    if (matchingBxDFs.size == 0) return 0.0
+    if (matchingBxDFs.size == 0) 0.0 else {
+      val wo = worldToLocal(woW)
+      val wi = worldToLocal(wiW)
 
-    // Compute average of the pdfs of the matching BxDF components
-    (matchingBxDFs.view map { _.pdf(wo, wi) } sum) / matchingBxDFs.size
+      // Compute average of the pdfs of the matching BxDF components
+      (matchingBxDFs.view map { _.pdf(wo, wi) } sum) / matchingBxDFs.size
+    }
   }
 }
