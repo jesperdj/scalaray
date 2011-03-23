@@ -22,44 +22,19 @@ package org.jesperdj.scalaray.reflection
 import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.spectrum._
 
-trait Fresnel {
+// Fresnel reflectance (pbrt 8.2.1)
+sealed trait Fresnel {
+  // Evaluate the reflectance
   def apply(cosThetaI: Double): Spectrum
 }
 
+// Fresnel reflectance for conductors (pbrt 8.2.1)
 final class FresnelConductor (eta: Spectrum, k: Spectrum) extends Fresnel {
-  def apply(cosThetaI: Double): Spectrum = Fresnel.conductorReflectance(cosThetaI.abs, eta, k)
-}
-
-final class FresnelDielectric (etaI: Double, etaT: Double) extends Fresnel {
-  def apply(cosThetaI: Double): Spectrum = {
-    val cti = clamp(cosThetaI, -1.0, 1.0)
-    val (ei, et) = if (cosThetaI > 0.0) (etaI, etaT) else (etaT, etaI)
-    val sint = ei / et * math.sqrt(math.max(0.0, 1.0 - cti * cti))
-    if (sint >= 1.0) Spectrum.Unit else {
-      val cost = math.sqrt(math.max(0.0, 1.0 - sint * sint))
-      Fresnel.dielectricReflectance(cti.abs, cost, new Spectrum(ei, ei, ei), new Spectrum(et, et, et))
-    }
-
-    Spectrum.Black
-  }
-}
-
-object Fresnel {
-  // Fresnel reflectance for a dielectric (pbrt 8.2.1)
-  def dielectricReflectance(cosThetaI: Double, cosThetaT: Double, etaI: Spectrum, etaT: Spectrum): Spectrum = {
-    val etci = etaT * cosThetaI
-    val eict = etaI * cosThetaT
-    val parl = (etci - eict) / (etci + eict)
-
-    val eici = etaI * cosThetaI
-    val etct = etaT * cosThetaT
-    val perp = (eici - etct) / (eici + etct)
-
-    (parl * parl + perp * perp) / 2.0
-  }
+  // Evaluate the reflectance
+  def apply(cosThetaI: Double): Spectrum = conductorReflectance(cosThetaI.abs, eta, k)
 
   // Fresnel reflectance for a conductor (pbrt 8.2.1)
-  def conductorReflectance(cosThetaI: Double, eta: Spectrum, k: Spectrum): Spectrum = {
+  private def conductorReflectance(cosThetaI: Double, eta: Spectrum, k: Spectrum): Spectrum = {
     val e2k2 = eta * eta + k * k
     val ci2 = cosThetaI * cosThetaI
 
@@ -70,5 +45,34 @@ object Fresnel {
     val perp2 = (e2k2 - (2.0 * eta * cosThetaI) + cis) / (e2k2 + (2.0 * eta * cosThetaI) + cis)
 
     (parl2 + perp2) / 2.0
+  }
+}
+
+// Fresnel reflectance for dielectrics (pbrt 8.2.1)
+final class FresnelDielectric (etaI: Double, etaT: Double) extends Fresnel {
+  // Evaluate the reflectance
+  def apply(cosThetaI: Double): Spectrum = {
+    val cti = clamp(cosThetaI, -1.0, 1.0)
+    val (ei, et) = if (cosThetaI > 0.0) (etaI, etaT) else (etaT, etaI)
+    val sint = ei / et * math.sqrt(math.max(0.0, 1.0 - cti * cti))
+    if (sint >= 1.0) Spectrum.Unit else {
+      val cost = math.sqrt(math.max(0.0, 1.0 - sint * sint))
+      dielectricReflectance(cti.abs, cost, new Spectrum(ei, ei, ei), new Spectrum(et, et, et))
+    }
+
+    Spectrum.Black
+  }
+
+  // Fresnel reflectance for a dielectric (pbrt 8.2.1)
+  private def dielectricReflectance(cosThetaI: Double, cosThetaT: Double, etaI: Spectrum, etaT: Spectrum): Spectrum = {
+    val etci = etaT * cosThetaI
+    val eict = etaI * cosThetaT
+    val parl = (etci - eict) / (etci + eict)
+
+    val eici = etaI * cosThetaI
+    val etct = etaT * cosThetaT
+    val perp = (eici - etct) / (eici + etct)
+
+    (parl * parl + perp * perp) / 2.0
   }
 }
