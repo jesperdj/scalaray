@@ -30,8 +30,6 @@ final class SamplerRenderer (sampler: Sampler, filter: Filter, camera: Camera, i
 
     val pixelBuffer = new PixelBuffer(sampler.rectangle, filter)
 
-    val scale = 1.0 / math.sqrt(sampler.samplesPerPixel)
-
     val latch = new CountDownLatch(sampler.numberOfBatches)
 
     for (batch <- sampler) {
@@ -40,7 +38,7 @@ final class SamplerRenderer (sampler: Sampler, filter: Filter, camera: Camera, i
         react {
           case batch: SampleBatch =>
             for (sample <- batch) {
-              val ray = camera.generateRayDifferential(sample.cameraSample, scale)
+              val ray = camera.generateRay(sample.cameraSample)
               val spectrum = integrator.radiance(ray, sample)
               pixelBuffer += (sample, spectrum)
             }

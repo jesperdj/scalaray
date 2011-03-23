@@ -24,9 +24,12 @@ import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath._
 
 import scala.collection.immutable.IndexedSeq
+import scala.util.Random
 
 // Light sample (pbrt 14.6.1)
-final case class LightSample (component: Double, u1: Double, u2: Double)
+final case class LightSample (component: Double, u1: Double, u2: Double) {
+  def this(rng: Random) = this(rng.nextDouble, rng.nextDouble, rng.nextDouble)
+}
 
 // Converter to transform sample patterns to LightSamples
 final class LightSampleConverter (val numberOfSamples: Int, samplePatternSpecs: Accumulator[SamplePatternSpec]) {

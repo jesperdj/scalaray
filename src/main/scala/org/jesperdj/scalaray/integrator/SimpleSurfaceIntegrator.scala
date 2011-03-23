@@ -20,7 +20,7 @@ package org.jesperdj.scalaray.integrator
 import org.jesperdj.scalaray.sampler.Sample
 import org.jesperdj.scalaray.scene.Intersection
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.vecmath.RayDifferential
+import org.jesperdj.scalaray.vecmath.Ray
 
 import scala.collection.immutable.IndexedSeq
 
@@ -34,7 +34,7 @@ object SimpleSurfaceIntegrator extends SurfaceIntegrator {
     Spectrum(0.0, 0.0, 1.0), Spectrum(0.0, 1.0, 1.0), Spectrum(1.0, 0.0, 1.0), Spectrum(1.0, 1.0, 0.0))
 
   // Compute the incident radiance along the given ray
-  def radiance(ray: RayDifferential, intersection: Intersection, sample: Sample): Spectrum =
+  def radiance(ray: Ray, intersection: Intersection, sample: Sample): Spectrum =
     colors(intersection.primitive.hashCode % colors.size)
 
   override def toString = "SimpleSurfaceIntegrator"

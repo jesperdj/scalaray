@@ -25,8 +25,12 @@ import org.jesperdj.scalaray.shape.DifferentialGeometry
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath.{ Normal, Vector }
 
+import scala.util.Random
+
 // BSDF sample (pbrt 14.5.6)
-final case class BSDFSample (component: Double, u1: Double, u2: Double)
+final case class BSDFSample (component: Double, u1: Double, u2: Double) {
+  def this(rng: Random) = this(rng.nextDouble, rng.nextDouble, rng.nextDouble)
+}
 
 // Converter to transform sample patterns to BSDFSamples
 final class BSDFSampleConverter (val numberOfSamples: Int, samplePatternSpecs: Accumulator[SamplePatternSpec]) {
@@ -51,7 +55,7 @@ final class BSDFSampleConverter (val numberOfSamples: Int, samplePatternSpecs: A
 }
 
 // Bidirectional Scattering Distribution Function (pbrt 9.1)
-final class BSDF (bxdfs: IndexedSeq[BxDF], dgShading: DifferentialGeometry, ng: Normal, eta: Double = 1.0) {
+final class BSDF (bxdfs: IndexedSeq[BxDF], val dgShading: DifferentialGeometry, ng: Normal, eta: Double = 1.0) {
   private val nn = dgShading.normal
   private val sn = dgShading.dpdu.normalize
   private val tn = nn ** sn

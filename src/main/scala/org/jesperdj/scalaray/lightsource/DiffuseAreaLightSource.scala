@@ -44,10 +44,8 @@ final class DiffuseAreaLightSource (shape: Shape, lightToWorld: Transform, emitt
     // Ray direction from point on light source to given point
     val rd = point - p
 
-    // TODO: The 1e-3 is to avoid self-intersections. Is there a better way to do this?
-
     // Return the radiance only if the light shines from the right side of the surface of the light source
-    (emittedRadiance(p, n, rd), -rd.normalize, new Ray(p, rd, 1e-3, 1.0), pdf)
+    (emittedRadiance(p, n, rd), -rd.normalize, new Ray(p, rd, 1e-6, 1.0), pdf)
   }
 
   // Probability density of the direction wi being sampled with respect to the distribution that sample uses (pbrt 14.6.1)

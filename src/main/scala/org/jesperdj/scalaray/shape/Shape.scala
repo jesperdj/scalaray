@@ -54,7 +54,7 @@ trait Shape extends HasBoundingBox {
 
   // Probability density of the direction wi (from viewPoint to a point on the surface) being sampled with respect to the distribution
   // that sampleSurface(viewPoint: Point, u1: Double, u2: Double) uses to sample points (pbrt 14.6.3)
-  def pdf(viewPoint: Point, wi: Vector): Double = intersect(Ray(viewPoint, wi, 1e-3)) match {
+  def pdf(viewPoint: Point, wi: Vector): Double = intersect(Ray(viewPoint, wi, 1e-6)) match {
     case Some((dg, _)) => val f = (dg.normal * -wi).abs; if (f > 0.0) viewPoint.distanceSquared(dg.point) / (f * surfaceArea) else 0.0
     case None => 0.0
   }

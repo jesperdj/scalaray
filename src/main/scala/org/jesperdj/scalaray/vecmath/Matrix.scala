@@ -53,11 +53,6 @@ private sealed class Matrix (elems: IndexedSeq[Double]) {
   // Transform a ray (pbrt 2.8.4)
   def *(r: Ray): Ray = new Ray(this * r.origin, this * r.direction, r.minDistance, r.maxDistance)
 
-  // Transform a ray differential (pbrt 2.8.4)
-  def *(rd: RayDifferential): RayDifferential =
-    new RayDifferential(this * rd.origin, this * rd.direction, this * rd.rxOrigin, this * rd.rxDirection, this * rd.ryOrigin, this * rd.ryDirection,
-      rd.minDistance, rd.maxDistance)
-
   // Multiply with another matrix (pbrt A.6.2)
   def *(m: Matrix) = new Matrix(
     for (row <- 0 to 3; col <- 0 to 3) yield this(row, 0) * m(0, col) + this(row, 1) * m(1, col) + this(row, 2) * m(2, col) + this(row, 3) * m(3, col))
@@ -93,7 +88,6 @@ private object Matrix {
     override def *(v: Vector) = v
     override def *(n: Normal) = n
     override def *(r: Ray) = r
-    override def *(rd: RayDifferential) = rd
     override def *(m: Matrix) = m
     override def transpose = this
     override def inverse = this

@@ -39,7 +39,8 @@ final class DirectLightingSurfaceIntegratorBuilder extends SurfaceIntegratorBuil
 }
 
 // Direct lighting surface integrator (pbrt 15.1)
-final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[SamplePatternSpec], integrator: Integrator) extends SurfaceIntegrator {
+final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[SamplePatternSpec], integrator: Integrator, maxDepth: Int = 5)
+  extends SurfaceIntegrator {
   // Sample converters for a light source
   private final class SampleConverters (val lightSource: LightSource) {
     val count = lightSource.numberOfSamples // TODO: Could be 1 for different sampling strategy
@@ -51,23 +52,28 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
   private val sampleConverters = integrator.scene.lightSources map { new SampleConverters(_) }
 
   // Compute the incident radiance along the given ray
-  def radiance(ray: RayDifferential, intersection: Intersection, sample: Sample): Spectrum = {
+  def radiance(ray: Ray, intersection: Intersection, sample: Sample): Spectrum = {
+    val bsdf = intersection.bsdf
     val wo = -ray.direction.normalize
 
     // Get emitted radiance if intersection point is on an area light source
     val emitted = intersection.emittedRadiance(wo)
 
+    val point = bsdf.dgShading.point
+    val normal = bsdf.dgShading.normal
+
     // TODO: This does not work if the light source is on the wrong side of the surface. Solve the self-intersection problem differently.
+    // How is this done in pbrt?
     // Point for shadow ray calculations just above surface to avoid self-intersection
-    val dg = intersection.dg
-    val shadowPoint = dg.point + dg.normal * 1e-6
+    val shadowPoint = point + normal * 1e-6
 
     // Get radiance of direct light from light sources on the intersection point
-    val direct = uniformSampleAllLights(shadowPoint, dg.normal, wo, intersection.bsdf, sample)
+    val direct = uniformSampleAllLights(shadowPoint, normal, wo, intersection.bsdf, sample)
 
-    // TODO: trace rays for specular reflection and refraction (make recursion stop at a depth limit)
+    // If maximum recursion depth has not yet been reached, trace rays for specular reflection and refraction
+    val specular = if (ray.depth >= maxDepth) Spectrum.Black else specularReflect(ray, intersection, sample) + specularTransmit(ray, intersection, sample)
 
-    emitted + direct
+    emitted + direct + specular
   }
 
   private def uniformSampleAllLights(point: Point, normal: Normal, wo: Vector, bsdf: BSDF, sample: Sample): Spectrum = {
@@ -157,14 +163,40 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
     (f * f) / (f * f + g * g)
   }
 
-  private def specularReflect(): Spectrum = {
-    // TODO: Implement specularReflect
-    throw new UnsupportedOperationException("Not yet implemented")
+  private def specularReflect(ray: Ray, intersection: Intersection, sample: Sample): Spectrum = {
+    val bsdf = intersection.bsdf
+    val wo = -ray.direction.normalize
+
+    val point = bsdf.dgShading.point
+    val normal = bsdf.dgShading.normal
+
+    // Sample the BSDF for specular reflection
+    val (reflectance, wi, _, pdf) = bsdf.sample(wo, new BSDFSample(new scala.util.Random), BxDFType.Reflection | BxDFType.Specular)
+
+    if (pdf > 0.0 && !reflectance.isBlack && (wi * normal).abs != 0.0) {
+      val radiance = integrator.radiance(new Ray(point, wi, 1e-6, Double.PositiveInfinity, ray.depth + 1), sample)
+      radiance * reflectance * ((wi * normal).abs / pdf)
+    }
+    else
+      Spectrum.Black
   }
 
-  private def specularTransmit: Spectrum = {
-    // TODO: Implement specularTransmit
-    throw new UnsupportedOperationException("Not yet implemented")
+  private def specularTransmit(ray: Ray, intersection: Intersection, sample: Sample): Spectrum = {
+    val bsdf = intersection.bsdf
+    val wo = -ray.direction.normalize
+
+    val point = bsdf.dgShading.point
+    val normal = bsdf.dgShading.normal
+
+    // Sample the BSDF for specular refraction
+    val (reflectance, wi, _, pdf) = bsdf.sample(wo, new BSDFSample(new scala.util.Random), BxDFType.Transmission | BxDFType.Specular)
+
+    if (pdf > 0.0 && !reflectance.isBlack && (wi * normal).abs != 0.0) {
+      val radiance = integrator.radiance(new Ray(point, wi, 1e-6, Double.PositiveInfinity, ray.depth + 1), sample)
+      radiance * reflectance * ((wi * normal).abs / pdf)
+    }
+    else
+      Spectrum.Black
   }
 
   override def toString = "DirectLightingSurfaceIntegrator"

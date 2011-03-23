@@ -21,21 +21,21 @@ import org.jesperdj.scalaray.common.Builder
 import org.jesperdj.scalaray.sampler.Sample
 import org.jesperdj.scalaray.scene.{ Intersection, Scene }
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.vecmath.RayDifferential
+import org.jesperdj.scalaray.vecmath.Ray
 
 // Surface integrator (pbrt 15)
 trait SurfaceIntegrator {
   // Compute the incident radiance along the given ray
-  def radiance(ray: RayDifferential, intersection: Intersection, sample: Sample): Spectrum
+  def radiance(ray: Ray, intersection: Intersection, sample: Sample): Spectrum
 }
 
 // Volume integrator (pbrt 16.2)
 trait VolumeIntegrator {
   // Compute the contribution of volume scattering along the ray; returns radiance and transmittance
-  def radiance(ray: RayDifferential, sample: Sample): (Spectrum, Spectrum)
+  def radiance(ray: Ray, sample: Sample): (Spectrum, Spectrum)
 
   // Compute the fraction of light that is attenuated by volumetric scattering along the ray
-  def transmittance(ray: RayDifferential, sample: Sample): Spectrum
+  def transmittance(ray: Ray, sample: Sample): Spectrum
 }
 
 trait WithIntegrator {
@@ -57,7 +57,7 @@ final class Integrator (val scene: Scene, surfaceIntegratorBuilder: SurfaceInteg
   private val volumeIntegrator = volumeIntegratorBuilder.withIntegrator(this).build()
 
   // Compute the incident radiance along the given ray
-  def radiance(ray: RayDifferential, sample: Sample): Spectrum = {
+  def radiance(ray: Ray, sample: Sample): Spectrum = {
     val li = scene.intersect(ray) match {
       // If the ray intersects geometry in the scene, get the reflected radiance from the surface integrator
       case Some(intersection) => surfaceIntegrator.radiance(ray, intersection, sample)
@@ -72,5 +72,5 @@ final class Integrator (val scene: Scene, surfaceIntegratorBuilder: SurfaceInteg
   }
 
   // Compute the fraction of light that is attenuated by volumetric scattering along the ray
-  def transmittance(ray: RayDifferential, sample: Sample): Spectrum = volumeIntegrator.transmittance(ray, sample)
+  def transmittance(ray: Ray, sample: Sample): Spectrum = volumeIntegrator.transmittance(ray, sample)
 }

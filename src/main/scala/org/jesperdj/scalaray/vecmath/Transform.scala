@@ -31,9 +31,6 @@ sealed class Transform private[vecmath] (private[vecmath] val mat: Matrix, priva
   // Transform a ray (pbrt 2.8.4)
   def *(r: Ray) = mat * r
 
-  // Transform a ray differential (pbrt 2.8.4)
-  def *(rd: RayDifferential) = mat * rd
-
   // Combine transforms (pbrt 2.8.6)
   def *(t: Transform) = new Transform(mat * t.mat, t.inv * inv)
 
@@ -57,7 +54,6 @@ object Transform {
     override def *(v: Vector) = v
     override def *(n: Normal) = n
     override def *(r: Ray) = r
-    override def *(rd: RayDifferential) = rd
     override def *(t: Transform) = t
     override def inverse = this
     override def hasScale = false
