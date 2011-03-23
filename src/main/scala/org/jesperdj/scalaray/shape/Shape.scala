@@ -20,7 +20,7 @@ package org.jesperdj.scalaray.shape
 import org.jesperdj.scalaray.vecmath._
 
 // NOTE: In contrast to pbrt, shapes in ScalaRay do not have a shape-to-world transform. Transformations have been abstracted away to TransformedPrimitive.
-// The methods in shapes work with and return values in local shape coordinates, not world coordinates as in pbrt.
+// The methods in shapes work with and return values in local shape coordinates, not world coordinates as in pbrt. This makes shapes simpler.
 
 // NOTE: ScalaRay doesn't implement the shape and primitive refinement functionality of pbrt (pbrt 3.1.2, 4.1).
 // It is not necessary and only complicates the architecture.

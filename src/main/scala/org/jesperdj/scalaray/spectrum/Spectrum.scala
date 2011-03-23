@@ -22,8 +22,14 @@ sealed class Spectrum (private val red: Double, private val green: Double, priva
   // Add two spectra
   def +(s: Spectrum): Spectrum = new Spectrum(red + s.red, green + s.green, blue + s.blue)
 
+  // Subtract two spectra
+  def -(s: Spectrum): Spectrum = new Spectrum(red - s.red, green - s.green, blue - s.blue)
+
   // Multiply two spectra
   def *(s: Spectrum): Spectrum = new Spectrum(red * s.red, green * s.green, blue * s.blue)
+
+  // Divide two spectra
+  def /(s: Spectrum): Spectrum = new Spectrum(red / s.red, green / s.green, blue / s.blue)
 
   // Scale this spectrum
   def *(f: Double): Spectrum = new Spectrum(red * f, green * f, blue * f)

@@ -17,7 +17,6 @@
  */
 package org.jesperdj.scalaray.reflection
 
-import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.sampler._
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath.Vector
