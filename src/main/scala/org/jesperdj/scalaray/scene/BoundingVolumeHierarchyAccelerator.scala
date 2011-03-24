@@ -17,20 +17,20 @@
  */
 package org.jesperdj.scalaray.scene
 
-import scala.collection.immutable.Traversable
+import scala.collection.immutable.IndexedSeq
 
 import org.jesperdj.scalaray.shape._
 import org.jesperdj.scalaray.vecmath._
 
 // Bounding volume hierarchy accelerator (pbrt 4.4)
-final class BoundingVolumeHierarchyAccelerator (primitives: Traversable[Primitive],
-                                                split: Traversable[Primitive] => (Traversable[Primitive], Traversable[Primitive]) = BoundingVolumeHierarchyAccelerator.splitSurfaceAreaHeuristic,
+final class BoundingVolumeHierarchyAccelerator (primitives: IndexedSeq[Primitive],
+                                                split: IndexedSeq[Primitive] => (IndexedSeq[Primitive], IndexedSeq[Primitive]) = BoundingVolumeHierarchyAccelerator.splitSurfaceAreaHeuristic,
                                                 maxPrimitivesPerNode: Int = 2) extends Primitive with Accelerator {
   require(maxPrimitivesPerNode >= 2, "maxPrimitivesPerNode must be >= 2")
 
   private val root: Primitive = {
     // Recursive method to build the tree
-    def build(ps: Traversable[Primitive]): Primitive = {
+    def build(ps: IndexedSeq[Primitive]): Primitive = {
       if (ps.size == 1) ps.head else if (ps.size <= maxPrimitivesPerNode) new CompositePrimitive(ps) else {
         val (left, right) = split(ps)
         new CompositePrimitive(build(left), build(right))
@@ -56,8 +56,8 @@ final class BoundingVolumeHierarchyAccelerator (primitives: Traversable[Primitiv
 }
 
 object BoundingVolumeHierarchyAccelerator {
-  // TODO: There are bugs in this, it might return empty collections, that should never happen
-  def splitMiddle(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) = {
+  // Split primitives by comparing their centroid to the centroid of the collection; partition along the axis with the largest extent (pbrt 4.4.1)
+  def splitMiddle(ps: IndexedSeq[Primitive]): (IndexedSeq[Primitive], IndexedSeq[Primitive]) = {
     // Compute bounding box of centroids and extents of that bounding box
     val cb = ps.foldLeft(BoundingBox.Empty) { (bb, p) => bb union p.boundingBox.centroid }
     val (ex, ey, ez) = (cb.max.x - cb.min.x, cb.max.y - cb.min.y, cb.max.z - cb.min.z)
@@ -70,12 +70,30 @@ object BoundingVolumeHierarchyAccelerator {
     // Select predicate for the largest extent axis
     val pred: (Primitive) => Boolean = if (ex > ey && ex > ez) predX else if (ey > ex && ey > ez) predY else predZ
 
-    ps partition pred
+    val (left, right) = ps partition pred
+    if (left.isEmpty) (IndexedSeq(right.head), right.tail) else (left, right)
   }
 
-  def splitEqualCounts(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) =
-    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement splitEqualCounts
+  // Sort primitives by their centroids along the axis with the largest extent, then split the collection so that both parts
+  // have an approximately equal number of primitives (pbrt 4.4.1)
+  def splitEqualCounts(ps: IndexedSeq[Primitive]): (IndexedSeq[Primitive], IndexedSeq[Primitive]) = {
+    // Compute bounding box of centroids and extents of that bounding box
+    val cb = ps.foldLeft(BoundingBox.Empty) { (bb, p) => bb union p.boundingBox.centroid }
+    val (ex, ey, ez) = (cb.max.x - cb.min.x, cb.max.y - cb.min.y, cb.max.z - cb.min.z)
 
-  def splitSurfaceAreaHeuristic(ps: Traversable[Primitive]): (Traversable[Primitive], Traversable[Primitive]) =
+    // Comparison functions for sorting
+    def compareX(p1: Primitive, p2: Primitive) = p1.boundingBox.centroid.x < p2.boundingBox.centroid.x
+    def compareY(p1: Primitive, p2: Primitive) = p1.boundingBox.centroid.y < p2.boundingBox.centroid.y
+    def compareZ(p1: Primitive, p2: Primitive) = p1.boundingBox.centroid.z < p2.boundingBox.centroid.z
+
+    // Select the comparison function for the largest extent axis
+    val compare: (Primitive, Primitive) => Boolean = if (ex > ey && ex > ez) compareX else if (ey > ex && ey > ez) compareY else compareZ
+
+    val sorted = ps sortWith compare
+    sorted.splitAt(sorted.size / 2)
+  }
+
+  // Split primitives according to the surface area heuristic (pbrt 4.4.2)
+  def splitSurfaceAreaHeuristic(ps: IndexedSeq[Primitive]): (IndexedSeq[Primitive], IndexedSeq[Primitive]) =
     throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement splitSurfaceAreaHeuristic
 }

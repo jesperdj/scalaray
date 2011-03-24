@@ -120,8 +120,6 @@ object Main {
   }
 
   def createCube(size: Double, material: Material): Primitive = {
-    import scala.collection.immutable.IndexedSeq
-
     // TODO: Properly generate normals and u, v surface coordinates for vertices
 
     // Generate vertices
@@ -131,33 +129,27 @@ object Main {
     // Front
     val ft1 = new GeometricPrimitive(new Triangle(v(0), v(2), v(3)), material)
     val ft2 = new GeometricPrimitive(new Triangle(v(3), v(1), v(0)), material)
-    val f = new CompositePrimitive(ft1, ft2)
 
     // Back
     val bkt1 = new GeometricPrimitive(new Triangle(v(5), v(7), v(6)), material)
     val bkt2 = new GeometricPrimitive(new Triangle(v(6), v(4), v(5)), material)
-    val bk = new CompositePrimitive(bkt1, bkt2)
 
     // Left
     val lt1 = new GeometricPrimitive(new Triangle(v(4), v(6), v(2)), material)
     val lt2 = new GeometricPrimitive(new Triangle(v(2), v(0), v(4)), material)
-    val l = new CompositePrimitive(lt1, lt2)
 
     // Right
     val rt1 = new GeometricPrimitive(new Triangle(v(1), v(3), v(7)), material)
     val rt2 = new GeometricPrimitive(new Triangle(v(7), v(5), v(1)), material)
-    val r = new CompositePrimitive(rt1, rt2)
 
     // Bottom
     val btt1 = new GeometricPrimitive(new Triangle(v(4), v(0), v(1)), material)
     val btt2 = new GeometricPrimitive(new Triangle(v(1), v(5), v(4)), material)
-    val bt = new CompositePrimitive(btt1, btt2)
 
     // Top
     val tt1 = new GeometricPrimitive(new Triangle(v(7), v(3), v(2)), material)
     val tt2 = new GeometricPrimitive(new Triangle(v(2), v(6), v(7)), material)
-    val t = new CompositePrimitive(tt1, tt2)
 
-    new CompositePrimitive(f, bk, l, r, bt, t)
+    new BoundingVolumeHierarchyAccelerator(IndexedSeq(ft1, ft2, bkt1, bkt2, lt1, lt2, rt1, rt2, btt1, btt2, tt1, tt2), BoundingVolumeHierarchyAccelerator.splitMiddle)
   }
 }
