@@ -26,8 +26,30 @@ final class Cube extends Shape {
 
   // Compute closest intersection between a ray and this shape, returns differential geometry and distance of intersection along ray
   def intersect(ray: Ray): Option[(DifferentialGeometry, Double)] = {
-    // TODO: Implement this
-    throw new UnsupportedOperationException("Not yet implemented")
+    boundingBox.intersect(ray) map {
+      case (distance, _) => (new DifferentialGeometry {
+        // Intersection point
+        lazy val point: Point = ray(distance)
+
+        // Surface normal
+        lazy val normal: Normal = Normal.Zero // TODO: Depends on which face of the cube was intersected
+
+        // Surface parameter coordinates
+        val u: Double = 0.0 // TODO
+        val v: Double = 0.0 // TODO
+
+        // Partial derivatives of the surface position
+        val dpdu: Vector = Vector.Zero // TODO
+        val dpdv: Vector = Vector.Zero // TODO
+
+        // Partial derivatives of the surface normal
+        val dndu: Normal = Normal.Zero
+        val dndv: Normal = Normal.Zero
+
+        // Shape which is intersected
+        val shape: Shape = Cube.this
+      }, distance)
+    }
   }
 
   // Surface area
