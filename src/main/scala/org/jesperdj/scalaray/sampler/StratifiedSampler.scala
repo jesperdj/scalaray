@@ -149,7 +149,7 @@ object StratifiedSampler {
     for (x <- 0 until count) array(x) = (x + (if (jitter) rng.nextDouble else 0.5)) / count
 
     // Shuffle samples to decorrelate dimensions
-    arrayToIndexedSeq(shuffle(array))
+    arrayToIndexedSeq(shuffle(array, rng))
   }
 
   // Generate a stratified 2D sample pattern
@@ -159,7 +159,7 @@ object StratifiedSampler {
       array(x + countX * y) = ((x + (if (jitter) rng.nextDouble else 0.5)) / countX, (y + (if (jitter) rng.nextDouble else 0.5)) / countY)
 
     // Shuffle samples to decorrelate dimensions
-    arrayToIndexedSeq(shuffle(array))
+    arrayToIndexedSeq(shuffle(array, rng))
   }
 
   // Generate a stratified 2D sample pattern using Latin hypercube sampling
@@ -172,6 +172,6 @@ object StratifiedSampler {
     def swapY(a: (Double, Double), b: (Double, Double)): ((Double, Double), (Double, Double)) = ((a._1, b._2), (b._1, a._2))
 
     // Shuffle along both dimensions independently
-    arrayToIndexedSeq(shuffle(shuffle(array, swapX), swapY))
+    arrayToIndexedSeq(shuffle(shuffle(array, rng, swapX), rng, swapY))
   }
 }

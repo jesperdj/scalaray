@@ -48,6 +48,9 @@ class ThreadSafeRandomNumberGenerator (create: () => RandomNumberGenerator) exte
 // Thread-safe Mersenne Twister
 object ThreadSafeMersenneTwister extends ThreadSafeRandomNumberGenerator(() => new MersenneTwister)
 
+// TODO: Potential weakness: If you quickly create multiple instances of MersenneTwister they will be initialized with the same seed value so that you will
+// get a bad distribution of random numbers. See this for an idea on how to improve this: http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/DC/dc.html
+
 // Mersenne Twister 19937
 // Based on code from: http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html
 // Note: This implementation is not thread-safe!

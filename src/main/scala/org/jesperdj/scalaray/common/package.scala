@@ -65,9 +65,8 @@ package object common {
 
   // Randomly permutate an array - Fisher-Yates shuffle (see: http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
   // This method can also take a custom swap method, which is useful for example for Latin hypercube sampling
-  def shuffle[@specialized(Double) T](array: Array[T], swap: (T, T) => (T, T) = { (a: T, b: T) => (b, a) }): Array[T] = {
-    val rng: RandomNumberGenerator = ThreadSafeMersenneTwister
-
+  def shuffle[@specialized(Double) T](array: Array[T], rng: RandomNumberGenerator = ThreadSafeMersenneTwister,
+                                      swap: (T, T) => (T, T) = { (a: T, b: T) => (b, a) }): Array[T] = {
     for (n <- array.length - 1 to 0 by -1) {
       val k = rng.nextInt(n + 1)
       val (a, b) = swap(array(k), array(n)); array(k) = a; array(n) = b
