@@ -19,17 +19,15 @@ package org.jesperdj.scalaray.reflection
 
 import scala.collection.immutable.IndexedSeq
 
-import org.jesperdj.scalaray.common.Accumulator
+import org.jesperdj.scalaray.common.{ Accumulator, RandomNumberGenerator }
 import org.jesperdj.scalaray.sampler.{ Sample, SamplePatternSpec, SamplePatternSpec1D, SamplePatternSpec2D }
 import org.jesperdj.scalaray.shape.DifferentialGeometry
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath.{ Normal, Vector }
 
-import scala.util.Random
-
 // BSDF sample (pbrt 14.5.6)
 final case class BSDFSample (component: Double, u1: Double, u2: Double) {
-  def this(rng: Random) = this(rng.nextDouble, rng.nextDouble, rng.nextDouble)
+  def this(rng: RandomNumberGenerator) = this(rng.nextDouble, rng.nextDouble, rng.nextDouble)
 }
 
 // Converter to transform sample patterns to BSDFSamples

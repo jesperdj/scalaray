@@ -17,7 +17,7 @@
  */
 package org.jesperdj.scalaray.integrator
 
-import org.jesperdj.scalaray.common.Accumulator
+import org.jesperdj.scalaray.common.{ Accumulator, RandomNumberGenerator, ThreadSafeMersenneTwister }
 import org.jesperdj.scalaray.lightsource.{ AreaLightSource, LightSample, LightSampleConverter, LightSource }
 import org.jesperdj.scalaray.reflection.{ BSDF, BSDFSample, BSDFSampleConverter, BxDFType }
 import org.jesperdj.scalaray.sampler.{ Sample, SamplePatternSpec }
@@ -41,6 +41,9 @@ final class DirectLightingSurfaceIntegratorBuilder extends SurfaceIntegratorBuil
 // Direct lighting surface integrator (pbrt 15.1)
 final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[SamplePatternSpec], integrator: Integrator, maxDepth: Int = 5)
   extends SurfaceIntegrator {
+  // Random number generator
+  private val rng: RandomNumberGenerator = ThreadSafeMersenneTwister
+
   // Sample converters for a light source
   private final class SampleConverters (val lightSource: LightSource) {
     val count = lightSource.numberOfSamples // TODO: Could be 1 for different sampling strategy
@@ -171,7 +174,7 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
     val normal = bsdf.dgShading.normal
 
     // Sample the BSDF for specular reflection
-    val (reflectance, wi, _, pdf) = bsdf.sample(wo, new BSDFSample(new scala.util.Random), BxDFType.Reflection | BxDFType.Specular)
+    val (reflectance, wi, _, pdf) = bsdf.sample(wo, new BSDFSample(rng), BxDFType.Reflection | BxDFType.Specular)
 
     if (pdf > 0.0 && !reflectance.isBlack && (wi * normal).abs != 0.0) {
       val radiance = integrator.radiance(new Ray(point, wi, 1e-6, Double.PositiveInfinity, ray.depth + 1), sample)
@@ -189,7 +192,7 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
     val normal = bsdf.dgShading.normal
 
     // Sample the BSDF for specular refraction
-    val (reflectance, wi, _, pdf) = bsdf.sample(wo, new BSDFSample(new scala.util.Random), BxDFType.Transmission | BxDFType.Specular)
+    val (reflectance, wi, _, pdf) = bsdf.sample(wo, new BSDFSample(rng), BxDFType.Transmission | BxDFType.Specular)
 
     if (pdf > 0.0 && !reflectance.isBlack && (wi * normal).abs != 0.0) {
       val radiance = integrator.radiance(new Ray(point, wi, 1e-6, Double.PositiveInfinity, ray.depth + 1), sample)

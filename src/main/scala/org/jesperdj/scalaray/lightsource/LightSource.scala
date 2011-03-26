@@ -17,18 +17,17 @@
  */
 package org.jesperdj.scalaray.lightsource
 
-import org.jesperdj.scalaray.common.Accumulator
+import org.jesperdj.scalaray.common.{ Accumulator, RandomNumberGenerator }
 import org.jesperdj.scalaray.sampler.{ Sample, SamplePatternSpec, SamplePatternSpec1D, SamplePatternSpec2D }
 import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.spectrum.Spectrum
 import org.jesperdj.scalaray.vecmath._
 
 import scala.collection.immutable.IndexedSeq
-import scala.util.Random
 
 // Light sample (pbrt 14.6.1)
 final case class LightSample (component: Double, u1: Double, u2: Double) {
-  def this(rng: Random) = this(rng.nextDouble, rng.nextDouble, rng.nextDouble)
+  def this(rng: RandomNumberGenerator) = this(rng.nextDouble, rng.nextDouble, rng.nextDouble)
 }
 
 // Converter to transform sample patterns to LightSamples
