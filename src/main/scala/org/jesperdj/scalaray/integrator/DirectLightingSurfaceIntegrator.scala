@@ -62,16 +62,8 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
     // Get emitted radiance if intersection point is on an area light source
     val emitted = intersection.emittedRadiance(wo)
 
-    val point = bsdf.dgShading.point
-    val normal = bsdf.dgShading.normal
-
-    // TODO: This does not work if the light source is on the wrong side of the surface. Solve the self-intersection problem differently.
-    // How is this done in pbrt?
-    // Point for shadow ray calculations just above surface to avoid self-intersection
-    val shadowPoint = point + normal * 1e-6
-
     // Get radiance of direct light from light sources on the intersection point
-    val direct = uniformSampleAllLights(shadowPoint, normal, wo, intersection.bsdf, sample)
+    val direct = uniformSampleAllLights(bsdf.dgShading.point, bsdf.dgShading.normal, wo, intersection.bsdf, sample)
 
     // If maximum recursion depth has not yet been reached, trace rays for specular reflection and refraction
     val specular = if (ray.depth >= maxDepth) Spectrum.Black else specularReflect(ray, intersection, sample) + specularTransmit(ray, intersection, sample)
@@ -106,10 +98,12 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
     val notSpecularMask = BxDFType.All & ~BxDFType.Specular
 
     // Sample light source with multiple importance sampling
-    val (radiance, wi, shadowRay, lightPdf) = lightSource.sample(point, lightSample)
+    val (radiance, wi, ray, lightPdf) = lightSource.sample(point, lightSample)
     if (lightPdf > 0.0 && !radiance.isBlack) {
       // Evaluate BSDF for the direction selected by the light source
       val reflectance = bsdf(wo, wi, notSpecularMask)
+
+      val shadowRay = Ray(ray.origin, ray.direction, ray.minDistance, ray.maxDistance - 1e-6, ray.depth) // TODO: rayEpsilon
 
       if (!reflectance.isBlack && !integrator.scene.checkIntersect(shadowRay)) {
         // TODO: take transmittance along ray into account
@@ -128,7 +122,7 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
         val lightPdf = lightSource.pdf(point, wi)
         if (lightPdf > 0.0) {
           // Evaluate radiance of light source at the point from the direction selected by the BSDF
-          val ray = Ray(point, wi)
+          val ray = Ray(point, wi, 1e-6) // TODO: rayEpsilon
           val radiance = integrator.scene.intersect(ray) match {
             case Some(Intersection(dg, prim, _)) if (prim.areaLightSource.isDefined && prim.areaLightSource.get == lightSource) =>
               // Ray intersects with this area light source and point isn't shadowed
@@ -177,7 +171,7 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
     val (reflectance, wi, _, pdf) = bsdf.sample(wo, new BSDFSample(rng), BxDFType.Reflection | BxDFType.Specular)
 
     if (pdf > 0.0 && !reflectance.isBlack && (wi * normal).abs != 0.0) {
-      val radiance = integrator.radiance(new Ray(point, wi, 1e-6, Double.PositiveInfinity, ray.depth + 1), sample)
+      val radiance = integrator.radiance(new Ray(point, wi, 1e-6, Double.PositiveInfinity, ray.depth + 1), sample) // TODO: rayEpsilon
       radiance * reflectance * ((wi * normal).abs / pdf)
     }
     else
@@ -195,7 +189,7 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
     val (reflectance, wi, _, pdf) = bsdf.sample(wo, new BSDFSample(rng), BxDFType.Transmission | BxDFType.Specular)
 
     if (pdf > 0.0 && !reflectance.isBlack && (wi * normal).abs != 0.0) {
-      val radiance = integrator.radiance(new Ray(point, wi, 1e-6, Double.PositiveInfinity, ray.depth + 1), sample)
+      val radiance = integrator.radiance(new Ray(point, wi, 1e-6, Double.PositiveInfinity, ray.depth + 1), sample) // TODO: rayEpsilon
       radiance * reflectance * ((wi * normal).abs / pdf)
     }
     else

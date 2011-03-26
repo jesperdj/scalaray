@@ -46,7 +46,7 @@ final class SpotLightSource (position: Point, direction: Vector, widthAngle: Dou
       delta * delta * delta * delta
     }
 
-    (if (falloff > 0.0) intensity * (falloff / rd.lengthSquared) else Spectrum.Black, Ray(position, rd, 0.0, 1.0))
+    (if (falloff > 0.0) intensity * (falloff / rd.lengthSquared) else Spectrum.Black, Ray(position, rd.normalize, 0.0, rd.length))
   }
 
   // Total emitted power of this light source onto the scene

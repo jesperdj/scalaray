@@ -96,7 +96,7 @@ final class BSDF (bxdfs: IndexedSeq[BxDF], val dgShading: DifferentialGeometry, 
     val wo = worldToLocal(woW)
     val (sampledSpectrum, wi, sampledPdf) = bxdf.sample(wo, sample.u1, sample.u2)
     if (sampledPdf == 0.0) return (Spectrum.Black, Vector.Zero, BxDFType.None, 0.0)
-    val wiW = localToWorld(wi)
+    val wiW = localToWorld(wi).normalize
 
     // Compute the overall pdf with all matching BxDFs
     val pdf = (if (bxdf.bxdfType.isDeltaBxDF || matchingBxDFs.size == 1) sampledPdf else

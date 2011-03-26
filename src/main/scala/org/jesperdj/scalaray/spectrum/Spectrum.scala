@@ -20,13 +20,16 @@ package org.jesperdj.scalaray.spectrum
 // Spectrum
 sealed class Spectrum (private val red: Double, private val green: Double, private val blue: Double) {
   // Add two spectra
-  def +(s: Spectrum): Spectrum = new Spectrum(red + s.red, green + s.green, blue + s.blue)
+  def +(s: Spectrum): Spectrum = if (s.isBlack) this else new Spectrum(red + s.red, green + s.green, blue + s.blue)
 
   // Subtract two spectra
-  def -(s: Spectrum): Spectrum = new Spectrum(red - s.red, green - s.green, blue - s.blue)
+  def -(s: Spectrum): Spectrum = if (s.isBlack) this else new Spectrum(red - s.red, green - s.green, blue - s.blue)
+
+  // Unary minus
+  def unary_- = new Spectrum(-red, -green, -blue)
 
   // Multiply two spectra
-  def *(s: Spectrum): Spectrum = new Spectrum(red * s.red, green * s.green, blue * s.blue)
+  def *(s: Spectrum): Spectrum = if (s.isBlack) Spectrum.Black else new Spectrum(red * s.red, green * s.green, blue * s.blue)
 
   // Divide two spectra
   def /(s: Spectrum): Spectrum = new Spectrum(red / s.red, green / s.green, blue / s.blue)
@@ -38,6 +41,7 @@ sealed class Spectrum (private val red: Double, private val green: Double, priva
   // Add another spectrum to this spectrum with a weight
   def +*(s: Spectrum, w: Double): Spectrum = new Spectrum(red + s.red * w, green + s.green * w, blue + s.blue * w)
 
+  // Check if this spectrum is black
   def isBlack = red == 0.0 && green == 0.0 && blue == 0.0
 
   def toRGB = (red, green, blue)
@@ -49,7 +53,10 @@ object Spectrum {
   // Spectrum constants
   val Black: Spectrum = new Spectrum(0.0, 0.0, 0.0) {
     override def +(s: Spectrum) = s
+    override def -(s: Spectrum) = -s
+    override def unary_- = this
     override def *(s: Spectrum) = this
+    override def /(s: Spectrum) = this
     override def *(f: Double) = this
     override def /(f: Double) = this
     override def +*(s: Spectrum, w: Double) = s * w

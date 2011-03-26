@@ -45,7 +45,7 @@ final class DiffuseAreaLightSource (shape: Shape, lightToWorld: Transform, emitt
     val rd = point - p
 
     // Return the radiance only if the light shines from the right side of the surface of the light source
-    (emittedRadiance(p, n, rd), -rd.normalize, new Ray(p, rd, 1e-6, 1.0), pdf)
+    (emittedRadiance(p, n, rd), -rd.normalize, new Ray(p, rd.normalize, 1e-6, rd.length), pdf) // TODO: rayEpsilon
   }
 
   // Probability density of the direction wi being sampled with respect to the distribution that sample uses (pbrt 14.6.1)
