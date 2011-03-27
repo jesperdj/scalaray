@@ -66,6 +66,15 @@ final class Quaternion (val v: Vector, val w: Double) {
     new Transform(m.transpose, m)
   }
 
+  // Get an element by index
+  def apply(index: Int): Double = index match {
+    case 0 => v.x
+    case 1 => v.y
+    case 2 => v.z
+    case 3 => w
+    case _ => throw new IndexOutOfBoundsException(index.toString)
+  }
+
   override def toString = "Quaternion(%g, %g, %g, %g)" format (v.x, v.y, v.z, w)
 }
 

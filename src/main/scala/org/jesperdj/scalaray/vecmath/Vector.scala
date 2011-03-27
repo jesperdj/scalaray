@@ -57,6 +57,14 @@ final class Vector (val x: Double, val y: Double, val z: Double) {
   // Normalize
   def normalize = this / length
 
+  // Get an element by index
+  def apply(index: Int): Double = index match {
+    case 0 => x
+    case 1 => y
+    case 2 => z
+    case _ => throw new IndexOutOfBoundsException(index.toString)
+  }
+
   override def toString = "Vector(%g, %g, %g)" format (x, y, z)
 }
 

@@ -48,6 +48,14 @@ final class Point (val x: Double, val y: Double, val z: Double) {
   def distance(p: Point) = math.sqrt(distanceSquared(p))
   def distanceSquared(p: Point) = (this - p).lengthSquared
 
+  // Get an element by index
+  def apply(index: Int): Double = index match {
+    case 0 => x
+    case 1 => y
+    case 2 => z
+    case _ => throw new IndexOutOfBoundsException(index.toString)
+  }
+
   override def toString = "Point(%g, %g, %g)" format (x, y, z)
 }
 

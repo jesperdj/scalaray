@@ -26,9 +26,9 @@ import spectrum._
 import texture._
 import vecmath._
 
-object Scene01 {
+object Scene02 {
   def createScene(): Scene = {
-    val mat1 = new MatteMaterial(new ConstantTexture(new Spectrum(1.0, 1.0, 0.5)))
+    val mat1 = new MatteMaterial(new ConstantTexture(new Spectrum(0.5, 1.0, 1.0)))
     val mat2 = new MatteMaterial(new ConstantTexture(new Spectrum(1.0, 1.0, 1.0)))
 
 //    val s1 = new Sphere(0.75, -1.0, 1.0, π * 4.0 / 3.0)
@@ -49,38 +49,6 @@ object Scene01 {
   }
 
   def createCube(size: Double, material: Material): Primitive = {
-    import scala.collection.immutable.IndexedSeq
-
-    // TODO: Properly generate normals and u, v surface coordinates for vertices
-
-    // Generate vertices
-    val v: IndexedSeq[Vertex] = for (i <- 0 to 7) yield
-      new Vertex(Point(if ((i & 1) != 0) size else -size, if ((i & 2) != 0) size else -size, if ((i & 4) != 0) size else -size), Normal.Zero, 0.0, 0.0)
-
-    // Front
-    val ft1 = new GeometricPrimitive(new Triangle(v(0), v(2), v(3)), material)
-    val ft2 = new GeometricPrimitive(new Triangle(v(3), v(1), v(0)), material)
-
-    // Back
-    val bkt1 = new GeometricPrimitive(new Triangle(v(5), v(7), v(6)), material)
-    val bkt2 = new GeometricPrimitive(new Triangle(v(6), v(4), v(5)), material)
-
-    // Left
-    val lt1 = new GeometricPrimitive(new Triangle(v(4), v(6), v(2)), material)
-    val lt2 = new GeometricPrimitive(new Triangle(v(2), v(0), v(4)), material)
-
-    // Right
-    val rt1 = new GeometricPrimitive(new Triangle(v(1), v(3), v(7)), material)
-    val rt2 = new GeometricPrimitive(new Triangle(v(7), v(5), v(1)), material)
-
-    // Bottom
-    val btt1 = new GeometricPrimitive(new Triangle(v(4), v(0), v(1)), material)
-    val btt2 = new GeometricPrimitive(new Triangle(v(1), v(5), v(4)), material)
-
-    // Top
-    val tt1 = new GeometricPrimitive(new Triangle(v(7), v(3), v(2)), material)
-    val tt2 = new GeometricPrimitive(new Triangle(v(2), v(6), v(7)), material)
-
-    new BoundingVolumeHierarchyAccelerator(IndexedSeq(ft1, ft2, bkt1, bkt2, lt1, lt2, rt1, rt2, btt1, btt2, tt1, tt2), BoundingVolumeHierarchyAccelerator.splitMiddle)
+    new TransformedPrimitive(new GeometricPrimitive(Cube, material), Transform.scale(2.0 * size) * Transform.translate(-0.5, -0.5, -0.5))
   }
 }
