@@ -43,14 +43,14 @@ final class CompositePrimitive (primitives: Traversable[Primitive]) extends Prim
 
     // Initialize the range of the ray with the range inside the bounding box
     val (minDistance, maxDistance) = range.get
-    var r = Ray(ray.origin, ray.direction, minDistance, maxDistance)
+    var r = Ray(ray.origin, ray.direction, minDistance, maxDistance, ray.depth)
 
     // Find the closest intersection between the ray and one of the primitives
     primitives.foldLeft(None: Option[(Intersection, Double)]) { (result: Option[(Intersection, Double)], prim: Primitive) =>
       prim.intersect(r) match {
         case Some((its, distance)) =>
           // Found a closer intersection; update max distance of the ray for subsequent intersection tests
-          r = Ray(r.origin, r.direction, r.minDistance, distance)
+          r = Ray(r.origin, r.direction, r.minDistance, distance, r.depth)
           Some(its, distance)
 
         case None => result
