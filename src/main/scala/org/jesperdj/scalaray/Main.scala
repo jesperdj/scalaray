@@ -36,7 +36,7 @@ class Timer (val name: String) {
   def start() { startTime = System.nanoTime }
   def stop() { totalTime += System.nanoTime - startTime }
 
-  def time[T](block: => T): T = { start; val result: T = block; stop; result }
+  def time[T](block: => T): T = { start(); val result: T = block; stop(); result }
 
   def total = totalTime
 

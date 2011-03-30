@@ -64,7 +64,7 @@ final class PixelBuffer (rectangle: Rectangle, filter: Filter) {
   }
 
   // Convert the pixels to an RGB image
-  def toImage(): java.awt.image.BufferedImage = {
+  def toImage: java.awt.image.BufferedImage = {
     def toByte(value: Double): Int = clamp(value * 255.0, 0.0, 255.0).toInt
 
     val image = new java.awt.image.BufferedImage(rectangle.width, rectangle.height, java.awt.image.BufferedImage.TYPE_INT_RGB)

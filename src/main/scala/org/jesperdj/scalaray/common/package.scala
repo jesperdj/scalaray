@@ -23,20 +23,20 @@ package object common {
   val π = math.Pi
 
   // Trait for types that can be multiplied with a T, resulting in an R
-  trait Multipliable[-T, +R] {
+  trait Multipliable[@specialized(Double) -T, @specialized(Double) +R] {
     def *(value: T): R
   }
 
   // Trait for types to which a T can be added, resulting in an R
-  trait Addable[-T, +R] {
+  trait Addable[@specialized(Double) -T, @specialized(Double) +R] {
     def +(value: T): R
   }
 
-  trait MultipliableSame[T] extends Multipliable[T, T]
+  trait MultipliableSame[@specialized(Double) T] extends Multipliable[T, T]
 
-  trait AddableSame[T] extends Addable[T, T]
+  trait AddableSame[@specialized(Double) T] extends Addable[T, T]
 
-  trait Interpolatable[T] extends Multipliable[Double, T] with AddableSame[T]
+  trait Interpolatable[@specialized(Double) T] extends Multipliable[Double, T] with AddableSame[T]
 
   implicit def doubleToInterpolatable(n: Double) = new Interpolatable[Double] {
     @inline def *(value: Double): Double = n * value
@@ -46,11 +46,13 @@ package object common {
   // Linearly interpolate between two values
   @inline def interpolate[@specialized(Double) T <% Interpolatable[T]](t: Double, a: T, b: T): T = a * (1.0 - t) + b * t
 
+  // NOTE: This will still do some boxing and unboxing because Ordering / Ordered is not @specialized.
   @inline def clamp[@specialized(Int, Double) T : Ordering](value: T, low: T, high: T): T = {
     import Ordered._
     if (value < low) low else if (value > high) high else value
   }
 
+  // NOTE: This will still do some boxing and unboxing because Ordering / Ordered is not @specialized.
   @inline def minmax[@specialized(Int, Double) T : Ordering](a: T, b: T): (T, T) = {
     import Ordered._
     if (a <= b) (a, b) else (b, a)
@@ -58,6 +60,7 @@ package object common {
 
   // Create an immutable IndexedSeq that wraps an Array. Note that Scala already contains a method wrapDoubleArray(), but this returns a mutable WrappedArray.
   // Also, this version is @specialized on Double to avoid unnecessary boxing and unboxing.
+  // NOTE: This does not eliminate all boxing and unboxing because IndexedSeq is not @specialized.
   def arrayToIndexedSeq[@specialized(Double) T](array: Array[T]): IndexedSeq[T] = new IndexedSeq[T] {
     @inline def apply(idx: Int): T = array(idx)
     @inline def length: Int = array.length
