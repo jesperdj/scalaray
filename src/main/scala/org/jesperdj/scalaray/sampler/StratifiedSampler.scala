@@ -37,7 +37,7 @@ final class StratifiedSampler (val rectangle: Rectangle, pixelsPerBatch: Int, sa
   def hasNext = nextBatchIndex < numberOfBatches
 
   // Generate the next batch
-  def next: SampleBatch = {
+  def next(): SampleBatch = {
     if (!hasNext) throw new NoSuchElementException("next on empty iterator")
 
     val batch = new SampleBatchImpl(nextBatchIndex)
@@ -71,7 +71,7 @@ final class StratifiedSampler (val rectangle: Rectangle, pixelsPerBatch: Int, sa
     def hasNext = moreSamples
 
     // Generate the next sample
-    def next = {
+    def next() = {
       if (!hasNext) throw new NoSuchElementException("next on empty iterator")
 
       val sample = pixelSamples(sampleIndex)
@@ -134,7 +134,7 @@ final class StratifiedSampler (val rectangle: Rectangle, pixelsPerBatch: Int, sa
     }
   }
 
-  override def toString = "StratifiedSampler"
+  override def toString() = "StratifiedSampler"
 }
 
 object StratifiedSampler {
@@ -146,7 +146,7 @@ object StratifiedSampler {
   // Generate a stratified 1D sample pattern
   private def generateSamplePattern1D(count: Int, jitter: Boolean): SamplePattern1D = {
     val array = new Array[Double](count)
-    for (x <- 0 until count) array(x) = (x + (if (jitter) rng.nextDouble else 0.5)) / count
+    for (x <- 0 until count) array(x) = (x + (if (jitter) rng.nextDouble() else 0.5)) / count
 
     // Shuffle samples to decorrelate dimensions
     arrayToIndexedSeq(shuffle(array, rng))
@@ -156,7 +156,7 @@ object StratifiedSampler {
   private def generateSamplePattern2D(countX: Int, countY: Int, jitter: Boolean): SamplePattern2D = {
     val array = new Array[(Double, Double)](countX * countY)
     for (y <- 0 until countY; x <- 0 until countX)
-      array(x + countX * y) = ((x + (if (jitter) rng.nextDouble else 0.5)) / countX, (y + (if (jitter) rng.nextDouble else 0.5)) / countY)
+      array(x + countX * y) = ((x + (if (jitter) rng.nextDouble() else 0.5)) / countX, (y + (if (jitter) rng.nextDouble() else 0.5)) / countY)
 
     // Shuffle samples to decorrelate dimensions
     arrayToIndexedSeq(shuffle(array, rng))
@@ -165,7 +165,7 @@ object StratifiedSampler {
   // Generate a stratified 2D sample pattern using Latin hypercube sampling
   private def generateSamplePattern2D(count: Int, jitter: Boolean): SamplePattern2D = {
     val array = new Array[(Double, Double)](count)
-    for (i <- 0 until count) array(i) = ((i + (if (jitter) rng.nextDouble else 0.5)) / count, (i + (if (jitter) rng.nextDouble else 0.5)) / count)
+    for (i <- 0 until count) array(i) = ((i + (if (jitter) rng.nextDouble() else 0.5)) / count, (i + (if (jitter) rng.nextDouble() else 0.5)) / count)
 
     // Swap functions to swap the X or Y components of two samples
     def swapX(a: (Double, Double), b: (Double, Double)): ((Double, Double), (Double, Double)) = ((b._1, a._2), (a._1, b._2))

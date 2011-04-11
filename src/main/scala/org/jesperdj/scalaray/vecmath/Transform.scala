@@ -109,9 +109,9 @@ object Transform {
   // Create a rotation around an arbitrary axis (pbrt 2.7.6)
   def rotate(angle: Double, axis: Vector) = {
     val a = axis.normalize
+
     val c = math.cos(angle)
     val s = math.sin(angle)
-
     val cc = 1.0 - c
 
     val t1 = a.x * a.y * cc
