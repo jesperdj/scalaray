@@ -23,7 +23,7 @@ import org.jesperdj.scalaray.common.Interval
 import org.jesperdj.scalaray.vecmath._
 
 // Axis-aligned bounding box (pbrt 2.6)
-sealed class BoundingBox (points: Traversable[Point]) {
+sealed class BoundingBox (points: Traversable[Point]) extends Intersectable[Interval] {
   // Create a bounding box from points (using varargs)
   def this(points: Point*) = this(Traversable(points: _*))
 

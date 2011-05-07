@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray.scene
+package org.jesperdj.scalaray.vecmath
 
-import org.jesperdj.scalaray.shape.HasBoundingBox
-import org.jesperdj.scalaray.vecmath.{ Intersectable, Ray }
+// Trait for classes that can be intersected with a ray
+trait Intersectable[R] {
+  // Compute closest intersection with the given ray
+  def intersect(ray: Ray): Option[R]
 
-// NOTE: ScalaRay doesn't implement the shape and primitive refinement functionality of pbrt (pbrt 3.1.2, 4.1).
-// It is not necessary and only complicates the architecture.
-
-// Primitive (pbrt 4.1)
-trait Primitive extends Intersectable[(Intersection, Double)] with HasBoundingBox
+  // Check if there is an intersection with the given ray; override this if a more efficient implementation can be provided
+  def checkIntersect(ray: Ray): Boolean = intersect(ray).isDefined
+}

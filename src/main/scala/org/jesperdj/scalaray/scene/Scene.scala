@@ -24,7 +24,7 @@ import org.jesperdj.scalaray.shape.BoundingBox
 import org.jesperdj.scalaray.vecmath._
 
 // Scene (pbrt 1.3.2)
-final class Scene (primitive: Primitive, val lightSources: Traversable[LightSource]) {
+final class Scene (primitive: Primitive, val lightSources: Traversable[LightSource]) extends Intersectable[Intersection] {
   // Bounding box of the whole scene
   val boundingBox: BoundingBox = primitive.boundingBox
 
@@ -35,7 +35,7 @@ final class Scene (primitive: Primitive, val lightSources: Traversable[LightSour
   def intersect(ray: Ray): Option[Intersection] = primitive.intersect(ray) map { case (its, _) => its }
 
   // Check if a ray intersects a primitive in the scene
-  def checkIntersect(ray: Ray): Boolean = primitive.checkIntersect(ray)
+  override def checkIntersect(ray: Ray): Boolean = primitive.checkIntersect(ray)
 
   override def toString = "Scene(primitive=%s, lightSources=%s)" format (primitive, lightSources)
 }
