@@ -15,21 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray.vecmath
+package org.jesperdj.scalaray.common
 
-import org.jesperdj.scalaray.common.Interval
+// Interval
+final class Interval (val min: Double, val max: Double) {
+  // Center of the interval
+  def center = (min + max) / 2.0
 
-// Ray (pbrt 2.5)
-sealed class Ray (val origin: Point, val direction: Vector, val range: Interval = new Interval(0.0, Double.PositiveInfinity), val depth: Int = 0) {
-  // Check if distance t is in the valid range of this ray
-  def isInRange(t: Double) = range.inside(t)
+  // Length of the interval
+  def length = max - min
 
-  // Get a point along the ray
-  def apply(t: Double) = origin + direction * t
+  // Check if a value is inside the interval
+  def inside(n: Double) = n >= min && n <= max
+
+  // Check if another interval overlaps with this one
+  def overlaps(i: Interval) = i.max >= min && i.min <= max
 }
 
-object Ray {
-  // Create a ray
-  def apply(origin: Point, direction: Vector, range: Interval, depth: Int = 0) =
-    new Ray(origin, direction, range, depth)
+object Interval {
+  def apply(min: Double, max: Double) = new Interval(min, max)
 }

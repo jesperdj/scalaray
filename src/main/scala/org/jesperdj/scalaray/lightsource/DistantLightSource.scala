@@ -17,9 +17,9 @@
  */
 package org.jesperdj.scalaray.lightsource
 
+import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
 
 // Distant light source (pbrt 12.3)
@@ -29,7 +29,7 @@ final class DistantLightSource (direction: Vector, radiance: Spectrum) extends D
 
   // Radiance of this light source at the given point
   // Returns the radiance and a ray from the light source to the given point
-  def radiance(point: Point): (Spectrum, Ray) = (radiance, Ray(point, direction, Double.NegativeInfinity, 0.0))
+  def radiance(point: Point): (Spectrum, Ray) = (radiance, Ray(point, direction, Interval(Double.NegativeInfinity, 0.0)))
 
   // Total emitted power of this light source onto the scene
   def totalPower(scene: Scene): Spectrum = {

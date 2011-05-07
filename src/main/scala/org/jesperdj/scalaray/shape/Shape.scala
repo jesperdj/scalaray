@@ -17,6 +17,7 @@
  */
 package org.jesperdj.scalaray.shape
 
+import org.jesperdj.scalaray.common.Interval
 import org.jesperdj.scalaray.vecmath._
 
 // NOTE: In contrast to pbrt, shapes in ScalaRay do not have a shape-to-world transform. Transformations have been abstracted away to TransformedPrimitive.
@@ -54,7 +55,7 @@ trait Shape extends HasBoundingBox {
 
   // Probability density of the direction wi (from viewPoint to a point on the surface) being sampled with respect to the distribution
   // that sampleSurface(viewPoint: Point, u1: Double, u2: Double) uses to sample points (pbrt 14.6.3)
-  def pdf(viewPoint: Point, wi: Vector): Double = intersect(Ray(viewPoint, wi, 1e-6)) match { // TODO: rayEpsilon
+  def pdf(viewPoint: Point, wi: Vector): Double = intersect(Ray(viewPoint, wi, Interval(1e-6, Double.PositiveInfinity))) match { // TODO: rayEpsilon
     case Some((dg, _)) => val f = (dg.normal * -wi).abs; if (f > 0.0) viewPoint.distanceSquared(dg.point) / (f * surfaceArea) else 0.0
     case None => 0.0
   }

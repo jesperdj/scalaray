@@ -51,7 +51,7 @@ private sealed class Matrix (elems: IndexedSeq[Double]) {
     elems(2) * n.x + elems(6) * n.y + elems(10) * n.z)
 
   // Transform a ray (pbrt 2.8.4)
-  def *(r: Ray): Ray = new Ray(this * r.origin, this * r.direction, r.minDistance, r.maxDistance, r.depth)
+  def *(r: Ray): Ray = new Ray(this * r.origin, this * r.direction, r.range, r.depth)
 
   // Multiply with another matrix (pbrt A.6.2)
   def *(m: Matrix) = new Matrix(

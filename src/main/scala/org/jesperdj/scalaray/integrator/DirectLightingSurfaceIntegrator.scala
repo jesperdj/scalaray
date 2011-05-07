@@ -17,7 +17,7 @@
  */
 package org.jesperdj.scalaray.integrator
 
-import org.jesperdj.scalaray.common.{ Accumulator, RandomNumberGenerator, ThreadSafeMersenneTwister }
+import org.jesperdj.scalaray.common.{ Interval, Accumulator, RandomNumberGenerator, ThreadSafeMersenneTwister }
 import org.jesperdj.scalaray.lightsource.{ AreaLightSource, LightSample, LightSampleConverter, LightSource }
 import org.jesperdj.scalaray.reflection.{ BSDF, BSDFSample, BSDFSampleConverter, BxDFType }
 import org.jesperdj.scalaray.sampler.{ Sample, SamplePatternSpec }
@@ -103,7 +103,7 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
       // Evaluate BSDF for the direction selected by the light source
       val reflectance = bsdf(wo, wi, notSpecularMask)
 
-      val shadowRay = Ray(ray.origin, ray.direction, ray.minDistance, ray.maxDistance - 1e-6, ray.depth) // TODO: rayEpsilon
+      val shadowRay = Ray(ray.origin, ray.direction, Interval(ray.range.min, ray.range.max - 1e-6), ray.depth) // TODO: rayEpsilon
 
       if (!reflectance.isBlack && !integrator.scene.checkIntersect(shadowRay)) {
         // TODO: take transmittance along ray into account
@@ -122,7 +122,7 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
         val lightPdf = lightSource.pdf(point, wi)
         if (lightPdf > 0.0) {
           // Evaluate radiance of light source at the point from the direction selected by the BSDF
-          val ray = Ray(point, wi, 1e-6) // TODO: rayEpsilon
+          val ray = Ray(point, wi, Interval(1e-6, Double.PositiveInfinity)) // TODO: rayEpsilon
           val radiance = integrator.scene.intersect(ray) match {
             case Some(Intersection(dg, prim, _)) if (prim.areaLightSource.isDefined && prim.areaLightSource.get == lightSource) =>
               // Ray intersects with this area light source and point isn't shadowed
@@ -171,7 +171,7 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
     val (reflectance, wi, _, pdf) = bsdf.sample(wo, new BSDFSample(rng), BxDFType.Reflection | BxDFType.Specular)
 
     if (pdf > 0.0 && !reflectance.isBlack && (wi * normal).abs != 0.0) {
-      val radiance = integrator.radiance(new Ray(point, wi, 1e-6, Double.PositiveInfinity, ray.depth + 1), sample) // TODO: rayEpsilon
+      val radiance = integrator.radiance(new Ray(point, wi, Interval(1e-6, Double.PositiveInfinity), ray.depth + 1), sample) // TODO: rayEpsilon
       radiance * reflectance * ((wi * normal).abs / pdf)
     }
     else
@@ -189,7 +189,7 @@ final class DirectLightingSurfaceIntegrator (samplePatternSpecs: Accumulator[Sam
     val (reflectance, wi, _, pdf) = bsdf.sample(wo, new BSDFSample(rng), BxDFType.Transmission | BxDFType.Specular)
 
     if (pdf > 0.0 && !reflectance.isBlack && (wi * normal).abs != 0.0) {
-      val radiance = integrator.radiance(new Ray(point, wi, 1e-6, Double.PositiveInfinity, ray.depth + 1), sample) // TODO: rayEpsilon
+      val radiance = integrator.radiance(new Ray(point, wi, Interval(1e-6, Double.PositiveInfinity), ray.depth + 1), sample) // TODO: rayEpsilon
       radiance * reflectance * ((wi * normal).abs / pdf)
     }
     else

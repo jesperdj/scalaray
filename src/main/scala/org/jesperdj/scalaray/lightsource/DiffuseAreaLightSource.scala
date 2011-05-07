@@ -17,10 +17,10 @@
  */
 package org.jesperdj.scalaray.lightsource
 
+import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.shape.Shape
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
 
 // Diffuse area light source (pbrt 12.4)
@@ -35,7 +35,7 @@ final class DiffuseAreaLightSource (shape: Shape, lightToWorld: Transform, emitt
   def sample(point: Point, sample: LightSample): (Spectrum, Vector, Ray, Double) = {
     // Sample a point on the light source with respect to the given point
     val (sp, sn, pdf) = shape.sampleSurface(worldToLight * point, sample.u1, sample.u2)
-    if (pdf == 0.0) return (Spectrum.Black, Vector.Zero, Ray(Point.Origin, Vector.Zero, 0.0, 0.0), 0.0)
+    if (pdf == 0.0) return (Spectrum.Black, Vector.Zero, Ray(Point.Origin, Vector.Zero, Interval(0.0, 0.0)), 0.0)
 
     // Transform point and normal to world coordinates
     val p = lightToWorld * sp
@@ -45,7 +45,7 @@ final class DiffuseAreaLightSource (shape: Shape, lightToWorld: Transform, emitt
     val rd = point - p
 
     // Return the radiance only if the light shines from the right side of the surface of the light source
-    (emittedRadiance(p, n, rd), -rd.normalize, new Ray(p, rd.normalize, 1e-6, rd.length), pdf) // TODO: rayEpsilon
+    (emittedRadiance(p, n, rd), -rd.normalize, new Ray(p, rd.normalize, Interval(1e-6, rd.length)), pdf) // TODO: rayEpsilon
   }
 
   // Probability density of the direction wi being sampled with respect to the distribution that sample uses (pbrt 14.6.1)

@@ -66,7 +66,13 @@ object Main {
     val sampler: Sampler = new StratifiedSampler(rect, 16384, 2, 2, true, samplePatternSpecs.build())
     val filter: Filter = new BoxFilter
 
-    val camera: Camera = new PerspectiveCamera(Transform.translate(0.0, 0.75, 0.0), π / 4.0, rect.width, rect.height)
+//    val dir = Vector(1.0, -2.0, -3.0)
+//    val look = scene.boundingBox.centroid
+//    val pos = look - 3.0 * dir
+//    val camTr = Transform.lookAt(pos, look, Vector.YAxis).inverse
+    val camTr = Transform.translate(0.0, 0.75, 0.0)
+
+    val camera: Camera = new PerspectiveCamera(camTr, π / 4.0, rect.width, rect.height)
 
     val renderer: Renderer = new SamplerRenderer(sampler, filter, camera, integrator)
 

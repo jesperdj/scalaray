@@ -17,9 +17,9 @@
  */
 package org.jesperdj.scalaray.lightsource
 
+import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.scene.Scene
 import org.jesperdj.scalaray.spectrum.Spectrum
-import org.jesperdj.scalaray.common._
 import org.jesperdj.scalaray.vecmath._
 
 // Point light source (pbrt 12.2)
@@ -31,7 +31,7 @@ final class PointLightSource (position: Point, intensity: Spectrum) extends Delt
   // Returns the radiance and a ray from the light source to the given point
   def radiance(point: Point): (Spectrum, Ray) = {
     val rd = point - position
-    (intensity / rd.lengthSquared, Ray(position, rd.normalize, 0.0, rd.length))
+    (intensity / rd.lengthSquared, Ray(position, rd.normalize, Interval(0.0, rd.length)))
   }
 
   // Total emitted power of this light source onto the scene

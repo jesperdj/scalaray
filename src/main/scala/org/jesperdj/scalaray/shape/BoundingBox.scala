@@ -19,6 +19,7 @@ package org.jesperdj.scalaray.shape
 
 import scala.collection.immutable.Traversable
 
+import org.jesperdj.scalaray.common.Interval
 import org.jesperdj.scalaray.vecmath._
 
 // Axis-aligned bounding box (pbrt 2.6)
@@ -69,9 +70,9 @@ sealed class BoundingBox (points: Traversable[Point]) {
     (max.z >= bb.min.z) && (min.z <= bb.max.z)
 
   // Compute intersection between a ray and this bounding box; returns an Option with the range of the ray that's inside the box (pbrt 4.2.1)
-  def intersect(ray: Ray): Option[(Double, Double)] = {
-    var minT = ray.minDistance
-    var maxT = ray.maxDistance
+  def intersect(ray: Ray): Option[Interval] = {
+    var minT = ray.range.min
+    var maxT = ray.range.max
 
     var t0 = (min.x - ray.origin.x) / ray.direction.x
     var t1 = (max.x - ray.origin.x) / ray.direction.x
@@ -97,7 +98,7 @@ sealed class BoundingBox (points: Traversable[Point]) {
     maxT = math.min(maxT, t1)
     if (minT > maxT) return None
 
-    Some((minT, maxT))
+    Some(Interval(minT, maxT))
   }
 
   // Surface area
@@ -121,7 +122,7 @@ object BoundingBox {
     override def union(bb: BoundingBox) = bb
     override def inside(p: Point) = false
     override def overlaps(bb: BoundingBox) = false
-    override def intersect(ray: Ray): Option[(Double, Double)] = None
+    override def intersect(ray: Ray): Option[Interval] = None
     override val surfaceArea = 0.0
     override val volume = 0.0
 

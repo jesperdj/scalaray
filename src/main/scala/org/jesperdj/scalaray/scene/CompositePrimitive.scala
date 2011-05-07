@@ -19,6 +19,7 @@ package org.jesperdj.scalaray.scene
 
 import scala.collection.immutable.Traversable
 
+import org.jesperdj.scalaray.common.Interval
 import org.jesperdj.scalaray.shape.BoundingBox
 import org.jesperdj.scalaray.vecmath._
 
@@ -42,15 +43,14 @@ final class CompositePrimitive (primitives: Traversable[Primitive]) extends Prim
     if (range.isEmpty) return None
 
     // Initialize the range of the ray with the range inside the bounding box
-    val (minDistance, maxDistance) = range.get
-    var r = Ray(ray.origin, ray.direction, minDistance, maxDistance, ray.depth)
+    var r = Ray(ray.origin, ray.direction, range.get, ray.depth)
 
     // Find the closest intersection between the ray and one of the primitives
     primitives.foldLeft(None: Option[(Intersection, Double)]) { (result: Option[(Intersection, Double)], prim: Primitive) =>
       prim.intersect(r) match {
         case Some((its, distance)) =>
           // Found a closer intersection; update max distance of the ray for subsequent intersection tests
-          r = Ray(r.origin, r.direction, r.minDistance, distance, r.depth)
+          r = Ray(r.origin, r.direction, Interval(r.range.min, distance), r.depth)
           Some(its, distance)
 
         case None => result
