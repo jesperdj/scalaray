@@ -1,3 +1,5 @@
+package org.jesperdj.scalaray.accelerator
+
 /*
  * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
  * Copyright (C) 2009, 2010, 2011  Jesper de Jong
@@ -15,29 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray.scene
-
 import scala.collection.immutable.Traversable
 
+import org.jesperdj.scalaray.scene.{ Intersection, Primitive }
 import org.jesperdj.scalaray.shape.BoundingBox
 import org.jesperdj.scalaray.vecmath._
 
-// Grid accelerator (pbrt 4.3)
-final class GridAccelerator (primitives: Traversable[Primitive]) extends Primitive with Accelerator {
+// kd-tree accelerator (pbrt 4.5)
+final class KdTreeAccelerator (primitives: Traversable[Primitive]) extends Primitive with Accelerator {
   // Bounding box that contains the primitive
-  val boundingBox: BoundingBox = BoundingBox.Empty // TODO: Implement GridAccelerator.boundingBox
+  val boundingBox: BoundingBox = BoundingBox.Empty // TODO: Implement KdTreeAccelerator.boundingBox
 
   // Bounding box when primitive is transformed
   override def boundingBox(transform: Transform): BoundingBox =
-    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement GridAccelerator.boundingBox
-
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement KdTreeAccelerator.boundingBox
+  
   // Compute closest intersection between a ray and this primitive, returns intersection and and distance of intersection along ray
   def intersect(ray: Ray): Option[(Intersection, Double)] =
-    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement GridAccelerator.intersect
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement KdTreeAccelerator.intersect
 
   // Check if a ray intersects this primitive
   override def checkIntersect(ray: Ray): Boolean =
-    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement GridAccelerator.checkIntersect
+    throw new UnsupportedOperationException("Not yet implemented") // TODO: Implement KdTreeAccelerator.checkIntersect
 
-  override def toString = "GridAccelerator"
+  override def toString = "KdTreeAccelerator"
 }

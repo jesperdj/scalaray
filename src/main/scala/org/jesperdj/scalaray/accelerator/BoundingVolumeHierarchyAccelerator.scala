@@ -1,3 +1,5 @@
+package org.jesperdj.scalaray.accelerator
+
 /*
  * ScalaRay - Ray tracer based on pbrt (see http://pbrt.org) written in Scala
  * Copyright (C) 2009, 2010, 2011  Jesper de Jong
@@ -15,10 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jesperdj.scalaray.scene
-
 import scala.collection.immutable.IndexedSeq
 
+import org.jesperdj.scalaray.scene.{ CompositePrimitive, Intersection, Primitive }
 import org.jesperdj.scalaray.shape._
 import org.jesperdj.scalaray.vecmath._
 

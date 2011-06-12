@@ -17,6 +17,7 @@
  */
 package org.jesperdj.scalaray
 
+import accelerator._
 import common._
 import lightsource._
 import material._
