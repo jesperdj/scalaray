@@ -1,6 +1,6 @@
 # ScalaRay
 
-This is ScalaRay, a [ray tracer](http://en.wikipedia.org/wiki/Ray_tracing_%28graphics%29) written in [Scala](http://www.scala-lang.org/) 2.8. It is based on [pbrt](http://pbrt.org/), the ray tracer described in the book *Physically Based Rendering - From Theory to Implementation* by Matt Pharr and Greg Humphreys, publisher: Morgan Kaufmann, ISBN: 0-12-553180-X; second edition ISBN: 978-0-12-375079-2
+This is ScalaRay, a [ray tracer](http://en.wikipedia.org/wiki/Ray_tracing_%28graphics%29) written in [Scala](http://www.scala-lang.org/). It is based on [pbrt](http://pbrt.org/), the ray tracer described in the book *Physically Based Rendering - From Theory to Implementation* by Matt Pharr and Greg Humphreys, publisher: Morgan Kaufmann, ISBN: 0-12-553180-X; second edition ISBN: 978-0-12-375079-2
 
 Note: The second edition of this book came out in July 2010. I initially based ScalaRay on the first edition, but I now also have the second edition and parts of ScalaRay are based on pbrt version 2.
 
@@ -16,8 +16,8 @@ I've been interested in 3D computer graphics for a long time. I wrote my first r
 
 To compile and run ScalaRay, you need:
 
-- [JDK for Java 6](http://java.sun.com/javase/)
-- [Scala 2.8](http://www.scala-lang.org/)
+- [JDK for Java 8](http://oracle.com/javase/)
+- [Scala 2.11](http://www.scala-lang.org/)
 - [Apache Maven](http://maven.apache.org/)
 
 After installing the JDK and Maven and adding their `bin` directories to your `PATH`, you can compile it with: `mvn package`
