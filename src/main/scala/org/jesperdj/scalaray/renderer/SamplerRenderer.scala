@@ -25,7 +25,7 @@ import org.jesperdj.scalaray.sampler.{ SampleBatch, Sampler }
 // Sampler renderer (pbrt 1.3.3)
 final class SamplerRenderer (sampler: Sampler, filter: Filter, camera: Camera, integrator: Integrator) extends Renderer {
   def render(): PixelBuffer = {
-    import scala.actors.Actor._
+    import scala.actors.Actor._   // TODO: See https://docs.scala-lang.org/overviews/core/actors-migration-guide.html
     import java.util.concurrent.{ CountDownLatch, TimeUnit }
 
     val pixelBuffer = new PixelBuffer(sampler.rectangle, filter)
